@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+dist-ssr
+
+# Environment
+.env
+.env.local
+*.local
+
+# OS
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Editor
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
