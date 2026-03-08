@@ -161,6 +161,7 @@ CREATE TABLE public.invitations (
 
 CREATE INDEX idx_invitations_token ON public.invitations(token);
 CREATE INDEX idx_invitations_org_id ON public.invitations(org_id);
+CREATE INDEX idx_invitations_invited_by ON public.invitations(invited_by);
 
 -- ============================================
 -- RLS HELPER FUNCTIONS
@@ -269,6 +270,10 @@ CREATE POLICY "incubators_update" ON public.incubators FOR UPDATE
     TO authenticated
     USING (org_id = (select public.get_user_org_id()) AND (select public.is_owner()));
 
+CREATE POLICY "incubators_delete" ON public.incubators FOR DELETE
+    TO authenticated
+    USING (org_id = (select public.get_user_org_id()) AND (select public.is_owner()));
+
 -- food_types
 ALTER TABLE public.food_types ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.food_types FORCE ROW LEVEL SECURITY;
@@ -282,6 +287,10 @@ CREATE POLICY "food_types_insert" ON public.food_types FOR INSERT
     WITH CHECK (org_id = (select public.get_user_org_id()) AND (select public.is_owner()));
 
 CREATE POLICY "food_types_update" ON public.food_types FOR UPDATE
+    TO authenticated
+    USING (org_id = (select public.get_user_org_id()) AND (select public.is_owner()));
+
+CREATE POLICY "food_types_delete" ON public.food_types FOR DELETE
     TO authenticated
     USING (org_id = (select public.get_user_org_id()) AND (select public.is_owner()));
 
