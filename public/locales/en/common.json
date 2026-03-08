@@ -1,0 +1,37 @@
+{
+  "app": {
+    "name": "CrocoTrack",
+    "description": "Crocodile Farm Management Platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "farms": "Farms",
+    "settings": "Settings"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "next": "Next",
+    "back": "Back",
+    "confirm": "Confirm"
+  },
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "syncing": "Syncing",
+    "synced": "Synced",
+    "pending": "Pending"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "network": "Connection error. Check your internet connection",
+    "required": "This field is required"
+  },
+  "validation": {
+    "required": "This field is required",
+    "min_length": "Must be at least {{min}} characters",
+    "max_length": "Must be at most {{max}} characters"
+  }
+}

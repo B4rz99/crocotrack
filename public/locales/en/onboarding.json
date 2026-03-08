@@ -1,0 +1,51 @@
+{
+  "welcome": {
+    "title": "Welcome to CrocoTrack",
+    "subtitle": "Set up your farm in a few simple steps"
+  },
+  "steps": {
+    "org": "Organization",
+    "farm": "Farm",
+    "food_types": "Food Types",
+    "pools": "Pools",
+    "incubators": "Incubators",
+    "invite": "Invite Team"
+  },
+  "org": {
+    "name": "Organization name",
+    "country": "Country",
+    "currency": "Currency"
+  },
+  "farm": {
+    "name": "Farm name",
+    "location": "Location"
+  },
+  "pool": {
+    "name": "Pool name",
+    "type": "Pool type",
+    "capacity": "Capacity",
+    "type_crianza": "Rearing",
+    "type_reproductor": "Breeder"
+  },
+  "incubator": {
+    "name": "Incubator name",
+    "capacity": "Capacity"
+  },
+  "food_type": {
+    "name": "Food name",
+    "unit": "Unit of measurement",
+    "defaults": {
+      "pollo": "Chicken",
+      "pescado": "Fish",
+      "visceras": "Offal"
+    }
+  },
+  "invite": {
+    "email": "Guest email",
+    "skip": "Skip for now"
+  },
+  "complete": {
+    "title": "Setup Complete!",
+    "subtitle": "Your farm is ready to be managed"
+  }
+}
