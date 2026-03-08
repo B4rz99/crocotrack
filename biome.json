@@ -14,9 +14,17 @@
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
-    "rules": { "recommended": true }
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noLabelWithoutControl": "off"
+      }
+    }
   },
   "javascript": {
     "formatter": { "quoteStyle": "double", "semicolons": "always" }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true }
   }
 }
