@@ -1,14 +1,13 @@
 import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+import { LoginPage } from "@/features/auth/pages/LoginPage";
+import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { ROUTES } from "@/shared/constants/routes";
 import { AppLayout } from "./layouts/AppLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { OnboardingLayout } from "./layouts/OnboardingLayout";
 
 /* ---------- Placeholder pages ---------- */
-
-const LoginPage = () => <div>Login</div>;
-const RegisterPage = () => <div>Register</div>;
 const InvitePage = () => <div>Invite</div>;
 const OnboardingPage = () => <div>Onboarding</div>;
 const DashboardPage = () => <div>Dashboard</div>;
