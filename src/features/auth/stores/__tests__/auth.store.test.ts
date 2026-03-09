@@ -60,9 +60,9 @@ describe("auth store", () => {
       expect(state.profile).toBeNull();
     });
 
-    it("has isLoading as true", () => {
+    it("has isLoading as false after clear", () => {
       const state = useAuthStore.getState();
-      expect(state.isLoading).toBe(true);
+      expect(state.isLoading).toBe(false);
     });
   });
 
@@ -136,7 +136,7 @@ describe("auth store", () => {
       expect(state.isAuthenticated).toBe(false);
       expect(state.user).toBeNull();
       expect(state.profile).toBeNull();
-      expect(state.isLoading).toBe(true);
+      expect(state.isLoading).toBe(false);
     });
   });
 

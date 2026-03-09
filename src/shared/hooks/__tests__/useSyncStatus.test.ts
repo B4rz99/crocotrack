@@ -1,87 +1,49 @@
 import { act, renderHook } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-vi.mock("../../lib/sync", () => ({
-  getPendingCount: vi.fn().mockResolvedValue(0),
-}));
-
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { db } from "../../lib/db";
 import { useSyncStatus } from "../useSyncStatus";
 
-async function getMockGetPendingCount() {
-  const mod = await import("../../lib/sync");
-  return mod.getPendingCount as ReturnType<typeof vi.fn>;
-}
-
-const flushPromises = () => act(async () => {});
-
 describe("useSyncStatus", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+  beforeEach(async () => {
+    await db.delete();
+    await db.open();
   });
 
   afterEach(async () => {
-    vi.useRealTimers();
-    const mock = await getMockGetPendingCount();
-    mock.mockReset();
-    mock.mockResolvedValue(0);
+    await db.delete();
   });
 
-  it("returns pendingCount as 0 initially after loading", async () => {
+  it("returns pendingCount as 0 when outbox is empty", async () => {
     const { result } = renderHook(() => useSyncStatus());
 
-    await flushPromises();
+    await act(async () => {});
 
     expect(result.current.pendingCount).toBe(0);
+    expect(result.current.hasPending).toBe(false);
   });
 
-  it("returns isSyncing as false when pendingCount is 0", async () => {
+  it("reflects outbox count reactively", async () => {
     const { result } = renderHook(() => useSyncStatus());
-
-    await flushPromises();
-
-    expect(result.current.isSyncing).toBe(false);
-  });
-
-  it("returns isSyncing as true when pendingCount > 0", async () => {
-    const mock = await getMockGetPendingCount();
-    mock.mockResolvedValue(3);
-
-    const { result } = renderHook(() => useSyncStatus());
-
-    await flushPromises();
-
-    expect(result.current.pendingCount).toBe(3);
-    expect(result.current.isSyncing).toBe(true);
-  });
-
-  it("polls for pending count on interval", async () => {
-    const mock = await getMockGetPendingCount();
-    mock.mockResolvedValue(0);
-
-    const { result } = renderHook(() => useSyncStatus());
-
-    await flushPromises();
-
-    expect(result.current.pendingCount).toBe(0);
-
-    mock.mockResolvedValue(5);
 
     await act(async () => {
-      vi.advanceTimersByTime(30_000);
+      await db.sync_outbox.add({
+        table_name: "farms",
+        record_id: "farm-1",
+        operation: "INSERT",
+        payload: { name: "Test" },
+        created_at: new Date().toISOString(),
+        retry_count: 0,
+      });
     });
 
-    expect(result.current.pendingCount).toBe(5);
-    expect(result.current.isSyncing).toBe(true);
-  });
+    expect(result.current.pendingCount).toBe(1);
+    expect(result.current.hasPending).toBe(true);
 
-  it("cleans up interval on unmount", async () => {
-    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+    await act(async () => {
+      await db.sync_outbox.clear();
+    });
 
-    const { unmount } = renderHook(() => useSyncStatus());
-
-    unmount();
-
-    expect(clearIntervalSpy).toHaveBeenCalled();
-    clearIntervalSpy.mockRestore();
+    expect(result.current.pendingCount).toBe(0);
+    expect(result.current.hasPending).toBe(false);
   });
 });

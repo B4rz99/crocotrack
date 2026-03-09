@@ -7,6 +7,9 @@ vi.mock("../supabase", () => {
     supabase: {
       from: mockFrom,
     },
+    untypedSupabase: {
+      from: mockFrom,
+    },
     __mockFrom: mockFrom,
   };
 });
@@ -291,6 +294,25 @@ describe("Sync Engine", () => {
       expect(remaining).toHaveLength(1);
       expect(remaining[0]?.record_id).toBe("farm-2");
       expect(remaining[0]?.retry_count).toBe(1);
+    });
+
+    it("removes entry from outbox when retry_count reaches MAX_RETRIES", async () => {
+      const mockFrom = await getSuppabaseMockFrom();
+
+      await db.sync_outbox.add({
+        table_name: "farms",
+        record_id: "farm-1",
+        operation: "INSERT" as const,
+        payload: { id: "farm-1", name: "Test Farm" },
+        created_at: new Date().toISOString(),
+        retry_count: 10,
+      });
+
+      await flushOutbox();
+
+      const remaining = await db.sync_outbox.toArray();
+      expect(remaining).toHaveLength(0);
+      expect(mockFrom).not.toHaveBeenCalled();
     });
 
     it("does nothing when outbox is empty", async () => {

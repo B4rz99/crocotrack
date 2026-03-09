@@ -34,6 +34,7 @@
   },
   "validation": {
     "required": "Este campo es obligatorio",
+    "invalid_email": "Correo electrónico inválido",
     "min_length": "Debe tener al menos {{min}} caracteres",
     "max_length": "Debe tener como máximo {{max}} caracteres"
   }

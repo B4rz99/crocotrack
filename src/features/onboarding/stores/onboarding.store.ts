@@ -22,8 +22,10 @@ interface OnboardingState {
   readonly inviteEmails: readonly string[];
   readonly setOrgData: (data: CreateOrgInput) => void;
   readonly setFarmData: (data: FarmData) => void;
+  readonly setPoolsData: (pools: readonly CreatePoolInput[]) => void;
   readonly addPool: (pool: CreatePoolInput) => void;
   readonly removePool: (index: number) => void;
+  readonly setFoodTypesData: (foodTypes: readonly CreateFoodTypeInput[]) => void;
   readonly addFoodType: (foodType: CreateFoodTypeInput) => void;
   readonly removeFoodType: (index: number) => void;
   readonly setIncubatorsData: (data: readonly CreateIncubatorInput[]) => void;
@@ -51,12 +53,16 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
 
   setFarmData: (data) => set({ farmData: data }),
 
+  setPoolsData: (pools) => set({ poolsData: pools }),
+
   addPool: (pool) => set((state) => ({ poolsData: [...state.poolsData, pool] })),
 
   removePool: (index) =>
     set((state) => ({
       poolsData: state.poolsData.filter((_, i) => i !== index),
     })),
+
+  setFoodTypesData: (foodTypes) => set({ foodTypesData: foodTypes }),
 
   addFoodType: (foodType) =>
     set((state) => ({ foodTypesData: [...state.foodTypesData, foodType] })),

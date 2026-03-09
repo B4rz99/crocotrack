@@ -1,8 +1,10 @@
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
+import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { type CreateFarmInput, createFarmSchema } from "@/shared/schemas/farm.schema";
 
 interface FarmSetupStepProps {
@@ -26,14 +28,7 @@ export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
       location: location || undefined,
     });
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const key = issue.path[0];
-        if (typeof key === "string") {
-          fieldErrors[key] = issue.message;
-        }
-      }
-      setErrors(fieldErrors);
+      setErrors(zodFieldErrors(result.error));
       return;
     }
 
@@ -51,11 +46,7 @@ export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
           onChange={(e) => setName(e.target.value)}
           aria-invalid={!!errors.name}
         />
-        {errors.name && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.name}
-          </p>
-        )}
+        <FieldError message={errors.name} />
       </div>
 
       <div className="space-y-2">

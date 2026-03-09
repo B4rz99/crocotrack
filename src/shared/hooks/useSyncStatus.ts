@@ -1,32 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
-import { APP_CONFIG } from "../constants/config";
-import { getPendingCount } from "../lib/sync";
+import { liveQuery } from "dexie";
+import { useEffect, useState } from "react";
+import { db } from "../lib/db";
 
 interface SyncStatus {
-  pendingCount: number;
-  isSyncing: boolean;
+  readonly pendingCount: number;
+  readonly hasPending: boolean;
 }
 
 export const useSyncStatus = (): SyncStatus => {
   const [pendingCount, setPendingCount] = useState(0);
 
-  const fetchCount = useCallback(async () => {
-    const count = await getPendingCount();
-    setPendingCount(count);
-  }, []);
-
   useEffect(() => {
-    fetchCount();
+    const subscription = liveQuery(() => db.sync_outbox.count()).subscribe({
+      next: (count) => setPendingCount(count),
+      error: (err) => console.error("[sync] liveQuery error:", err),
+    });
 
-    const intervalId = setInterval(fetchCount, APP_CONFIG.SYNC_INTERVAL_MS);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [fetchCount]);
+    return () => subscription.unsubscribe();
+  }, []);
 
   return {
     pendingCount,
-    isSyncing: pendingCount > 0,
+    hasPending: pendingCount > 0,
   };
 };

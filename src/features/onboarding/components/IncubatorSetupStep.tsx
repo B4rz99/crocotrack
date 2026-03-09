@@ -1,15 +1,10 @@
-import { Trash2 } from "lucide-react";
-import { type FormEvent, useRef, useState } from "react";
+import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
+import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
-
-interface KeyedIncubator {
-  readonly key: string;
-  readonly data: CreateIncubatorInput;
-}
 
 interface IncubatorSetupStepProps {
   readonly onNext: (data: readonly CreateIncubatorInput[]) => void;
@@ -20,36 +15,54 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
   const { t } = useTranslation("onboarding");
   const { t: tc } = useTranslation("common");
   const [enabled, setEnabled] = useState(false);
-  const [incubators, setIncubators] = useState<readonly KeyedIncubator[]>([]);
-  const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
   const [capacity, setCapacity] = useState("");
-  const keyCounter = useRef(0);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  function handleAdd(e: FormEvent) {
+  const incubatorCount = (() => {
+    const qty = Number(quantity) || 0;
+    const cap = Number(capacity) || 0;
+    return qty > 0 && cap > 0 ? qty : 0;
+  })();
+
+  function buildIncubators(): readonly CreateIncubatorInput[] {
+    const qty = Number(quantity) || 0;
+    const cap = Number(capacity) || 0;
+    return Array.from({ length: qty }, (_, i) => ({
+      name: String(i + 1),
+      capacity: cap,
+    }));
+  }
+
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!enabled) {
+      onNext([]);
+      return;
+    }
 
-    const newIncubator: CreateIncubatorInput = {
-      name: name.trim(),
-      ...(capacity ? { capacity: Number(capacity) } : {}),
-    };
+    setErrors({});
+    const newErrors: Record<string, string> = {};
+    const qty = Number(quantity);
+    const cap = Number(capacity);
 
-    keyCounter.current += 1;
-    setIncubators((prev) => [...prev, { key: `inc-${keyCounter.current}`, data: newIncubator }]);
-    setName("");
-    setCapacity("");
-  }
+    if (!qty || qty <= 0) {
+      newErrors.quantity = t("incubator.error_quantity");
+    }
+    if (!cap || cap <= 0) {
+      newErrors.capacity = t("incubator.error_capacity");
+    }
 
-  function handleRemove(key: string) {
-    setIncubators((prev) => prev.filter((item) => item.key !== key));
-  }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-  function handleNext() {
-    onNext(enabled ? incubators.map((item) => item.data) : []);
+    onNext(buildIncubators());
   }
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="flex items-center gap-2">
         <input
           id="enable-incubators"
@@ -62,72 +75,51 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
       </div>
 
       {enabled && (
-        <>
-          {incubators.length > 0 && (
-            <ul className="space-y-2">
-              {incubators.map((item) => (
-                <li
-                  key={item.key}
-                  className="flex items-center justify-between rounded-lg border p-3"
-                >
-                  <div>
-                    <span>{item.data.name}</span>
-                    {item.data.capacity && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        ({item.data.capacity})
-                      </span>
-                    )}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => handleRemove(item.key)}
-                    aria-label={tc("actions.remove")}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <form onSubmit={handleAdd} className="space-y-3">
+        <div className="space-y-3 rounded-lg border p-4">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="incubator-name">{t("incubator.name")}</Label>
+              <Label htmlFor="incubator-qty">{t("incubator.quantity")}</Label>
               <Input
-                id="incubator-name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                id="incubator-qty"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                placeholder="5"
+                aria-invalid={!!errors.quantity}
               />
+              <FieldError message={errors.quantity} />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="incubator-capacity">{t("incubator.capacity")}</Label>
+              <Label htmlFor="incubator-cap">{t("incubator.capacity_per")}</Label>
               <Input
-                id="incubator-capacity"
+                id="incubator-cap"
                 type="number"
+                min="1"
                 value={capacity}
                 onChange={(e) => setCapacity(e.target.value)}
+                placeholder="500"
+                aria-invalid={!!errors.capacity}
               />
+              <FieldError message={errors.capacity} />
             </div>
+          </div>
 
-            <Button type="submit" variant="outline">
-              {tc("actions.add")}
-            </Button>
-          </form>
-        </>
+          {incubatorCount > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {t("incubator.summary", { count: incubatorCount })}
+            </p>
+          )}
+        </div>
       )}
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
           {tc("actions.back")}
         </Button>
-        <Button type="button" onClick={handleNext}>
-          {tc("actions.next")}
-        </Button>
+        <Button type="submit">{tc("actions.next")}</Button>
       </div>
-    </div>
+    </form>
   );
 }

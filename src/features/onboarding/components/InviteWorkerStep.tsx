@@ -1,7 +1,9 @@
 import { Trash2 } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
+import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 
@@ -22,12 +24,21 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
   const [newEmail, setNewEmail] = useState("");
   const keyCounter = useRef(0);
 
+  const [emailError, setEmailError] = useState("");
+
   function handleAdd(e: FormEvent) {
     e.preventDefault();
-    if (!newEmail.trim()) return;
+    setEmailError("");
+    const trimmed = newEmail.trim();
+    if (!trimmed) return;
+
+    if (!z.email().safeParse(trimmed).success) {
+      setEmailError(tc("validation.invalid_email"));
+      return;
+    }
 
     keyCounter.current += 1;
-    setEmails((prev) => [...prev, { key: `email-${keyCounter.current}`, email: newEmail.trim() }]);
+    setEmails((prev) => [...prev, { key: `email-${keyCounter.current}`, email: trimmed }]);
     setNewEmail("");
   }
 
@@ -66,7 +77,9 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
             type="email"
             value={newEmail}
             onChange={(e) => setNewEmail(e.target.value)}
+            aria-invalid={!!emailError}
           />
+          <FieldError message={emailError} />
         </div>
         <Button type="submit" variant="outline" className="self-end">
           {tc("actions.add")}

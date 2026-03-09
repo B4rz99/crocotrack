@@ -1,8 +1,18 @@
 import { type FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
+import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
+import { COUNTRIES, COUNTRY_CURRENCY_MAP, CURRENCIES } from "@/shared/constants/countries";
+import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { type CreateOrgInput, createOrgSchema } from "@/shared/schemas/org.schema";
 
 interface OrgSetupStepProps {
@@ -17,20 +27,22 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
   const [currency, setCurrency] = useState("COP");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  function handleCountryChange(value: string | null) {
+    if (!value) return;
+    setCountry(value);
+    const mapped = COUNTRY_CURRENCY_MAP[value];
+    if (mapped) {
+      setCurrency(mapped);
+    }
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErrors({});
 
     const result = createOrgSchema.safeParse({ name, country, currency });
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const key = issue.path[0];
-        if (typeof key === "string") {
-          fieldErrors[key] = issue.message;
-        }
-      }
-      setErrors(fieldErrors);
+      setErrors(zodFieldErrors(result.error));
       return;
     }
 
@@ -48,43 +60,41 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
           onChange={(e) => setName(e.target.value)}
           aria-invalid={!!errors.name}
         />
-        {errors.name && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.name}
-          </p>
-        )}
+        <FieldError message={errors.name} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="org-country">{t("org.country")}</Label>
-        <Input
-          id="org-country"
-          type="text"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          aria-invalid={!!errors.country}
-        />
-        {errors.country && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.country}
-          </p>
-        )}
+        <Label>{t("org.country")}</Label>
+        <Select value={country} onValueChange={handleCountryChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {COUNTRIES.map((c) => (
+              <SelectItem key={c.code} value={c.code}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FieldError message={errors.country} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="org-currency">{t("org.currency")}</Label>
-        <Input
-          id="org-currency"
-          type="text"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-          aria-invalid={!!errors.currency}
-        />
-        {errors.currency && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.currency}
-          </p>
-        )}
+        <Label>{t("org.currency")}</Label>
+        <Select value={currency} onValueChange={(v) => v && setCurrency(v)}>
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CURRENCIES.map((c) => (
+              <SelectItem key={c.code} value={c.code}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FieldError message={errors.currency} />
       </div>
 
       <div className="flex justify-end">

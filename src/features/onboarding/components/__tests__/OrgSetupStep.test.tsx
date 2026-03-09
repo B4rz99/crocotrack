@@ -44,12 +44,12 @@ describe("OrgSetupStep", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders name, country, and currency fields", () => {
+  it("renders name field and country/currency select labels", () => {
     renderStep();
 
     expect(screen.getByLabelText("Organization name")).toBeInTheDocument();
-    expect(screen.getByLabelText("Country")).toBeInTheDocument();
-    expect(screen.getByLabelText("Currency")).toBeInTheDocument();
+    expect(screen.getByText("Country")).toBeInTheDocument();
+    expect(screen.getByText("Currency")).toBeInTheDocument();
   });
 
   it("shows validation error when name is empty", async () => {
@@ -63,14 +63,10 @@ describe("OrgSetupStep", () => {
     expect(onNext).not.toHaveBeenCalled();
   });
 
-  it("calls onNext with valid data", async () => {
+  it("calls onNext with valid data using default country/currency", async () => {
     const { user, onNext } = renderStep();
 
     await user.type(screen.getByLabelText("Organization name"), "My Org");
-    await user.clear(screen.getByLabelText("Country"));
-    await user.type(screen.getByLabelText("Country"), "CO");
-    await user.clear(screen.getByLabelText("Currency"));
-    await user.type(screen.getByLabelText("Currency"), "COP");
     await user.click(screen.getByRole("button", { name: "Next" }));
 
     await waitFor(() => {

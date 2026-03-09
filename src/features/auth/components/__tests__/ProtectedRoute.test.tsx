@@ -33,7 +33,6 @@ describe("ProtectedRoute", () => {
   });
 
   it("renders a loading state when auth is loading", () => {
-    // isLoading defaults to true in the store
     useAuthStore.setState({ isLoading: true, isAuthenticated: false });
 
     renderWithRouter(
@@ -64,10 +63,32 @@ describe("ProtectedRoute", () => {
     expect(screen.getByText("Login Page")).toBeInTheDocument();
   });
 
-  it("renders children when authenticated", () => {
+  it("redirects to onboarding when onboarding not completed", () => {
     useAuthStore.setState({
       isLoading: false,
       isAuthenticated: true,
+      onboardingCompleted: false,
+      profile: createMockProfile(),
+    });
+
+    renderWithRouter(
+      <Routes>
+        <Route element={<ProtectedRoute />}>
+          <Route index path="protected" element={<div>Protected Content</div>} />
+        </Route>
+        <Route path={ROUTES.ONBOARDING} element={<div>Onboarding</div>} />
+      </Routes>,
+    );
+
+    expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
+    expect(screen.getByText("Onboarding")).toBeInTheDocument();
+  });
+
+  it("renders children when authenticated and onboarding completed", () => {
+    useAuthStore.setState({
+      isLoading: false,
+      isAuthenticated: true,
+      onboardingCompleted: true,
       profile: createMockProfile(),
     });
 
@@ -86,6 +107,7 @@ describe("ProtectedRoute", () => {
     useAuthStore.setState({
       isLoading: false,
       isAuthenticated: true,
+      onboardingCompleted: true,
       profile: createMockProfile({ role: "worker" }),
     });
 
@@ -106,6 +128,7 @@ describe("ProtectedRoute", () => {
     useAuthStore.setState({
       isLoading: false,
       isAuthenticated: true,
+      onboardingCompleted: true,
       profile: createMockProfile({ role: "owner" }),
     });
 
@@ -124,6 +147,7 @@ describe("ProtectedRoute", () => {
     useAuthStore.setState({
       isLoading: false,
       isAuthenticated: true,
+      onboardingCompleted: true,
       profile: createMockProfile({ role: "worker" }),
     });
 
