@@ -29,7 +29,8 @@
   },
   "incubator": {
     "name": "Nombre de la incubadora",
-    "capacity": "Capacidad"
+    "capacity": "Capacidad",
+    "enable": "Habilitar configuración de incubadoras"
   },
   "food_type": {
     "name": "Nombre del alimento",

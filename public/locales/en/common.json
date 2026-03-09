@@ -15,7 +15,10 @@
     "edit": "Edit",
     "next": "Next",
     "back": "Back",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "add": "Add",
+    "remove": "Remove",
+    "complete": "Complete"
   },
   "status": {
     "online": "Online",

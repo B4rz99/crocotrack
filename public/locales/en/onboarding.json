@@ -29,7 +29,8 @@
   },
   "incubator": {
     "name": "Incubator name",
-    "capacity": "Capacity"
+    "capacity": "Capacity",
+    "enable": "Enable incubator setup"
   },
   "food_type": {
     "name": "Food name",

@@ -15,7 +15,10 @@
     "edit": "Editar",
     "next": "Siguiente",
     "back": "Atrás",
-    "confirm": "Confirmar"
+    "confirm": "Confirmar",
+    "add": "Agregar",
+    "remove": "Eliminar",
+    "complete": "Completar"
   },
   "status": {
     "online": "En línea",
