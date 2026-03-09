@@ -1,14 +1,13 @@
 -- ============================================
 -- Extensions
 -- ============================================
-CREATE EXTENSION IF NOT EXISTS "pg_uuidv7";
 CREATE EXTENSION IF NOT EXISTS "moddatetime";
 
 -- ============================================
 -- ORGANIZATIONS (Tenants)
 -- ============================================
 CREATE TABLE public.organizations (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name            TEXT NOT NULL,
     slug            TEXT NOT NULL UNIQUE,
     country         TEXT NOT NULL DEFAULT 'CO',
@@ -48,7 +47,7 @@ CREATE TRIGGER profiles_updated_at
 -- FARMS
 -- ============================================
 CREATE TABLE public.farms (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
     name            TEXT NOT NULL,
     location        TEXT,
@@ -66,7 +65,7 @@ CREATE TRIGGER farms_updated_at
 -- USER_FARM_ASSIGNMENTS
 -- ============================================
 CREATE TABLE public.user_farm_assignments (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     farm_id         UUID NOT NULL REFERENCES public.farms(id) ON DELETE CASCADE,
     assigned_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -82,7 +81,7 @@ CREATE INDEX idx_user_farm_farm ON public.user_farm_assignments(farm_id);
 CREATE TYPE public.pool_type AS ENUM ('crianza', 'reproductor');
 
 CREATE TABLE public.pools (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
     farm_id         UUID NOT NULL REFERENCES public.farms(id) ON DELETE CASCADE,
     name            TEXT NOT NULL,
@@ -104,7 +103,7 @@ CREATE TRIGGER pools_updated_at
 -- INCUBATORS
 -- ============================================
 CREATE TABLE public.incubators (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
     farm_id         UUID NOT NULL REFERENCES public.farms(id) ON DELETE CASCADE,
     name            TEXT NOT NULL,
@@ -128,7 +127,7 @@ CREATE TRIGGER incubators_updated_at
 -- FOOD TYPES
 -- ============================================
 CREATE TABLE public.food_types (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
     name            TEXT NOT NULL,
     unit            TEXT NOT NULL DEFAULT 'kg',
@@ -147,7 +146,7 @@ CREATE TRIGGER food_types_updated_at
 -- INVITATIONS
 -- ============================================
 CREATE TABLE public.invitations (
-    id              UUID PRIMARY KEY DEFAULT uuid_generate_v7(),
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     org_id          UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
     email           TEXT NOT NULL,
     role            TEXT NOT NULL DEFAULT 'worker',
