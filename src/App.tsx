@@ -1,7 +1,6 @@
+import { RouterProvider } from "react-router";
+import { router } from "./app/router";
+
 export default function App() {
-  return (
-    <div>
-      <h1>CrocoTrack</h1>
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
