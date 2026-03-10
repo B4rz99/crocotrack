@@ -246,7 +246,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
 
       {totalCount > 0 && (
         <p className="text-center text-sm text-muted-foreground">
-          {`Se crearán ${totalCount} estanques en total`}
+          {`Se ${totalCount === 1 ? "creará" : "crearán"} ${totalCount} ${totalCount === 1 ? "estanque" : "estanques"} en total`}
         </p>
       )}
 

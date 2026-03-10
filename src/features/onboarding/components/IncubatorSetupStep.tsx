@@ -105,7 +105,7 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
 
           {incubatorCount > 0 && (
             <p className="text-sm text-muted-foreground">
-              {`Se crearán ${incubatorCount} incubadoras`}
+              {`Se ${incubatorCount === 1 ? "creará" : "crearán"} ${incubatorCount} ${incubatorCount === 1 ? "incubadora" : "incubadoras"}`}
             </p>
           )}
         </div>
