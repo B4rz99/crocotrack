@@ -1,10 +1,15 @@
 import { Trash2 } from "lucide-react";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
+
+interface KeyedFoodType {
+  readonly key: number;
+  readonly data: CreateFoodTypeInput;
+}
 
 const DEFAULT_FOOD_TYPES: readonly CreateFoodTypeInput[] = [
   { name: "Pollo", unit: "kg" },
@@ -20,38 +25,44 @@ interface FoodTypeSetupStepProps {
 export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
   const { t } = useTranslation("onboarding");
   const { t: tc } = useTranslation("common");
-  const [foodTypes, setFoodTypes] = useState<readonly CreateFoodTypeInput[]>([
-    ...DEFAULT_FOOD_TYPES,
-  ]);
+  const keyCounter = useRef(DEFAULT_FOOD_TYPES.length);
+
+  const [foodTypes, setFoodTypes] = useState<readonly KeyedFoodType[]>(
+    DEFAULT_FOOD_TYPES.map((ft, i) => ({ key: i, data: ft })),
+  );
   const [newName, setNewName] = useState("");
 
   function handleAdd(e: FormEvent) {
     e.preventDefault();
     if (!newName.trim()) return;
 
-    setFoodTypes((prev) => [...prev, { name: newName.trim(), unit: "kg" }]);
+    keyCounter.current += 1;
+    setFoodTypes((prev) => [
+      ...prev,
+      { key: keyCounter.current, data: { name: newName.trim(), unit: "kg" } },
+    ]);
     setNewName("");
   }
 
-  function handleRemove(index: number) {
-    setFoodTypes((prev) => prev.filter((_, i) => i !== index));
+  function handleRemove(key: number) {
+    setFoodTypes((prev) => prev.filter((item) => item.key !== key));
   }
 
   function handleNext() {
-    onNext(foodTypes);
+    onNext(foodTypes.map((item) => item.data));
   }
 
   return (
     <div className="space-y-4">
       <ul className="space-y-2">
-        {foodTypes.map((ft, index) => (
-          <li key={ft.name} className="flex items-center justify-between rounded-lg border p-3">
-            <span>{ft.name}</span>
+        {foodTypes.map((item) => (
+          <li key={item.key} className="flex items-center justify-between rounded-lg border p-3">
+            <span>{item.data.name}</span>
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
-              onClick={() => handleRemove(index)}
+              onClick={() => handleRemove(item.key)}
               aria-label={tc("actions.remove")}
             >
               <Trash2 className="size-4" />

@@ -11,8 +11,10 @@ interface AuthState {
   readonly isLoading: boolean;
   readonly isOwner: boolean;
   readonly isWorker: boolean;
+  readonly onboardingCompleted: boolean;
   readonly setSession: (session: Session | null) => void;
   readonly setProfile: (profile: Profile | null) => void;
+  readonly setOnboardingCompleted: (completed: boolean) => void;
   readonly setLoading: (isLoading: boolean) => void;
   readonly clear: () => void;
 }
@@ -24,6 +26,7 @@ const initialState = {
   isLoading: true,
   isOwner: false,
   isWorker: false,
+  onboardingCompleted: false,
 } as const;
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -43,7 +46,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       isWorker: profile?.role === "worker",
     }),
 
+  setOnboardingCompleted: (completed) => set({ onboardingCompleted: completed }),
+
   setLoading: (isLoading) => set({ isLoading }),
 
-  clear: () => set({ ...initialState }),
+  clear: () => set({ ...initialState, isLoading: false }),
 }));

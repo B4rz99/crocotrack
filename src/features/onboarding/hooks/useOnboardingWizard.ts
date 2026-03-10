@@ -24,16 +24,14 @@ export function useOnboardingWizard() {
     currentStep,
     setOrgData,
     setFarmData,
-    addPool,
-    addFoodType,
+    setPoolsData,
+    setFoodTypesData,
     setIncubatorsData,
     addInviteEmail,
     nextStep,
     prevStep,
     reset,
   } = useOnboardingStore();
-
-  const store = useOnboardingStore.getState;
 
   const handleOrgNext = useCallback(
     (data: CreateOrgInput) => {
@@ -53,31 +51,18 @@ export function useOnboardingWizard() {
 
   const handleFoodTypesNext = useCallback(
     (data: readonly CreateFoodTypeInput[]) => {
-      // Reset and re-add since user may have modified list
-      const current = store();
-      for (let i = current.foodTypesData.length - 1; i >= 0; i--) {
-        useOnboardingStore.getState().removeFoodType(i);
-      }
-      for (const ft of data) {
-        addFoodType(ft);
-      }
+      setFoodTypesData(data);
       nextStep();
     },
-    [addFoodType, nextStep],
+    [setFoodTypesData, nextStep],
   );
 
   const handlePoolsNext = useCallback(
     (data: readonly CreatePoolInput[]) => {
-      const current = store();
-      for (let i = current.poolsData.length - 1; i >= 0; i--) {
-        useOnboardingStore.getState().removePool(i);
-      }
-      for (const pool of data) {
-        addPool(pool);
-      }
+      setPoolsData(data);
       nextStep();
     },
-    [addPool, nextStep],
+    [setPoolsData, nextStep],
   );
 
   const handleIncubatorsNext = useCallback(

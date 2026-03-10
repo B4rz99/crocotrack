@@ -25,12 +25,29 @@
     "type": "Tipo de estanque",
     "capacity": "Capacidad",
     "type_crianza": "Crianza",
-    "type_reproductor": "Reproductor"
+    "type_reproductor": "Reproductor",
+    "batch_description": "Genera tus estanques en lote. Define cuántos necesitas, el patrón de numeración y la capacidad por tipo.",
+    "group_label": "Grupo {{n}}",
+    "quantity": "Cantidad",
+    "prefix": "Prefijo",
+    "prefix_placeholder": "ej: A, R, P",
+    "start_number": "Número inicial",
+    "capacity_per_pool": "Capacidad por estanque",
+    "preview": "Vista previa:",
+    "and_more": "y {{count}} más",
+    "total_summary": "Se crearán {{count}} estanques en total",
+    "add_group": "+ Agregar otro grupo",
+    "error_quantity": "Ingresa la cantidad de estanques",
+    "error_capacity": "Ingresa la capacidad por estanque"
   },
   "incubator": {
-    "name": "Nombre de la incubadora",
     "capacity": "Capacidad",
-    "enable": "Habilitar configuración de incubadoras"
+    "enable": "Habilitar configuración de incubadoras",
+    "quantity": "Cantidad de incubadoras",
+    "capacity_per": "Capacidad por incubadora",
+    "summary": "Se crearán {{count}} incubadoras",
+    "error_quantity": "Ingresa la cantidad de incubadoras",
+    "error_capacity": "Ingresa la capacidad por incubadora"
   },
   "food_type": {
     "name": "Nombre del alimento",

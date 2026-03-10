@@ -1,20 +1,23 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
+import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { ROUTES } from "@/shared/constants/routes";
+import { zodFieldErrors } from "@/shared/lib/form-utils";
 
-const registerSchema = z.object({
-  full_name: z.string().min(1, "Full name is required"),
-  email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  org_name: z.string().min(1, "Organization name is required"),
-});
+export type RegisterFormData = z.infer<ReturnType<typeof makeRegisterSchema>>;
 
-export type RegisterFormData = z.infer<typeof registerSchema>;
+const makeRegisterSchema = (t: (key: string, opts?: Record<string, unknown>) => string) =>
+  z.object({
+    full_name: z.string().min(1, t("validation.required")),
+    email: z.email(t("validation.invalid_email")),
+    password: z.string().min(6, t("validation.min_length", { min: 6 })),
+    org_name: z.string().min(1, t("validation.required")),
+  });
 
 interface RegisterFormProps {
   readonly onSubmit: (data: RegisterFormData) => void;
@@ -23,6 +26,8 @@ interface RegisterFormProps {
 
 export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps) {
   const { t } = useTranslation("auth");
+  const { t: tc } = useTranslation("common");
+  const schema = useMemo(() => makeRegisterSchema(tc), [tc]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +38,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
     e.preventDefault();
     setErrors({});
 
-    const result = registerSchema.safeParse({
+    const result = schema.safeParse({
       full_name: fullName,
       email,
       password,
@@ -41,14 +46,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
     });
 
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const key = issue.path[0];
-        if (typeof key === "string") {
-          fieldErrors[key] = issue.message;
-        }
-      }
-      setErrors(fieldErrors);
+      setErrors(zodFieldErrors(result.error));
       return;
     }
 
@@ -66,11 +64,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
           onChange={(e) => setFullName(e.target.value)}
           aria-invalid={!!errors.full_name}
         />
-        {errors.full_name && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.full_name}
-          </p>
-        )}
+        <FieldError message={errors.full_name} />
       </div>
 
       <div className="space-y-2">
@@ -82,11 +76,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
           onChange={(e) => setEmail(e.target.value)}
           aria-invalid={!!errors.email}
         />
-        {errors.email && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.email}
-          </p>
-        )}
+        <FieldError message={errors.email} />
       </div>
 
       <div className="space-y-2">
@@ -98,11 +88,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
           onChange={(e) => setPassword(e.target.value)}
           aria-invalid={!!errors.password}
         />
-        {errors.password && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.password}
-          </p>
-        )}
+        <FieldError message={errors.password} />
       </div>
 
       <div className="space-y-2">
@@ -114,11 +100,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
           onChange={(e) => setOrgName(e.target.value)}
           aria-invalid={!!errors.org_name}
         />
-        {errors.org_name && (
-          <p role="alert" className="text-sm text-destructive">
-            {errors.org_name}
-          </p>
-        )}
+        <FieldError message={errors.org_name} />
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

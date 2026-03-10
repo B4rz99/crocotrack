@@ -1,31 +1,41 @@
 import {
   LayoutDashboardIcon,
+  LogOutIcon,
   SettingsIcon,
   WarehouseIcon,
   WifiIcon,
   WifiOffIcon,
 } from "lucide-react";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
+import { Button } from "@/shared/components/ui/button";
 import { ROUTES } from "@/shared/constants/routes";
 import { useOnlineStatus } from "@/shared/hooks/useOnlineStatus";
 import { useSyncStatus } from "@/shared/hooks/useSyncStatus";
-
-const navItems = [
-  { to: ROUTES.DASHBOARD, label: "Dashboard", icon: LayoutDashboardIcon },
-  { to: ROUTES.FARMS, label: "Farms", icon: WarehouseIcon },
-  { to: ROUTES.SETTINGS, label: "Settings", icon: SettingsIcon },
-] as const;
+import { supabase } from "@/shared/lib/supabase";
 
 export function AppLayout() {
+  const { t: tc } = useTranslation("common");
+  const { t: ta } = useTranslation("auth");
   const { isOnline } = useOnlineStatus();
   const { pendingCount } = useSyncStatus();
+
+  const navItems = useMemo(
+    () => [
+      { to: ROUTES.DASHBOARD, label: tc("nav.dashboard"), icon: LayoutDashboardIcon },
+      { to: ROUTES.FARMS, label: tc("nav.farms"), icon: WarehouseIcon },
+      { to: ROUTES.SETTINGS, label: tc("nav.settings"), icon: SettingsIcon },
+    ],
+    [tc],
+  );
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <aside className="hidden w-64 flex-col border-r border-sidebar-border bg-sidebar md:flex">
         <div className="flex h-14 items-center border-b border-sidebar-border px-4">
-          <span className="text-lg font-bold text-sidebar-primary">CrocoTrack</span>
+          <span className="text-lg font-bold text-sidebar-primary">{tc("app.name")}</span>
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map(({ to, label, icon: Icon }) => (
@@ -46,18 +56,28 @@ export function AppLayout() {
             </NavLink>
           ))}
         </nav>
+        <div className="border-t border-sidebar-border p-3">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50"
+            onClick={() => supabase.auth.signOut()}
+          >
+            <LogOutIcon className="size-4" />
+            {ta("logout")}
+          </Button>
+        </div>
       </aside>
 
       {/* Main content */}
       <div className="flex flex-1 flex-col">
         {/* Header */}
         <header className="flex h-14 items-center justify-between border-b px-4 md:px-6">
-          <span className="text-lg font-bold text-primary md:hidden">CrocoTrack</span>
+          <span className="text-lg font-bold text-primary md:hidden">{tc("app.name")}</span>
 
           <div className="ml-auto flex items-center gap-3">
             {pendingCount > 0 && (
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                {pendingCount} pending
+                {pendingCount} {tc("status.pending").toLowerCase()}
               </span>
             )}
             <span
@@ -66,7 +86,7 @@ export function AppLayout() {
               }`}
             >
               {isOnline ? <WifiIcon className="size-3.5" /> : <WifiOffIcon className="size-3.5" />}
-              {isOnline ? "Online" : "Offline"}
+              {isOnline ? tc("status.online") : tc("status.offline")}
             </span>
           </div>
         </header>

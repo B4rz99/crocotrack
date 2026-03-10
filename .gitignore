@@ -17,6 +17,9 @@ dist-ssr
 logs
 *.log
 
+# TypeScript
+tsconfig.tsbuildinfo
+
 # Editor
 .idea
 *.suo

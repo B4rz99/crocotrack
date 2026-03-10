@@ -1,4 +1,5 @@
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
+import { useShallow } from "zustand/react/shallow";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { ROUTES } from "@/shared/constants/routes";
 
@@ -7,9 +8,15 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isLoading = useAuthStore((s) => s.isLoading);
-  const profile = useAuthStore((s) => s.profile);
+  const { isAuthenticated, isLoading, profile, onboardingCompleted } = useAuthStore(
+    useShallow((s) => ({
+      isAuthenticated: s.isAuthenticated,
+      isLoading: s.isLoading,
+      profile: s.profile,
+      onboardingCompleted: s.onboardingCompleted,
+    })),
+  );
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -21,6 +28,14 @@ export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (!onboardingCompleted && location.pathname !== ROUTES.ONBOARDING) {
+    return <Navigate to={ROUTES.ONBOARDING} replace />;
+  }
+
+  if (onboardingCompleted && location.pathname === ROUTES.ONBOARDING) {
+    return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
 
   if (requiredRole && profile?.role !== requiredRole) {

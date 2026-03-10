@@ -12,9 +12,13 @@ beforeAll(async () => {
       en: {
         onboarding: {
           incubator: {
-            name: "Incubator name",
             capacity: "Capacity",
             enable: "Enable incubator setup",
+            quantity: "Number of incubators",
+            capacity_per: "Capacity per incubator",
+            summary: "{{count}} incubators will be created",
+            error_quantity: "Enter the number of incubators",
+            error_capacity: "Enter the capacity per incubator",
           },
           steps: { incubators: "Incubators" },
         },
@@ -22,8 +26,6 @@ beforeAll(async () => {
           actions: {
             next: "Next",
             back: "Back",
-            add: "Add",
-            remove: "Remove",
           },
         },
       },
@@ -54,57 +56,39 @@ describe("IncubatorSetupStep", () => {
     expect(screen.getByLabelText("Enable incubator setup")).toBeInTheDocument();
   });
 
-  it("shows form fields when enabled", async () => {
+  it("shows quantity and capacity fields when enabled", async () => {
     const { user } = renderStep();
 
     await user.click(screen.getByLabelText("Enable incubator setup"));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Incubator name")).toBeInTheDocument();
-      expect(screen.getByLabelText("Capacity")).toBeInTheDocument();
+      expect(screen.getByLabelText("Number of incubators")).toBeInTheDocument();
+      expect(screen.getByLabelText("Capacity per incubator")).toBeInTheDocument();
     });
   });
 
-  it("allows adding an incubator", async () => {
+  it("shows summary when quantity and capacity are filled", async () => {
     const { user } = renderStep();
 
     await user.click(screen.getByLabelText("Enable incubator setup"));
+    await user.type(screen.getByLabelText("Number of incubators"), "3");
+    await user.type(screen.getByLabelText("Capacity per incubator"), "500");
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Incubator name")).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByLabelText("Incubator name"), "Inc 1");
-    await user.type(screen.getByLabelText("Capacity"), "200");
-    await user.click(screen.getByRole("button", { name: "Add" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Inc 1")).toBeInTheDocument();
+      expect(screen.getByText("3 incubators will be created")).toBeInTheDocument();
     });
   });
 
-  it("allows removing an incubator", async () => {
-    const { user } = renderStep();
+  it("shows validation errors when enabled but fields empty", async () => {
+    const { user, onNext } = renderStep();
 
     await user.click(screen.getByLabelText("Enable incubator setup"));
+    await user.click(screen.getByRole("button", { name: "Next" }));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Incubator name")).toBeInTheDocument();
+      expect(screen.getAllByRole("alert").length).toBeGreaterThanOrEqual(1);
     });
-
-    await user.type(screen.getByLabelText("Incubator name"), "Inc 1");
-    await user.type(screen.getByLabelText("Capacity"), "200");
-    await user.click(screen.getByRole("button", { name: "Add" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Inc 1")).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByRole("button", { name: "Remove" }));
-
-    await waitFor(() => {
-      expect(screen.queryByText("Inc 1")).not.toBeInTheDocument();
-    });
+    expect(onNext).not.toHaveBeenCalled();
   });
 
   it("calls onNext with empty list when disabled", async () => {
@@ -117,27 +101,19 @@ describe("IncubatorSetupStep", () => {
     });
   });
 
-  it("calls onNext with incubator list when enabled", async () => {
+  it("calls onNext with generated incubators when enabled", async () => {
     const { user, onNext } = renderStep();
 
     await user.click(screen.getByLabelText("Enable incubator setup"));
-
-    await waitFor(() => {
-      expect(screen.getByLabelText("Incubator name")).toBeInTheDocument();
-    });
-
-    await user.type(screen.getByLabelText("Incubator name"), "Inc 1");
-    await user.type(screen.getByLabelText("Capacity"), "200");
-    await user.click(screen.getByRole("button", { name: "Add" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Inc 1")).toBeInTheDocument();
-    });
-
+    await user.type(screen.getByLabelText("Number of incubators"), "2");
+    await user.type(screen.getByLabelText("Capacity per incubator"), "500");
     await user.click(screen.getByRole("button", { name: "Next" }));
 
     await waitFor(() => {
-      expect(onNext).toHaveBeenCalledWith([{ name: "Inc 1", capacity: 200 }]);
+      expect(onNext).toHaveBeenCalledWith([
+        { name: "1", capacity: 500 },
+        { name: "2", capacity: 500 },
+      ]);
     });
   });
 
