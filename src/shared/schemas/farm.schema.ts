@@ -6,3 +6,7 @@ export const createFarmSchema = z.object({
 });
 
 export type CreateFarmInput = z.infer<typeof createFarmSchema>;
+
+export const updateFarmSchema = createFarmSchema;
+
+export type UpdateFarmInput = z.infer<typeof updateFarmSchema>;
