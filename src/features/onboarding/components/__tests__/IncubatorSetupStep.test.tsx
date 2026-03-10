@@ -1,40 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { IncubatorSetupStep } from "../IncubatorSetupStep";
-
-beforeAll(async () => {
-  await i18n.use(initReactI18next).init({
-    lng: "en",
-    resources: {
-      en: {
-        onboarding: {
-          incubator: {
-            capacity: "Capacity",
-            enable: "Enable incubator setup",
-            quantity: "Number of incubators",
-            capacity_per: "Capacity per incubator",
-            summary: "{{count}} incubators will be created",
-            error_quantity: "Enter the number of incubators",
-            error_capacity: "Enter the capacity per incubator",
-          },
-          steps: { incubators: "Incubators" },
-        },
-        common: {
-          actions: {
-            next: "Next",
-            back: "Back",
-          },
-        },
-      },
-    },
-    defaultNS: "onboarding",
-    ns: ["onboarding", "common"],
-    interpolation: { escapeValue: false },
-  });
-});
 
 function renderStep(onNext = vi.fn(), onBack = vi.fn()) {
   return {
@@ -53,37 +20,37 @@ describe("IncubatorSetupStep", () => {
   it("renders enable toggle", () => {
     renderStep();
 
-    expect(screen.getByLabelText("Enable incubator setup")).toBeInTheDocument();
+    expect(screen.getByLabelText("Habilitar configuración de incubadoras")).toBeInTheDocument();
   });
 
   it("shows quantity and capacity fields when enabled", async () => {
     const { user } = renderStep();
 
-    await user.click(screen.getByLabelText("Enable incubator setup"));
+    await user.click(screen.getByLabelText("Habilitar configuración de incubadoras"));
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Number of incubators")).toBeInTheDocument();
-      expect(screen.getByLabelText("Capacity per incubator")).toBeInTheDocument();
+      expect(screen.getByLabelText("Cantidad de incubadoras")).toBeInTheDocument();
+      expect(screen.getByLabelText("Capacidad por incubadora")).toBeInTheDocument();
     });
   });
 
   it("shows summary when quantity and capacity are filled", async () => {
     const { user } = renderStep();
 
-    await user.click(screen.getByLabelText("Enable incubator setup"));
-    await user.type(screen.getByLabelText("Number of incubators"), "3");
-    await user.type(screen.getByLabelText("Capacity per incubator"), "500");
+    await user.click(screen.getByLabelText("Habilitar configuración de incubadoras"));
+    await user.type(screen.getByLabelText("Cantidad de incubadoras"), "3");
+    await user.type(screen.getByLabelText("Capacidad por incubadora"), "500");
 
     await waitFor(() => {
-      expect(screen.getByText("3 incubators will be created")).toBeInTheDocument();
+      expect(screen.getByText("Se crearán 3 incubadoras")).toBeInTheDocument();
     });
   });
 
   it("shows validation errors when enabled but fields empty", async () => {
     const { user, onNext } = renderStep();
 
-    await user.click(screen.getByLabelText("Enable incubator setup"));
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByLabelText("Habilitar configuración de incubadoras"));
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
       expect(screen.getAllByRole("alert").length).toBeGreaterThanOrEqual(1);
@@ -94,7 +61,7 @@ describe("IncubatorSetupStep", () => {
   it("calls onNext with empty list when disabled", async () => {
     const { user, onNext } = renderStep();
 
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
       expect(onNext).toHaveBeenCalledWith([]);
@@ -104,10 +71,10 @@ describe("IncubatorSetupStep", () => {
   it("calls onNext with generated incubators when enabled", async () => {
     const { user, onNext } = renderStep();
 
-    await user.click(screen.getByLabelText("Enable incubator setup"));
-    await user.type(screen.getByLabelText("Number of incubators"), "2");
-    await user.type(screen.getByLabelText("Capacity per incubator"), "500");
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByLabelText("Habilitar configuración de incubadoras"));
+    await user.type(screen.getByLabelText("Cantidad de incubadoras"), "2");
+    await user.type(screen.getByLabelText("Capacidad por incubadora"), "500");
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
       expect(onNext).toHaveBeenCalledWith([
@@ -120,7 +87,7 @@ describe("IncubatorSetupStep", () => {
   it("calls onBack when back button is clicked", async () => {
     const { user, onBack } = renderStep();
 
-    await user.click(screen.getByRole("button", { name: "Back" }));
+    await user.click(screen.getByRole("button", { name: "Atrás" }));
 
     expect(onBack).toHaveBeenCalled();
   });

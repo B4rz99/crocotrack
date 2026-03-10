@@ -1,5 +1,4 @@
-import { type FormEvent, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { type FormEvent, useState } from "react";
 import { Link } from "react-router";
 import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
@@ -9,13 +8,12 @@ import { Label } from "@/shared/components/ui/label";
 import { ROUTES } from "@/shared/constants/routes";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
 
-export type LoginFormData = z.infer<ReturnType<typeof makeLoginSchema>>;
+const loginSchema = z.object({
+  email: z.email("Correo electrónico inválido"),
+  password: z.string().min(6, "Debe tener al menos 6 caracteres"),
+});
 
-const makeLoginSchema = (t: (key: string, opts?: Record<string, unknown>) => string) =>
-  z.object({
-    email: z.email(t("validation.invalid_email")),
-    password: z.string().min(6, t("validation.min_length", { min: 6 })),
-  });
+export type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
   readonly onSubmit: (data: LoginFormData) => void;
@@ -23,9 +21,6 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
-  const { t } = useTranslation("auth");
-  const { t: tc } = useTranslation("common");
-  const schema = useMemo(() => makeLoginSchema(tc), [tc]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -34,7 +29,7 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
     e.preventDefault();
     setErrors({});
 
-    const result = schema.safeParse({ email, password });
+    const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
       setErrors(zodFieldErrors(result.error));
       return;
@@ -46,7 +41,7 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">{t("login.email")}</Label>
+        <Label htmlFor="email">Correo electrónico</Label>
         <Input
           id="email"
           type="email"
@@ -58,7 +53,7 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">{t("login.password")}</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
           id="password"
           type="password"
@@ -70,13 +65,13 @@ export function LoginForm({ onSubmit, isLoading = false }: LoginFormProps) {
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {t("login.submit")}
+        Ingresar
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        {t("login.no_account")}{" "}
+        ¿No tienes una cuenta?{" "}
         <Link to={ROUTES.REGISTER} className="text-primary hover:underline">
-          {t("login.register_link")}
+          Regístrate aquí
         </Link>
       </p>
     </form>

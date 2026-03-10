@@ -1,5 +1,4 @@
 import { type FormEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -20,8 +19,6 @@ interface OrgSetupStepProps {
 }
 
 export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
   const [name, setName] = useState("");
   const [country, setCountry] = useState("CO");
   const [currency, setCurrency] = useState("COP");
@@ -52,7 +49,7 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="org-name">{t("org.name")}</Label>
+        <Label htmlFor="org-name">Nombre de la organización</Label>
         <Input
           id="org-name"
           type="text"
@@ -64,7 +61,7 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
       </div>
 
       <div className="space-y-2">
-        <Label>{t("org.country")}</Label>
+        <Label>País</Label>
         <Select value={country} onValueChange={handleCountryChange}>
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -81,7 +78,7 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
       </div>
 
       <div className="space-y-2">
-        <Label>{t("org.currency")}</Label>
+        <Label>Moneda</Label>
         <Select value={currency} onValueChange={(v) => v && setCurrency(v)}>
           <SelectTrigger className="w-full">
             <SelectValue />
@@ -98,7 +95,7 @@ export function OrgSetupStep({ onNext }: OrgSetupStepProps) {
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit">{tc("actions.next")}</Button>
+        <Button type="submit">Siguiente</Button>
       </div>
     </form>
   );

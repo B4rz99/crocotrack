@@ -1,5 +1,4 @@
 import { type FormEvent, useMemo, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -64,9 +63,6 @@ function makeEmptyGroup(id: number, poolType: "crianza" | "reproductor"): PoolGr
 }
 
 export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
-
   const idCounter = useRef(1);
   const [groups, setGroups] = useState<readonly PoolGroupConfig[]>([makeEmptyGroup(0, "crianza")]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -110,10 +106,10 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
       const cap = Number(g.capacity);
 
       if (!Number.isInteger(qty) || qty <= 0) {
-        newErrors[`${g.id}-quantity`] = t("pool.error_quantity");
+        newErrors[`${g.id}-quantity`] = "Ingresa la cantidad de estanques";
       }
       if (!Number.isInteger(cap) || cap <= 0) {
-        newErrors[`${g.id}-capacity`] = t("pool.error_capacity");
+        newErrors[`${g.id}-capacity`] = "Ingresa la capacidad por estanque";
       }
     }
 
@@ -127,7 +123,10 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <p className="text-sm text-muted-foreground">{t("pool.batch_description")}</p>
+      <p className="text-sm text-muted-foreground">
+        Genera tus estanques en lote. Define cuántos necesitas, el patrón de numeración y la
+        capacidad por tipo.
+      </p>
 
       {groups.map((group, index) => {
         const preview = previews[index] ?? [];
@@ -136,7 +135,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
         return (
           <div key={group.id} className="space-y-3 rounded-lg border p-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium">{t("pool.group_label", { n: index + 1 })}</h4>
+              <h4 className="text-sm font-medium">{`Grupo ${index + 1}`}</h4>
               {groups.length > 1 && (
                 <Button
                   type="button"
@@ -144,14 +143,14 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
                   size="sm"
                   onClick={() => removeGroup(group.id)}
                 >
-                  {tc("actions.remove")}
+                  Eliminar
                 </Button>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor={`pool-type-${group.id}`}>{t("pool.type")}</Label>
+                <Label htmlFor={`pool-type-${group.id}`}>Tipo de estanque</Label>
                 <Select
                   value={group.poolType}
                   onValueChange={(v) => {
@@ -166,14 +165,14 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="crianza">{t("pool.type_crianza")}</SelectItem>
-                    <SelectItem value="reproductor">{t("pool.type_reproductor")}</SelectItem>
+                    <SelectItem value="crianza">Crianza</SelectItem>
+                    <SelectItem value="reproductor">Reproductor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor={`pool-qty-${group.id}`}>{t("pool.quantity")}</Label>
+                <Label htmlFor={`pool-qty-${group.id}`}>Cantidad</Label>
                 <Input
                   id={`pool-qty-${group.id}`}
                   type="number"
@@ -187,18 +186,18 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor={`pool-prefix-${group.id}`}>{t("pool.prefix")}</Label>
+                <Label htmlFor={`pool-prefix-${group.id}`}>Prefijo</Label>
                 <Input
                   id={`pool-prefix-${group.id}`}
                   type="text"
                   value={group.prefix}
                   onChange={(e) => updateGroup(group.id, { prefix: e.target.value })}
-                  placeholder={t("pool.prefix_placeholder")}
+                  placeholder="ej: A, R, P"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor={`pool-start-${group.id}`}>{t("pool.start_number")}</Label>
+                <Label htmlFor={`pool-start-${group.id}`}>Número inicial</Label>
                 <Input
                   id={`pool-start-${group.id}`}
                   type="number"
@@ -209,7 +208,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
               </div>
 
               <div className="col-span-2 space-y-1">
-                <Label htmlFor={`pool-cap-${group.id}`}>{t("pool.capacity_per_pool")}</Label>
+                <Label htmlFor={`pool-cap-${group.id}`}>Capacidad por estanque</Label>
                 <Input
                   id={`pool-cap-${group.id}`}
                   type="number"
@@ -225,15 +224,13 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
 
             {preview.length > 0 && (
               <div className="rounded-md bg-muted px-3 py-2">
-                <p className="mb-1 text-xs font-medium text-muted-foreground">
-                  {t("pool.preview")}
-                </p>
+                <p className="mb-1 text-xs font-medium text-muted-foreground">Vista previa:</p>
                 <p className="text-sm">
                   {preview.join(", ")}
                   {qty > MAX_PREVIEW && (
                     <span className="text-muted-foreground">
                       {" "}
-                      ... {t("pool.and_more", { count: qty - MAX_PREVIEW })}
+                      ... {`y ${qty - MAX_PREVIEW} más`}
                     </span>
                   )}
                 </p>
@@ -244,20 +241,20 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
       })}
 
       <Button type="button" variant="outline" className="w-full" onClick={addGroup}>
-        {t("pool.add_group")}
+        + Agregar otro grupo
       </Button>
 
       {totalCount > 0 && (
         <p className="text-center text-sm text-muted-foreground">
-          {t("pool.total_summary", { count: totalCount })}
+          {`Se ${totalCount === 1 ? "creará" : "crearán"} ${totalCount} ${totalCount === 1 ? "estanque" : "estanques"} en total`}
         </p>
       )}
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
-          {tc("actions.back")}
+          Atrás
         </Button>
-        <Button type="submit">{tc("actions.next")}</Button>
+        <Button type="submit">Siguiente</Button>
       </div>
     </form>
   );
