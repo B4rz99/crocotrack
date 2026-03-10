@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { ROUTES } from "@/shared/constants/routes";
@@ -8,7 +7,6 @@ import type { RegisterFormData } from "../components/RegisterForm";
 import { RegisterForm } from "../components/RegisterForm";
 
 export function RegisterPage() {
-  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +38,7 @@ export function RegisterPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("register.title")}</CardTitle>
+        <CardTitle>Crear Cuenta</CardTitle>
       </CardHeader>
       <CardContent>
         {error && (

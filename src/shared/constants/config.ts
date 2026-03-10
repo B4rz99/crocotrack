@@ -1,6 +1,4 @@
 export const APP_CONFIG = {
-  DEFAULT_LANGUAGE: "es",
-  SUPPORTED_LANGUAGES: ["es", "en"] as const,
   DEFAULT_CURRENCY: "COP",
   INCUBATION_DAYS: 80,
   SYNC_INTERVAL_MS: 30_000,

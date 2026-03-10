@@ -1,6 +1,5 @@
 import { Trash2 } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
@@ -18,8 +17,6 @@ interface InviteWorkerStepProps {
 }
 
 export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
   const [emails, setEmails] = useState<readonly KeyedEmail[]>([]);
   const [newEmail, setNewEmail] = useState("");
   const keyCounter = useRef(0);
@@ -33,7 +30,7 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
     if (!trimmed) return;
 
     if (!z.email().safeParse(trimmed).success) {
-      setEmailError(tc("validation.invalid_email"));
+      setEmailError("Correo electrónico inválido");
       return;
     }
 
@@ -60,7 +57,7 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
                 variant="ghost"
                 size="icon-sm"
                 onClick={() => handleRemove(item.key)}
-                aria-label={tc("actions.remove")}
+                aria-label="Eliminar"
               >
                 <Trash2 className="size-4" />
               </Button>
@@ -71,7 +68,7 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
 
       <form onSubmit={handleAdd} className="flex gap-2">
         <div className="flex-1 space-y-1">
-          <Label htmlFor="invite-email">{t("invite.email")}</Label>
+          <Label htmlFor="invite-email">Correo electrónico del invitado</Label>
           <Input
             id="invite-email"
             type="email"
@@ -82,20 +79,20 @@ export function InviteWorkerStep({ onComplete, onBack }: InviteWorkerStepProps) 
           <FieldError message={emailError} />
         </div>
         <Button type="submit" variant="outline" className="self-end">
-          {tc("actions.add")}
+          Agregar
         </Button>
       </form>
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
-          {tc("actions.back")}
+          Atrás
         </Button>
         <div className="flex gap-2">
           <Button type="button" variant="outline" onClick={() => onComplete([])}>
-            {t("invite.skip")}
+            Omitir por ahora
           </Button>
           <Button type="button" onClick={() => onComplete(emailValues)}>
-            {tc("actions.complete")}
+            Completar
           </Button>
         </div>
       </div>

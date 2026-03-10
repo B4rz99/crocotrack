@@ -1,5 +1,4 @@
-import { type FormEvent, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { type FormEvent, useState } from "react";
 import { Link } from "react-router";
 import { z } from "zod";
 import { Button } from "@/shared/components/ui/button";
@@ -9,15 +8,14 @@ import { Label } from "@/shared/components/ui/label";
 import { ROUTES } from "@/shared/constants/routes";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
 
-export type RegisterFormData = z.infer<ReturnType<typeof makeRegisterSchema>>;
+const registerSchema = z.object({
+  full_name: z.string().min(1, "Este campo es obligatorio"),
+  email: z.email("Correo electrónico inválido"),
+  password: z.string().min(6, "Debe tener al menos 6 caracteres"),
+  org_name: z.string().min(1, "Este campo es obligatorio"),
+});
 
-const makeRegisterSchema = (t: (key: string, opts?: Record<string, unknown>) => string) =>
-  z.object({
-    full_name: z.string().min(1, t("validation.required")),
-    email: z.email(t("validation.invalid_email")),
-    password: z.string().min(6, t("validation.min_length", { min: 6 })),
-    org_name: z.string().min(1, t("validation.required")),
-  });
+export type RegisterFormData = z.infer<typeof registerSchema>;
 
 interface RegisterFormProps {
   readonly onSubmit: (data: RegisterFormData) => void;
@@ -25,9 +23,6 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps) {
-  const { t } = useTranslation("auth");
-  const { t: tc } = useTranslation("common");
-  const schema = useMemo(() => makeRegisterSchema(tc), [tc]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +33,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
     e.preventDefault();
     setErrors({});
 
-    const result = schema.safeParse({
+    const result = registerSchema.safeParse({
       full_name: fullName,
       email,
       password,
@@ -56,7 +51,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="full_name">{t("register.full_name")}</Label>
+        <Label htmlFor="full_name">Nombre completo</Label>
         <Input
           id="full_name"
           type="text"
@@ -68,7 +63,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">{t("register.email")}</Label>
+        <Label htmlFor="email">Correo electrónico</Label>
         <Input
           id="email"
           type="email"
@@ -80,7 +75,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">{t("register.password")}</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
           id="password"
           type="password"
@@ -92,7 +87,7 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="org_name">{t("register.org_name")}</Label>
+        <Label htmlFor="org_name">Nombre de la organización</Label>
         <Input
           id="org_name"
           type="text"
@@ -104,13 +99,13 @@ export function RegisterForm({ onSubmit, isLoading = false }: RegisterFormProps)
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {t("register.submit")}
+        Registrarse
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        {t("register.has_account")}{" "}
+        ¿Ya tienes una cuenta?{" "}
         <Link to={ROUTES.LOGIN} className="text-primary hover:underline">
-          {t("register.login_link")}
+          Inicia sesión aquí
         </Link>
       </p>
     </form>

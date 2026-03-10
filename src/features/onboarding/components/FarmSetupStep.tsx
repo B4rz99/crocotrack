@@ -1,5 +1,4 @@
 import { type FormEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -13,8 +12,6 @@ interface FarmSetupStepProps {
 }
 
 export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,7 +35,7 @@ export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="farm-name">{t("farm.name")}</Label>
+        <Label htmlFor="farm-name">Nombre de la granja</Label>
         <Input
           id="farm-name"
           type="text"
@@ -50,7 +47,7 @@ export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="farm-location">{t("farm.location")}</Label>
+        <Label htmlFor="farm-location">Ubicación</Label>
         <Input
           id="farm-location"
           type="text"
@@ -61,9 +58,9 @@ export function FarmSetupStep({ onNext, onBack }: FarmSetupStepProps) {
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
-          {tc("actions.back")}
+          Atrás
         </Button>
-        <Button type="submit">{tc("actions.next")}</Button>
+        <Button type="submit">Siguiente</Button>
       </div>
     </form>
   );

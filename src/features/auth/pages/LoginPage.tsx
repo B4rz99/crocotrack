@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { ROUTES } from "@/shared/constants/routes";
@@ -8,7 +7,6 @@ import type { LoginFormData } from "../components/LoginForm";
 import { LoginForm } from "../components/LoginForm";
 
 export function LoginPage() {
-  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,7 @@ export function LoginPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("login.title")}</CardTitle>
+        <CardTitle>Iniciar Sesión</CardTitle>
       </CardHeader>
       <CardContent>
         {error && (

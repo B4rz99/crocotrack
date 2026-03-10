@@ -1,6 +1,5 @@
 import { Trash2 } from "lucide-react";
 import { type FormEvent, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
@@ -23,8 +22,6 @@ interface FoodTypeSetupStepProps {
 }
 
 export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
   const keyCounter = useRef(DEFAULT_FOOD_TYPES.length);
 
   const [foodTypes, setFoodTypes] = useState<readonly KeyedFoodType[]>(
@@ -63,7 +60,7 @@ export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
               variant="ghost"
               size="icon-sm"
               onClick={() => handleRemove(item.key)}
-              aria-label={tc("actions.remove")}
+              aria-label="Eliminar"
             >
               <Trash2 className="size-4" />
             </Button>
@@ -73,7 +70,7 @@ export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
 
       <form onSubmit={handleAdd} className="flex gap-2">
         <div className="flex-1 space-y-1">
-          <Label htmlFor="food-name">{t("food_type.name")}</Label>
+          <Label htmlFor="food-name">Nombre del alimento</Label>
           <Input
             id="food-name"
             type="text"
@@ -82,16 +79,16 @@ export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
           />
         </div>
         <Button type="submit" variant="outline" className="self-end">
-          {tc("actions.add")}
+          Agregar
         </Button>
       </form>
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
-          {tc("actions.back")}
+          Atrás
         </Button>
         <Button type="button" onClick={handleNext}>
-          {tc("actions.next")}
+          Siguiente
         </Button>
       </div>
     </div>

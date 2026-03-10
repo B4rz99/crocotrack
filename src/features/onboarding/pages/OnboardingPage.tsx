@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Progress } from "@/shared/components/ui/progress";
 import { FarmSetupStep } from "../components/FarmSetupStep";
@@ -9,19 +8,18 @@ import { OrgSetupStep } from "../components/OrgSetupStep";
 import { PoolSetupStep } from "../components/PoolSetupStep";
 import { useOnboardingWizard } from "../hooks/useOnboardingWizard";
 
-const TOTAL_STEPS = 6;
-
-const STEP_KEYS = [
-  "steps.org",
-  "steps.farm",
-  "steps.food_types",
-  "steps.pools",
-  "steps.incubators",
-  "steps.invite",
+const STEP_LABELS = [
+  "Organización",
+  "Granja",
+  "Tipos de Alimento",
+  "Estanques",
+  "Incubadoras",
+  "Invitar Equipo",
 ] as const;
 
+const TOTAL_STEPS = STEP_LABELS.length;
+
 export function OnboardingPage() {
-  const { t } = useTranslation("onboarding");
   const {
     currentStep,
     isSubmitting,
@@ -36,18 +34,20 @@ export function OnboardingPage() {
   } = useOnboardingWizard();
 
   const progressValue = ((currentStep + 1) / TOTAL_STEPS) * 100;
-  const stepKey = STEP_KEYS[currentStep];
+  const stepLabel = STEP_LABELS[currentStep] ?? "";
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold">{t("welcome.title")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("welcome.subtitle")}</p>
+        <h2 className="text-2xl font-bold">Bienvenido a CrocoTrack</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Configura tu criadero en unos simples pasos
+        </p>
       </div>
 
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
-          <span>{stepKey ? t(stepKey) : ""}</span>
+          <span>{stepLabel}</span>
           <span>
             {currentStep + 1} / {TOTAL_STEPS}
           </span>
@@ -66,7 +66,7 @@ export function OnboardingPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{stepKey ? t(stepKey) : ""}</CardTitle>
+          <CardTitle>{stepLabel}</CardTitle>
         </CardHeader>
         <CardContent>
           {currentStep === 0 && <OrgSetupStep onNext={handleOrgNext} />}
@@ -81,7 +81,7 @@ export function OnboardingPage() {
           {currentStep === 5 && <InviteWorkerStep onComplete={handleComplete} onBack={prevStep} />}
           {isSubmitting && (
             <div className="mt-4 text-center text-sm text-muted-foreground">
-              {t("complete.subtitle")}
+              Tu criadero está listo para ser gestionado
             </div>
           )}
         </CardContent>

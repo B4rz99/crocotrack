@@ -16,7 +16,6 @@ Crocodile farm management platform with offline-first architecture, multi-tenant
 - **Testing:** Vitest + React Testing Library + fake-indexeddb
 - **Backend:** Supabase (PostgreSQL + Auth + Storage)
 - **Offline:** Dexie.js (IndexedDB) + Workbox service worker
-- **i18n:** react-i18next (Spanish primary, English secondary)
 - **Icons:** lucide-react
 - **Charts:** Recharts
 - **Export:** SheetJS (xlsx) + jsPDF
@@ -59,7 +58,7 @@ src/
     components/ui/  # shadcn/ui components
     constants/      # Routes, config
     hooks/          # Shared hooks (useOnlineStatus, useSyncStatus)
-    lib/            # Supabase client, Dexie DB, sync engine, i18n, utils
+    lib/            # Supabase client, Dexie DB, sync engine, utils
     schemas/        # Zod validation schemas
     types/          # Database types (generated), shared types
   test/         # Test setup
@@ -81,6 +80,7 @@ supabase/
 - **`next-themes` dependency:** Required by the sonner/Toaster component. `Providers` wraps the app in `ThemeProvider` to prevent runtime errors.
 - **`"use client"` directives:** Some shadcn components have `"use client"` directives — these are harmless in a Vite SPA (no RSC) but are dead code.
 - **Path alias:** `@/*` maps to `./src/*` (configured in both `tsconfig.json` and `vite.config.ts`).
+- **All UI strings are hardcoded in Spanish** (Colombia-only MVP). No i18n library is used.
 
 ## Commands
 

@@ -1,5 +1,4 @@
 import { type FormEvent, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -12,8 +11,6 @@ interface IncubatorSetupStepProps {
 }
 
 export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) {
-  const { t } = useTranslation("onboarding");
-  const { t: tc } = useTranslation("common");
   const [enabled, setEnabled] = useState(false);
   const [quantity, setQuantity] = useState("");
   const [capacity, setCapacity] = useState("");
@@ -47,10 +44,10 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
     const cap = Number(capacity);
 
     if (!Number.isInteger(qty) || qty <= 0) {
-      newErrors.quantity = t("incubator.error_quantity");
+      newErrors.quantity = "Ingresa la cantidad de incubadoras";
     }
     if (!Number.isInteger(cap) || cap <= 0) {
-      newErrors.capacity = t("incubator.error_capacity");
+      newErrors.capacity = "Ingresa la capacidad por incubadora";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -71,14 +68,14 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
           onChange={(e) => setEnabled(e.target.checked)}
           className="size-4 rounded border-input"
         />
-        <Label htmlFor="enable-incubators">{t("incubator.enable")}</Label>
+        <Label htmlFor="enable-incubators">Habilitar configuración de incubadoras</Label>
       </div>
 
       {enabled && (
         <div className="space-y-3 rounded-lg border p-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="incubator-qty">{t("incubator.quantity")}</Label>
+              <Label htmlFor="incubator-qty">Cantidad de incubadoras</Label>
               <Input
                 id="incubator-qty"
                 type="number"
@@ -92,7 +89,7 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="incubator-cap">{t("incubator.capacity_per")}</Label>
+              <Label htmlFor="incubator-cap">Capacidad por incubadora</Label>
               <Input
                 id="incubator-cap"
                 type="number"
@@ -108,7 +105,7 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
 
           {incubatorCount > 0 && (
             <p className="text-sm text-muted-foreground">
-              {t("incubator.summary", { count: incubatorCount })}
+              {`Se crearán ${incubatorCount} incubadoras`}
             </p>
           )}
         </div>
@@ -116,9 +113,9 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
 
       <div className="flex justify-between">
         <Button type="button" variant="outline" onClick={onBack}>
-          {tc("actions.back")}
+          Atrás
         </Button>
-        <Button type="submit">{tc("actions.next")}</Button>
+        <Button type="submit">Siguiente</Button>
       </div>
     </form>
   );

@@ -1,35 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { OrgSetupStep } from "../OrgSetupStep";
-
-beforeAll(async () => {
-  await i18n.use(initReactI18next).init({
-    lng: "en",
-    resources: {
-      en: {
-        onboarding: {
-          org: {
-            name: "Organization name",
-            country: "Country",
-            currency: "Currency",
-          },
-          steps: { org: "Organization" },
-        },
-        common: {
-          actions: {
-            next: "Next",
-          },
-        },
-      },
-    },
-    defaultNS: "onboarding",
-    ns: ["onboarding", "common"],
-    interpolation: { escapeValue: false },
-  });
-});
 
 function renderStep(onNext = vi.fn()) {
   return {
@@ -47,15 +19,15 @@ describe("OrgSetupStep", () => {
   it("renders name field and country/currency select labels", () => {
     renderStep();
 
-    expect(screen.getByLabelText("Organization name")).toBeInTheDocument();
-    expect(screen.getByText("Country")).toBeInTheDocument();
-    expect(screen.getByText("Currency")).toBeInTheDocument();
+    expect(screen.getByLabelText("Nombre de la organización")).toBeInTheDocument();
+    expect(screen.getByText("País")).toBeInTheDocument();
+    expect(screen.getByText("Moneda")).toBeInTheDocument();
   });
 
   it("shows validation error when name is empty", async () => {
     const { user, onNext } = renderStep();
 
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
@@ -66,8 +38,8 @@ describe("OrgSetupStep", () => {
   it("calls onNext with valid data using default country/currency", async () => {
     const { user, onNext } = renderStep();
 
-    await user.type(screen.getByLabelText("Organization name"), "My Org");
-    await user.click(screen.getByRole("button", { name: "Next" }));
+    await user.type(screen.getByLabelText("Nombre de la organización"), "My Org");
+    await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
       expect(onNext).toHaveBeenCalledWith({
