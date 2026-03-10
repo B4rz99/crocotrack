@@ -109,10 +109,10 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
       const qty = Number(g.quantity);
       const cap = Number(g.capacity);
 
-      if (!qty || qty <= 0) {
+      if (!Number.isInteger(qty) || qty <= 0) {
         newErrors[`${g.id}-quantity`] = t("pool.error_quantity");
       }
-      if (!cap || cap <= 0) {
+      if (!Number.isInteger(cap) || cap <= 0) {
         newErrors[`${g.id}-capacity`] = t("pool.error_capacity");
       }
     }

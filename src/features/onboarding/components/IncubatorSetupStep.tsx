@@ -46,10 +46,10 @@ export function IncubatorSetupStep({ onNext, onBack }: IncubatorSetupStepProps) 
     const qty = Number(quantity);
     const cap = Number(capacity);
 
-    if (!qty || qty <= 0) {
+    if (!Number.isInteger(qty) || qty <= 0) {
       newErrors.quantity = t("incubator.error_quantity");
     }
-    if (!cap || cap <= 0) {
+    if (!Number.isInteger(cap) || cap <= 0) {
       newErrors.capacity = t("incubator.error_capacity");
     }
 

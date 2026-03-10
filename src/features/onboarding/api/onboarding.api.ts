@@ -178,22 +178,22 @@ export async function submitOnboarding(
     })),
   ]);
 
-  // 4. Batch insert invitations (best effort, no offline fallback)
-  if (data.inviteEmails.length > 0) {
-    const invitations = data.inviteEmails.map((email) => ({
-      org_id: orgId,
-      email,
-      role: "worker",
-      farm_ids: [farmId],
-      invited_by: userId,
-      token: generateId(),
-      status: "pending",
-    }));
+  // 4. Insert invitations individually (best effort, no offline fallback)
+  await Promise.all(
+    data.inviteEmails.map(async (email) => {
+      const { error: inviteError } = await untypedSupabase.from("invitations").insert({
+        org_id: orgId,
+        email,
+        role: "worker",
+        farm_ids: [farmId],
+        invited_by: userId,
+        token: generateId(),
+        status: "pending",
+      });
 
-    const { error: inviteError } = await untypedSupabase.from("invitations").insert(invitations);
-
-    if (inviteError) {
-      console.error("[onboarding] invitations batch failed:", inviteError.message, inviteError);
-    }
-  }
+      if (inviteError) {
+        console.error("[onboarding] invitation insert failed:", inviteError.message, inviteError);
+      }
+    }),
+  );
 }
