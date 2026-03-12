@@ -11,7 +11,7 @@ import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
-import { createFarmSchema } from "@/shared/schemas/farm.schema";
+import { createFarmSchema, updateFarmSchema } from "@/shared/schemas/farm.schema";
 
 interface FarmFormModalProps {
   readonly open: boolean;
@@ -47,7 +47,8 @@ export function FarmFormModal({
     e.preventDefault();
     setErrors({});
 
-    const result = createFarmSchema.safeParse({
+    const schema = farm ? updateFarmSchema : createFarmSchema;
+    const result = schema.safeParse({
       name,
       location: location || undefined,
     });

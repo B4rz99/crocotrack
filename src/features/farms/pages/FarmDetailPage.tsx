@@ -1,5 +1,5 @@
 import { ArrowLeftIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -67,14 +67,21 @@ export function FarmDetailPage() {
     }
   }
 
-  const sortedPools = pools
-    ? [...pools].sort((a, b) => {
-        const aVal = a[sortKey] ?? "";
-        const bVal = b[sortKey] ?? "";
-        const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-        return sortDir === "asc" ? cmp : -cmp;
-      })
-    : [];
+  const sortedPools = useMemo(
+    () =>
+      pools
+        ? [...pools].sort((a, b) => {
+            const aVal = a[sortKey];
+            const bVal = b[sortKey];
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return 1;
+            if (bVal == null) return -1;
+            const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            return sortDir === "asc" ? cmp : -cmp;
+          })
+        : [],
+    [pools, sortKey, sortDir],
+  );
 
   if (farmLoading || poolsLoading) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;

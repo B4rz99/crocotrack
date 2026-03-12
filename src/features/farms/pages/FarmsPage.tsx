@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
+import { ROUTES } from "@/shared/constants/routes";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { FarmFormModal } from "../components/FarmFormModal";
 import { useCreateFarm, useDeleteFarm, useUpdateFarm } from "../hooks/useFarmMutations";
@@ -48,7 +49,10 @@ export function FarmsPage() {
         <ul className="divide-y rounded-lg border">
           {farms.map((farm) => (
             <li key={farm.id} className="flex items-center justify-between px-4 py-3">
-              <Link to={`/farms/${farm.id}`} className="text-sm font-medium hover:underline">
+              <Link
+                to={ROUTES.FARM_DETAIL.replace(":farmId", farm.id)}
+                className="text-sm font-medium hover:underline"
+              >
                 {farm.name}
               </Link>
               <DropdownMenu>

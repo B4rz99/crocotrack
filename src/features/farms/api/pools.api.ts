@@ -1,10 +1,8 @@
 import { db } from "@/shared/lib/db";
 import { supabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
+import { generateId, nowISO } from "@/shared/lib/utils";
 import type { CreatePoolInput, UpdatePoolInput } from "@/shared/schemas/pool.schema";
-
-const generateId = (): string => crypto.randomUUID();
-const nowISO = (): string => new Date().toISOString();
 
 export async function getPoolsByFarm(farmId: string) {
   const { data, error } = await supabase

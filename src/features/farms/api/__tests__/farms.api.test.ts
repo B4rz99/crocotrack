@@ -10,7 +10,7 @@ vi.mock("@/shared/lib/supabase", () => {
 });
 
 import { db } from "@/shared/lib/db";
-import { createFarm, deleteFarm, getFarms } from "../farms.api";
+import { createFarm, deleteFarm, getFarms, updateFarm } from "../farms.api";
 
 async function getMockFrom() {
   const mod = await import("@/shared/lib/supabase");
@@ -151,6 +151,42 @@ describe("Farms API", () => {
         record_id: id,
         operation: "INSERT",
       });
+    });
+  });
+
+  describe("updateFarm", () => {
+    it("updates in Supabase and Dexie", async () => {
+      const mockFrom = await getMockFrom();
+
+      const mockEq = vi.fn().mockResolvedValue({ error: null });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ update: mockUpdate });
+
+      const now = new Date().toISOString();
+      await db.farms.add({
+        id: "farm-upd",
+        org_id: ORG_ID,
+        name: "Old Name",
+        location: "Old Location",
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+        _sync_status: "synced",
+        _local_updated_at: now,
+      });
+
+      await updateFarm("farm-upd", { name: "Updated", location: "New Location" });
+
+      expect(mockFrom).toHaveBeenCalledWith("farms");
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ name: "Updated", location: "New Location" }),
+      );
+      expect(mockEq).toHaveBeenCalledWith("id", "farm-upd");
+
+      const local = await db.farms.get("farm-upd");
+      expect(local?.name).toBe("Updated");
+      expect(local?.location).toBe("New Location");
+      expect(local?._sync_status).toBe("synced");
     });
   });
 

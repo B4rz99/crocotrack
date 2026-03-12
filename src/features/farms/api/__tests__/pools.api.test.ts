@@ -10,7 +10,7 @@ vi.mock("@/shared/lib/supabase", () => {
 });
 
 import { db } from "@/shared/lib/db";
-import { createPool, deletePool, getPoolsByFarm } from "../pools.api";
+import { createPool, deletePool, getPoolsByFarm, updatePool } from "../pools.api";
 
 async function getMockFrom() {
   const mod = await import("@/shared/lib/supabase");
@@ -170,6 +170,53 @@ describe("Pools API", () => {
         record_id: id,
         operation: "INSERT",
       });
+    });
+  });
+
+  describe("updatePool", () => {
+    it("updates in Supabase and Dexie", async () => {
+      const mockFrom = await getMockFrom();
+
+      const mockEq = vi.fn().mockResolvedValue({ error: null });
+      const mockUpdate = vi.fn().mockReturnValue({ eq: mockEq });
+      mockFrom.mockReturnValue({ update: mockUpdate });
+
+      const now = new Date().toISOString();
+      await db.pools.add({
+        id: "pool-upd",
+        org_id: ORG_ID,
+        farm_id: FARM_ID,
+        name: "Old Pool",
+        pool_type: "crianza" as const,
+        capacity: 50,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+        _sync_status: "synced",
+        _local_updated_at: now,
+      });
+
+      await updatePool("pool-upd", {
+        name: "Updated Pool",
+        pool_type: "reproductor",
+        capacity: 200,
+      });
+
+      expect(mockFrom).toHaveBeenCalledWith("pools");
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "Updated Pool",
+          pool_type: "reproductor",
+          capacity: 200,
+        }),
+      );
+      expect(mockEq).toHaveBeenCalledWith("id", "pool-upd");
+
+      const local = await db.pools.get("pool-upd");
+      expect(local?.name).toBe("Updated Pool");
+      expect(local?.pool_type).toBe("reproductor");
+      expect(local?.capacity).toBe(200);
+      expect(local?._sync_status).toBe("synced");
     });
   });
 

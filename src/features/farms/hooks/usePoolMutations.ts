@@ -7,8 +7,13 @@ export function useCreatePool(farmId: string) {
   const queryClient = useQueryClient();
   const { profile } = useAuth();
 
+  const orgId = profile?.org_id;
+
   return useMutation({
-    mutationFn: (input: CreatePoolInput) => createPool(profile?.org_id as string, farmId, input),
+    mutationFn: (input: CreatePoolInput) => {
+      if (!orgId) throw new Error("No org_id available");
+      return createPool(orgId, farmId, input);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pools", farmId] });
     },

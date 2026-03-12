@@ -7,8 +7,13 @@ export function useCreateFarm() {
   const queryClient = useQueryClient();
   const { profile } = useAuth();
 
+  const orgId = profile?.org_id;
+
   return useMutation({
-    mutationFn: (input: CreateFarmInput) => createFarm(profile?.org_id as string, input),
+    mutationFn: (input: CreateFarmInput) => {
+      if (!orgId) throw new Error("No org_id available");
+      return createFarm(orgId, input);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["farms"] });
     },

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
-import { createPoolSchema } from "@/shared/schemas/pool.schema";
+import { createPoolSchema, updatePoolSchema } from "@/shared/schemas/pool.schema";
 
 interface PoolFormModalProps {
   readonly open: boolean;
@@ -63,7 +63,8 @@ export function PoolFormModal({
     e.preventDefault();
     setErrors({});
 
-    const result = createPoolSchema.safeParse({
+    const schema = pool ? updatePoolSchema : createPoolSchema;
+    const result = schema.safeParse({
       name,
       pool_type: poolType,
       capacity: Number(capacity),

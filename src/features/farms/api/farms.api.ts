@@ -1,10 +1,8 @@
 import { db } from "@/shared/lib/db";
 import { supabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
+import { generateId, nowISO } from "@/shared/lib/utils";
 import type { CreateFarmInput, UpdateFarmInput } from "@/shared/schemas/farm.schema";
-
-const generateId = (): string => crypto.randomUUID();
-const nowISO = (): string => new Date().toISOString();
 
 export async function getFarms(orgId: string) {
   const { data, error } = await supabase
@@ -37,11 +35,16 @@ export async function getFarms(orgId: string) {
 }
 
 export async function getFarmById(farmId: string) {
-  const { data, error } = await supabase.from("farms").select("*").eq("id", farmId).single();
+  const { data, error } = await supabase
+    .from("farms")
+    .select("*")
+    .eq("id", farmId)
+    .eq("is_active", true)
+    .single();
 
   if (error) {
     const local = await db.farms.get(farmId);
-    return local ?? null;
+    return local?.is_active ? local : null;
   }
 
   const now = nowISO();
