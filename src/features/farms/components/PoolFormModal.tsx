@@ -81,9 +81,7 @@ export function PoolFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {pool ? "Editar Estanque" : "Crear Estanque"}
-          </DialogTitle>
+          <DialogTitle>{pool ? "Editar Estanque" : "Crear Estanque"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

@@ -22,27 +22,23 @@ import { FarmFormModal } from "../components/FarmFormModal";
 import { PoolFormModal } from "../components/PoolFormModal";
 import { useFarm } from "../hooks/useFarm";
 import { useDeleteFarm, useUpdateFarm } from "../hooks/useFarmMutations";
-import {
-  useCreatePool,
-  useDeletePool,
-  useUpdatePool,
-} from "../hooks/usePoolMutations";
+import { useCreatePool, useDeletePool, useUpdatePool } from "../hooks/usePoolMutations";
 import { usePools } from "../hooks/usePools";
 
 type SortKey = "name" | "pool_type" | "capacity";
 type SortDir = "asc" | "desc";
 
 export function FarmDetailPage() {
-  const { farmId } = useParams<{ farmId: string }>();
+  const { farmId = "" } = useParams<{ farmId: string }>();
   const navigate = useNavigate();
-  const { data: farm, isLoading: farmLoading } = useFarm(farmId!);
-  const { data: pools, isLoading: poolsLoading } = usePools(farmId!);
+  const { data: farm, isLoading: farmLoading } = useFarm(farmId);
+  const { data: pools, isLoading: poolsLoading } = usePools(farmId);
 
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
-  const createPool = useCreatePool(farmId!);
-  const updatePool = useUpdatePool(farmId!);
-  const deletePoolMutation = useDeletePool(farmId!);
+  const createPool = useCreatePool(farmId);
+  const updatePool = useUpdatePool(farmId);
+  const deletePoolMutation = useDeletePool(farmId);
 
   const [editFarmOpen, setEditFarmOpen] = useState(false);
   const [deleteFarmOpen, setDeleteFarmOpen] = useState(false);
@@ -85,9 +81,7 @@ export function FarmDetailPage() {
   }
 
   if (!farm) {
-    return (
-      <div className="text-sm text-destructive">Granja no encontrada.</div>
-    );
+    return <div className="text-sm text-destructive">Granja no encontrada.</div>;
   }
 
   const sortIndicator = (key: SortKey) =>
@@ -103,15 +97,11 @@ export function FarmDetailPage() {
         </Link>
         <h1 className="flex-1 text-xl font-bold">{farm.name}</h1>
         <DropdownMenu>
-          <DropdownMenuTrigger
-            render={<Button variant="outline" size="sm" />}
-          >
+          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
             <MoreHorizontalIcon className="size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setEditFarmOpen(true)}>
-              Editar Granja
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setEditFarmOpen(true)}>Editar Granja</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setDeleteFarmOpen(true)}>
               Eliminar Granja
             </DropdownMenuItem>
@@ -133,10 +123,7 @@ export function FarmDetailPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => handleSort("name")}
-              >
+              <TableHead className="cursor-pointer select-none" onClick={() => handleSort("name")}>
                 Nombre{sortIndicator("name")}
               </TableHead>
               <TableHead
@@ -166,17 +153,13 @@ export function FarmDetailPage() {
                         : "bg-blue-100 text-blue-700"
                     }`}
                   >
-                    {pool.pool_type === "reproductor"
-                      ? "Reproductor"
-                      : "Crianza"}
+                    {pool.pool_type === "reproductor" ? "Reproductor" : "Crianza"}
                   </span>
                 </TableCell>
                 <TableCell>{pool.capacity ?? "—"}</TableCell>
                 <TableCell>
                   <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={<Button variant="ghost" size="icon-sm" />}
-                    >
+                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
                       <MoreHorizontalIcon className="size-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -211,9 +194,7 @@ export function FarmDetailPage() {
           </TableBody>
         </Table>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          No hay estanques creados.
-        </p>
+        <p className="text-sm text-muted-foreground">No hay estanques creados.</p>
       )}
 
       {/* Farm modals */}
@@ -223,10 +204,7 @@ export function FarmDetailPage() {
         farm={farm}
         isLoading={updateFarm.isPending}
         onSubmit={(data) => {
-          updateFarm.mutate(
-            { farmId: farmId!, input: data },
-            { onSuccess: () => setEditFarmOpen(false) },
-          );
+          updateFarm.mutate({ farmId, input: data }, { onSuccess: () => setEditFarmOpen(false) });
         }}
       />
 
@@ -237,7 +215,7 @@ export function FarmDetailPage() {
         description={`¿Estás seguro de eliminar "${farm.name}"? Esta acción se puede revertir.`}
         isLoading={deleteFarmMutation.isPending}
         onConfirm={() => {
-          deleteFarmMutation.mutate(farmId!, {
+          deleteFarmMutation.mutate(farmId, {
             onSuccess: () => navigate(ROUTES.FARMS),
           });
         }}

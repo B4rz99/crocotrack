@@ -8,7 +8,7 @@ export function useFarms() {
 
   return useQuery({
     queryKey: ["farms", orgId],
-    queryFn: () => getFarms(orgId!),
+    queryFn: () => getFarms(orgId as string),
     enabled: !!orgId,
   });
 }

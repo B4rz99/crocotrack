@@ -8,7 +8,7 @@ export function useCreateFarm() {
   const { profile } = useAuth();
 
   return useMutation({
-    mutationFn: (input: CreateFarmInput) => createFarm(profile!.org_id, input),
+    mutationFn: (input: CreateFarmInput) => createFarm(profile?.org_id as string, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["farms"] });
     },

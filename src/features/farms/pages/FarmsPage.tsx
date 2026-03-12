@@ -10,11 +10,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { FarmFormModal } from "../components/FarmFormModal";
-import {
-  useCreateFarm,
-  useDeleteFarm,
-  useUpdateFarm,
-} from "../hooks/useFarmMutations";
+import { useCreateFarm, useDeleteFarm, useUpdateFarm } from "../hooks/useFarmMutations";
 import { useFarms } from "../hooks/useFarms";
 
 export function FarmsPage() {
@@ -51,20 +47,12 @@ export function FarmsPage() {
       {farms && farms.length > 0 ? (
         <ul className="divide-y rounded-lg border">
           {farms.map((farm) => (
-            <li
-              key={farm.id}
-              className="flex items-center justify-between px-4 py-3"
-            >
-              <Link
-                to={`/farms/${farm.id}`}
-                className="text-sm font-medium hover:underline"
-              >
+            <li key={farm.id} className="flex items-center justify-between px-4 py-3">
+              <Link to={`/farms/${farm.id}`} className="text-sm font-medium hover:underline">
                 {farm.name}
               </Link>
               <DropdownMenu>
-                <DropdownMenuTrigger
-                  render={<Button variant="ghost" size="icon-sm" />}
-                >
+                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
                   <MoreHorizontalIcon className="size-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -95,9 +83,7 @@ export function FarmsPage() {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          No hay granjas creadas.
-        </p>
+        <p className="text-sm text-muted-foreground">No hay granjas creadas.</p>
       )}
 
       <FarmFormModal
