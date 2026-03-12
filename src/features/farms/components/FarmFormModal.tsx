@@ -86,7 +86,9 @@ export function FarmFormModal({
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              aria-invalid={!!errors.location}
             />
+            <FieldError message={errors.location} />
           </div>
           <DialogFooter>
             <Button

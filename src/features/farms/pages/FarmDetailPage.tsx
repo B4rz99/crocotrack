@@ -31,8 +31,8 @@ type SortDir = "asc" | "desc";
 export function FarmDetailPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const navigate = useNavigate();
-  const { data: farm, isLoading: farmLoading } = useFarm(farmId);
-  const { data: pools, isLoading: poolsLoading } = usePools(farmId);
+  const { data: farm, isLoading: farmLoading, error: farmError } = useFarm(farmId);
+  const { data: pools, isLoading: poolsLoading, error: poolsError } = usePools(farmId);
 
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
@@ -85,6 +85,10 @@ export function FarmDetailPage() {
 
   if (farmLoading || poolsLoading) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;
+  }
+
+  if (farmError || poolsError) {
+    return <div className="text-sm text-destructive">Error al cargar datos de la granja.</div>;
   }
 
   if (!farm) {

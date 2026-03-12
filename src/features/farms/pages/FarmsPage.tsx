@@ -15,7 +15,7 @@ import { useCreateFarm, useDeleteFarm, useUpdateFarm } from "../hooks/useFarmMut
 import { useFarms } from "../hooks/useFarms";
 
 export function FarmsPage() {
-  const { data: farms, isLoading } = useFarms();
+  const { data: farms, isLoading, error } = useFarms();
   const createFarm = useCreateFarm();
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
@@ -33,6 +33,10 @@ export function FarmsPage() {
 
   if (isLoading) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;
+  }
+
+  if (error) {
+    return <div className="text-sm text-destructive">Error al cargar granjas.</div>;
   }
 
   return (

@@ -48,6 +48,7 @@ export function PoolFormModal({
   const [name, setName] = useState("");
   const [poolType, setPoolType] = useState<"crianza" | "reproductor">("crianza");
   const [capacity, setCapacity] = useState("");
+  const [code, setCode] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export function PoolFormModal({
       setName(pool?.name ?? "");
       setPoolType(pool?.pool_type ?? "crianza");
       setCapacity(pool?.capacity != null ? String(pool.capacity) : "");
+      setCode(pool?.code ?? "");
       setErrors({});
     }
   }, [open, pool]);
@@ -66,6 +68,7 @@ export function PoolFormModal({
     const schema = pool ? updatePoolSchema : createPoolSchema;
     const result = schema.safeParse({
       name,
+      code: code || undefined,
       pool_type: poolType,
       capacity: Number(capacity),
     });
