@@ -24,7 +24,7 @@ const makePoolRow = (overrides: Record<string, unknown> = {}) => ({
   id: "pool-1",
   org_id: ORG_ID,
   farm_id: FARM_ID,
-  name: "Estanque Alpha",
+  name: "Pileta Alpha",
   code: null,
   pool_type: "crianza" as const,
   capacity: 100,
@@ -45,7 +45,7 @@ describe("Pools API", () => {
   describe("getPoolsByFarm", () => {
     it("returns pools from Supabase and populates Dexie", async () => {
       const mockFrom = await getMockFrom();
-      const pools = [makePoolRow(), makePoolRow({ id: "pool-2", name: "Estanque Beta" })];
+      const pools = [makePoolRow(), makePoolRow({ id: "pool-2", name: "Pileta Beta" })];
 
       const mockOrder = vi.fn().mockResolvedValue({ data: pools, error: null });
       const mockEq2 = vi.fn().mockReturnValue({ order: mockOrder });
@@ -122,7 +122,7 @@ describe("Pools API", () => {
       mockFrom.mockReturnValue({ insert: mockInsert });
 
       const { id } = await createPool(ORG_ID, FARM_ID, {
-        name: "Nuevo Estanque",
+        name: "Nuevo Pileta",
         pool_type: "reproductor",
         capacity: 50,
       });
@@ -134,7 +134,7 @@ describe("Pools API", () => {
           id,
           org_id: ORG_ID,
           farm_id: FARM_ID,
-          name: "Nuevo Estanque",
+          name: "Nuevo Pileta",
           pool_type: "reproductor",
           capacity: 50,
           is_active: true,
@@ -144,7 +144,7 @@ describe("Pools API", () => {
       const local = await db.pools.get(id);
       expect(local).toBeDefined();
       expect(local?._sync_status).toBe("synced");
-      expect(local?.name).toBe("Nuevo Estanque");
+      expect(local?.name).toBe("Nuevo Pileta");
       expect(local?.pool_type).toBe("reproductor");
     });
 

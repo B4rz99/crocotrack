@@ -85,11 +85,11 @@ export function PoolFormModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{pool ? "Editar Estanque" : "Crear Estanque"}</DialogTitle>
+          <DialogTitle>{pool ? "Editar Pileta" : "Crear Pileta"}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="pool-name">Nombre del estanque</Label>
+            <Label htmlFor="pool-name">Nombre de la pileta</Label>
             <Input
               id="pool-name"
               type="text"
@@ -100,7 +100,7 @@ export function PoolFormModal({
             <FieldError message={errors.name} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="pool-type">Tipo de estanque</Label>
+            <Label htmlFor="pool-type">Tipo de pileta</Label>
             <Select
               value={poolType}
               onValueChange={(v) => {
@@ -108,7 +108,7 @@ export function PoolFormModal({
               }}
             >
               <SelectTrigger id="pool-type" className="w-full">
-                <SelectValue />
+                <SelectValue>{poolType === "reproductor" ? "Reproductor" : "Crianza"}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="crianza">Crianza</SelectItem>

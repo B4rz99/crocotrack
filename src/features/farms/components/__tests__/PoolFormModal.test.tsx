@@ -15,19 +15,19 @@ describe("PoolFormModal", () => {
     vi.clearAllMocks();
   });
 
-  it("renders 'Crear Estanque' title when no pool prop", () => {
+  it("renders 'Crear Pileta' title when no pool prop", () => {
     render(<PoolFormModal {...defaultProps} />);
-    expect(screen.getByText("Crear Estanque")).toBeInTheDocument();
+    expect(screen.getByText("Crear Pileta")).toBeInTheDocument();
   });
 
-  it("renders 'Editar Estanque' title when pool prop provided", () => {
+  it("renders 'Editar Pileta' title when pool prop provided", () => {
     render(
       <PoolFormModal
         {...defaultProps}
-        pool={{ name: "Estanque A", pool_type: "crianza", capacity: 100 }}
+        pool={{ name: "Pileta A", pool_type: "crianza", capacity: 100 }}
       />,
     );
-    expect(screen.getByText("Editar Estanque")).toBeInTheDocument();
+    expect(screen.getByText("Editar Pileta")).toBeInTheDocument();
   });
 
   it("shows validation error when name is empty", async () => {
@@ -50,8 +50,8 @@ describe("PoolFormModal", () => {
     const user = userEvent.setup();
     render(<PoolFormModal {...defaultProps} />);
 
-    const nameInput = screen.getByLabelText("Nombre del estanque");
-    await user.type(nameInput, "Nuevo Estanque");
+    const nameInput = screen.getByLabelText("Nombre de la pileta");
+    await user.type(nameInput, "Nuevo Pileta");
 
     const capacityInput = screen.getByLabelText("Capacidad");
     await user.type(capacityInput, "75");
@@ -62,7 +62,7 @@ describe("PoolFormModal", () => {
     await waitFor(() => {
       expect(defaultProps.onSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: "Nuevo Estanque",
+          name: "Nuevo Pileta",
           pool_type: "crianza",
           capacity: 75,
         }),
@@ -74,14 +74,14 @@ describe("PoolFormModal", () => {
     render(
       <PoolFormModal
         {...defaultProps}
-        pool={{ name: "Estanque Existente", pool_type: "reproductor", capacity: 200 }}
+        pool={{ name: "Pileta Existente", pool_type: "reproductor", capacity: 200 }}
       />,
     );
 
-    const nameInput = screen.getByLabelText("Nombre del estanque");
+    const nameInput = screen.getByLabelText("Nombre de la pileta");
     const capacityInput = screen.getByLabelText("Capacidad");
 
-    expect(nameInput).toHaveValue("Estanque Existente");
+    expect(nameInput).toHaveValue("Pileta Existente");
     expect(capacityInput).toHaveValue(200);
   });
 
@@ -89,7 +89,7 @@ describe("PoolFormModal", () => {
     render(
       <PoolFormModal
         {...defaultProps}
-        pool={{ name: "Estanque A", pool_type: "crianza", capacity: 50 }}
+        pool={{ name: "Pileta A", pool_type: "crianza", capacity: 50 }}
       />,
     );
     expect(screen.getByRole("button", { name: "Guardar" })).toBeInTheDocument();

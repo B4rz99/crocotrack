@@ -121,11 +121,11 @@ export function FarmDetailPage() {
 
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-medium text-muted-foreground">
-          Estanques ({sortedPools.length})
+          Piletas ({sortedPools.length})
         </h2>
         <Button onClick={() => setCreatePoolOpen(true)} size="sm">
           <PlusIcon className="mr-1 size-4" />
-          Crear Estanque
+          Crear Pileta
         </Button>
       </div>
 
@@ -205,7 +205,7 @@ export function FarmDetailPage() {
           </TableBody>
         </Table>
       ) : (
-        <p className="text-sm text-muted-foreground">No hay estanques creados.</p>
+        <p className="text-sm text-muted-foreground">No hay piletas creadas.</p>
       )}
 
       {/* Farm modals */}
@@ -265,7 +265,7 @@ export function FarmDetailPage() {
         onOpenChange={(open) => {
           if (!open) setDeletePoolTarget(null);
         }}
-        title="Eliminar Estanque"
+        title="Eliminar Pileta"
         description={`¿Estás seguro de eliminar "${deletePoolNameRef.current}"? Esta acción se puede revertir.`}
         isLoading={deletePoolMutation.isPending}
         onConfirm={() => {
