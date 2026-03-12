@@ -22,12 +22,12 @@ describe("PoolSetupStep", () => {
 
     expect(
       screen.getByText(
-        "Genera tus estanques en lote. Define cuántos necesitas, el patrón de numeración y la capacidad por tipo.",
+        "Genera tus piletas en lote. Define cuántas necesitas, el patrón de numeración y la capacidad por tipo.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByText("Grupo 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Cantidad")).toBeInTheDocument();
-    expect(screen.getByLabelText("Capacidad por estanque")).toBeInTheDocument();
+    expect(screen.getByLabelText("Capacidad por pileta")).toBeInTheDocument();
     expect(screen.getByLabelText("Prefijo")).toBeInTheDocument();
     expect(screen.getByLabelText("Número inicial")).toBeInTheDocument();
   });
@@ -36,7 +36,7 @@ describe("PoolSetupStep", () => {
     const { user } = renderStep();
 
     await user.type(screen.getByLabelText("Cantidad"), "5");
-    await user.type(screen.getByLabelText("Capacidad por estanque"), "100");
+    await user.type(screen.getByLabelText("Capacidad por pileta"), "100");
 
     await waitFor(() => {
       expect(screen.getByText("Vista previa:")).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe("PoolSetupStep", () => {
     await user.clear(screen.getByLabelText("Prefijo"));
     await user.type(screen.getByLabelText("Prefijo"), "A");
     await user.type(screen.getByLabelText("Cantidad"), "3");
-    await user.type(screen.getByLabelText("Capacidad por estanque"), "50");
+    await user.type(screen.getByLabelText("Capacidad por pileta"), "50");
 
     await waitFor(() => {
       expect(screen.getByText("A1, A2, A3")).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe("PoolSetupStep", () => {
     const { user, onNext } = renderStep();
 
     await user.type(screen.getByLabelText("Cantidad"), "3");
-    await user.type(screen.getByLabelText("Capacidad por estanque"), "100");
+    await user.type(screen.getByLabelText("Capacidad por pileta"), "100");
     await user.click(screen.getByRole("button", { name: "Siguiente" }));
 
     await waitFor(() => {
@@ -97,10 +97,10 @@ describe("PoolSetupStep", () => {
     const { user } = renderStep();
 
     await user.type(screen.getByLabelText("Cantidad"), "10");
-    await user.type(screen.getByLabelText("Capacidad por estanque"), "50");
+    await user.type(screen.getByLabelText("Capacidad por pileta"), "50");
 
     await waitFor(() => {
-      expect(screen.getByText("Se crearán 10 estanques en total")).toBeInTheDocument();
+      expect(screen.getByText("Se crearán 10 piletas en total")).toBeInTheDocument();
     });
   });
 

@@ -12,7 +12,7 @@ const STEP_LABELS = [
   "Organización",
   "Granja",
   "Tipos de Alimento",
-  "Estanques",
+  "Piletas",
   "Incubadoras",
   "Invitar Equipo",
 ] as const;

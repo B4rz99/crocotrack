@@ -106,10 +106,10 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
       const cap = Number(g.capacity);
 
       if (!Number.isInteger(qty) || qty <= 0) {
-        newErrors[`${g.id}-quantity`] = "Ingresa la cantidad de estanques";
+        newErrors[`${g.id}-quantity`] = "Ingresa la cantidad de piletas";
       }
       if (!Number.isInteger(cap) || cap <= 0) {
-        newErrors[`${g.id}-capacity`] = "Ingresa la capacidad por estanque";
+        newErrors[`${g.id}-capacity`] = "Ingresa la capacidad por pileta";
       }
     }
 
@@ -124,8 +124,8 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Genera tus estanques en lote. Define cuántos necesitas, el patrón de numeración y la
-        capacidad por tipo.
+        Genera tus piletas en lote. Define cuántas necesitas, el patrón de numeración y la capacidad
+        por tipo.
       </p>
 
       {groups.map((group, index) => {
@@ -150,7 +150,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label htmlFor={`pool-type-${group.id}`}>Tipo de estanque</Label>
+                <Label htmlFor={`pool-type-${group.id}`}>Tipo de pileta</Label>
                 <Select
                   value={group.poolType}
                   onValueChange={(v) => {
@@ -162,7 +162,9 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
                   }}
                 >
                   <SelectTrigger id={`pool-type-${group.id}`} className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {group.poolType === "reproductor" ? "Reproductor" : "Crianza"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="crianza">Crianza</SelectItem>
@@ -208,7 +210,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
               </div>
 
               <div className="col-span-2 space-y-1">
-                <Label htmlFor={`pool-cap-${group.id}`}>Capacidad por estanque</Label>
+                <Label htmlFor={`pool-cap-${group.id}`}>Capacidad por pileta</Label>
                 <Input
                   id={`pool-cap-${group.id}`}
                   type="number"
@@ -246,7 +248,7 @@ export function PoolSetupStep({ onNext, onBack }: PoolSetupStepProps) {
 
       {totalCount > 0 && (
         <p className="text-center text-sm text-muted-foreground">
-          {`Se ${totalCount === 1 ? "creará" : "crearán"} ${totalCount} ${totalCount === 1 ? "estanque" : "estanques"} en total`}
+          {`Se ${totalCount === 1 ? "creará" : "crearán"} ${totalCount} ${totalCount === 1 ? "pileta" : "piletas"} en total`}
         </p>
       )}
 

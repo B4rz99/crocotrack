@@ -1,6 +1,7 @@
 import { db } from "@/shared/lib/db";
 import { untypedSupabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
+import { generateId, nowISO } from "@/shared/lib/utils";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
 import type { CreateOrgInput } from "@/shared/schemas/org.schema";
@@ -14,10 +15,6 @@ interface OnboardingData {
   readonly incubatorsData: readonly CreateIncubatorInput[];
   readonly inviteEmails: readonly string[];
 }
-
-const generateId = (): string => crypto.randomUUID();
-
-const nowISO = (): string => new Date().toISOString();
 
 async function batchInsertWithSync(
   tableName: string,
