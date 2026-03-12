@@ -36,7 +36,7 @@ export async function getPoolsByFarm(farmId: string) {
   const localPools = await db.pools
     .where("farm_id")
     .equals(farmId)
-    .filter((p) => p.is_active && !remoteIds.has(p.id))
+    .filter((p) => p.is_active && p._sync_status !== "pending" && !remoteIds.has(p.id))
     .toArray();
   if (localPools.length > 0) {
     await db.pools.bulkUpdate(

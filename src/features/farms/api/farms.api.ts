@@ -35,7 +35,7 @@ export async function getFarms(orgId: string) {
   const localFarms = await db.farms
     .where("org_id")
     .equals(orgId)
-    .filter((f) => f.is_active && !remoteIds.has(f.id))
+    .filter((f) => f.is_active && f._sync_status !== "pending" && !remoteIds.has(f.id))
     .toArray();
   if (localFarms.length > 0) {
     await db.farms.bulkUpdate(
@@ -60,8 +60,11 @@ export async function getFarmById(farmId: string) {
   }
 
   if (!data) {
-    await db.farms.update(farmId, { is_active: false });
-    return null;
+    const local = await db.farms.get(farmId);
+    if (local && local._sync_status !== "pending") {
+      await db.farms.update(farmId, { is_active: false });
+    }
+    return local?._sync_status === "pending" && local.is_active ? local : null;
   }
 
   const now = nowISO();
