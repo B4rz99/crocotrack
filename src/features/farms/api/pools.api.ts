@@ -32,6 +32,18 @@ export async function getPoolsByFarm(farmId: string) {
     })),
   );
 
+  const remoteIds = new Set(data.map((p) => p.id));
+  const localPools = await db.pools
+    .where("farm_id")
+    .equals(farmId)
+    .filter((p) => p.is_active && !remoteIds.has(p.id))
+    .toArray();
+  if (localPools.length > 0) {
+    await db.pools.bulkUpdate(
+      localPools.map((p) => ({ key: p.id, changes: { is_active: false } })),
+    );
+  }
+
   return data;
 }
 

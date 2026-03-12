@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { Button } from "@/shared/components/ui/button";
+import { Button, buttonVariants } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +54,7 @@ export function FarmDetailPage() {
     id: string;
     name: string;
   } | null>(null);
+  const deletePoolNameRef = useRef("");
 
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
@@ -101,10 +102,8 @@ export function FarmDetailPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Link to={ROUTES.FARMS}>
-          <Button variant="ghost" size="icon-sm">
-            <ArrowLeftIcon className="size-4" />
-          </Button>
+        <Link to={ROUTES.FARMS} className={buttonVariants({ variant: "ghost", size: "icon-sm" })}>
+          <ArrowLeftIcon className="size-4" />
         </Link>
         <h1 className="flex-1 text-xl font-bold">{farm.name}</h1>
         <DropdownMenu>
@@ -188,12 +187,13 @@ export function FarmDetailPage() {
                         Editar
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() =>
+                        onClick={() => {
+                          deletePoolNameRef.current = pool.name;
                           setDeletePoolTarget({
                             id: pool.id,
                             name: pool.name,
-                          })
-                        }
+                          });
+                        }}
                       >
                         Eliminar
                       </DropdownMenuItem>
@@ -266,7 +266,7 @@ export function FarmDetailPage() {
           if (!open) setDeletePoolTarget(null);
         }}
         title="Eliminar Estanque"
-        description={`¿Estás seguro de eliminar "${deletePoolTarget?.name}"? Esta acción se puede revertir.`}
+        description={`¿Estás seguro de eliminar "${deletePoolNameRef.current}"? Esta acción se puede revertir.`}
         isLoading={deletePoolMutation.isPending}
         onConfirm={() => {
           if (!deletePoolTarget) return;

@@ -31,6 +31,18 @@ export async function getFarms(orgId: string) {
     })),
   );
 
+  const remoteIds = new Set(data.map((f) => f.id));
+  const localFarms = await db.farms
+    .where("org_id")
+    .equals(orgId)
+    .filter((f) => f.is_active && !remoteIds.has(f.id))
+    .toArray();
+  if (localFarms.length > 0) {
+    await db.farms.bulkUpdate(
+      localFarms.map((f) => ({ key: f.id, changes: { is_active: false } })),
+    );
+  }
+
   return data;
 }
 
@@ -40,11 +52,16 @@ export async function getFarmById(farmId: string) {
     .select("*")
     .eq("id", farmId)
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
 
   if (error) {
     const local = await db.farms.get(farmId);
     return local?.is_active ? local : null;
+  }
+
+  if (!data) {
+    await db.farms.update(farmId, { is_active: false });
+    return null;
   }
 
   const now = nowISO();
