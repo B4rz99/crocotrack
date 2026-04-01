@@ -1,7 +1,7 @@
 import { ArrowLeftIcon, MoreHorizontalIcon, PlusIcon } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { Button, buttonVariants } from "@/shared/components/ui/button";
+import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { ROUTES } from "@/shared/constants/routes";
+import type { PoolWithLotes } from "../api/pools.api";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { FarmFormModal } from "../components/FarmFormModal";
 import { PoolFormModal } from "../components/PoolFormModal";
@@ -27,6 +28,21 @@ import { usePools } from "../hooks/usePools";
 
 type SortKey = "name" | "pool_type" | "capacity";
 type SortDir = "asc" | "desc";
+
+const getActiveLote = (pool: PoolWithLotes) =>
+  pool.lotes[0] as PoolWithLotes["lotes"][number] | undefined;
+
+const getTotalAnimals = (pool: PoolWithLotes): number | null => {
+  const lote = getActiveLote(pool);
+  if (!lote) return null;
+  return lote.lote_size_compositions.reduce((sum, c) => sum + c.animal_count, 0);
+};
+
+const getSizesList = (pool: PoolWithLotes): string => {
+  const lote = getActiveLote(pool);
+  if (!lote || lote.lote_size_compositions.length === 0) return "";
+  return lote.lote_size_compositions.map((c) => `${c.size_inches}"`).join(", ");
+};
 
 export function FarmDetailPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
@@ -54,7 +70,6 @@ export function FarmDetailPage() {
     id: string;
     name: string;
   } | null>(null);
-  const deletePoolNameRef = useRef("");
 
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
@@ -102,12 +117,16 @@ export function FarmDetailPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Link to={ROUTES.FARMS} className={buttonVariants({ variant: "ghost", size: "icon-sm" })}>
-          <ArrowLeftIcon className="size-4" />
+        <Link to={ROUTES.FARMS}>
+          <Button variant="ghost" size="icon-sm" aria-label="Volver a granjas">
+            <ArrowLeftIcon className="size-4" />
+          </Button>
         </Link>
         <h1 className="flex-1 text-xl font-bold">{farm.name}</h1>
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
+          <DropdownMenuTrigger
+            render={<Button variant="outline" size="sm" aria-label="Acciones de granja" />}
+          >
             <MoreHorizontalIcon className="size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -148,60 +167,78 @@ export function FarmDetailPage() {
               >
                 Capacidad{sortIndicator("capacity")}
               </TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Animales</TableHead>
+              <TableHead>Tamaños</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedPools.map((pool) => (
-              <TableRow key={pool.id}>
-                <TableCell className="font-medium">{pool.name}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
-                      pool.pool_type === "reproductor"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
-                  >
-                    {pool.pool_type === "reproductor" ? "Reproductor" : "Crianza"}
-                  </span>
-                </TableCell>
-                <TableCell>{pool.capacity ?? "—"}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
-                      <MoreHorizontalIcon className="size-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          setEditPool({
-                            id: pool.id,
-                            name: pool.name,
-                            pool_type: pool.pool_type,
-                            capacity: pool.capacity,
-                            code: pool.code,
-                          })
+            {sortedPools.map((pool) => {
+              const hasActiveLote = !!getActiveLote(pool);
+              const totalAnimals = getTotalAnimals(pool);
+              const sizes = getSizesList(pool);
+
+              return (
+                <TableRow key={pool.id}>
+                  <TableCell className="font-medium">{pool.name}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                        pool.pool_type === "reproductor"
+                          ? "bg-purple-100 text-purple-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {pool.pool_type === "reproductor" ? "Reproductor" : "Crianza"}
+                    </span>
+                  </TableCell>
+                  <TableCell>{pool.capacity ?? "—"}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                        hasActiveLote ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {hasActiveLote ? "Con lote" : "Vacía"}
+                    </span>
+                  </TableCell>
+                  <TableCell>{totalAnimals ?? "—"}</TableCell>
+                  <TableCell>{sizes || "—"}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button variant="ghost" size="icon-sm" aria-label="Acciones de pileta" />
                         }
                       >
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          deletePoolNameRef.current = pool.name;
-                          setDeletePoolTarget({
-                            id: pool.id,
-                            name: pool.name,
-                          });
-                        }}
-                      >
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                        <MoreHorizontalIcon className="size-4" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setEditPool({
+                              id: pool.id,
+                              name: pool.name,
+                              pool_type: pool.pool_type,
+                              capacity: pool.capacity,
+                              code: pool.code,
+                            })
+                          }
+                        >
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setDeletePoolTarget({ id: pool.id, name: pool.name })}
+                        >
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       ) : (
@@ -266,7 +303,7 @@ export function FarmDetailPage() {
           if (!open) setDeletePoolTarget(null);
         }}
         title="Eliminar Pileta"
-        description={`¿Estás seguro de eliminar "${deletePoolNameRef.current}"? Esta acción se puede revertir.`}
+        description={`¿Estás seguro de eliminar "${deletePoolTarget?.name}"? Esta acción se puede revertir.`}
         isLoading={deletePoolMutation.isPending}
         onConfirm={() => {
           if (!deletePoolTarget) return;

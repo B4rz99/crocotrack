@@ -65,6 +65,28 @@ export interface LocalFoodType extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalLote extends SyncMeta {
+  readonly id: string;
+  readonly pool_id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly status: "activo" | "cerrado";
+  readonly opened_at: string;
+  readonly closed_at?: string;
+  readonly created_by?: string;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalLoteSizeComposition extends SyncMeta {
+  readonly id: string;
+  readonly lote_id: string;
+  readonly size_inches: number;
+  readonly animal_count: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
@@ -81,6 +103,8 @@ class CrocoTrackDB extends Dexie {
   pools!: Table<LocalPool>;
   incubators!: Table<LocalIncubator>;
   food_types!: Table<LocalFoodType>;
+  lotes!: Table<LocalLote>;
+  lote_size_compositions!: Table<LocalLoteSizeComposition>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -92,6 +116,10 @@ class CrocoTrackDB extends Dexie {
       incubators: "id, org_id, farm_id, _sync_status",
       food_types: "id, org_id, _sync_status",
       sync_outbox: "++id, table_name, record_id",
+    });
+    this.version(2).stores({
+      lotes: "id, pool_id, farm_id, org_id, status, _sync_status",
+      lote_size_compositions: "id, lote_id, _sync_status",
     });
   }
 }
