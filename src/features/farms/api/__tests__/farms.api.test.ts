@@ -129,7 +129,7 @@ describe("farms.api", () => {
           name: "Granja Nueva",
           location: "Monteria",
           is_active: true,
-        }),
+        })
       );
 
       const localFarm = await db.farms.get(result.id);
@@ -164,7 +164,7 @@ describe("farms.api", () => {
           org_id: ORG_ID,
           name: "Granja Offline",
           is_active: true,
-        }),
+        })
       );
     });
   });

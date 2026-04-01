@@ -11,7 +11,7 @@ function renderRegisterForm(onSubmit = vi.fn()) {
     ...render(
       <MemoryRouter>
         <RegisterForm onSubmit={onSubmit} />
-      </MemoryRouter>,
+      </MemoryRouter>
     ),
   };
 }
@@ -113,7 +113,7 @@ describe("RegisterForm", () => {
     render(
       <MemoryRouter>
         <RegisterForm onSubmit={vi.fn()} isLoading />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     expect(screen.getByRole("button", { name: "Registrarse" })).toBeDisabled();

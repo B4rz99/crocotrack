@@ -18,7 +18,7 @@ function renderModal(overrides: Partial<Parameters<typeof FarmFormModal>[0]> = {
         onSubmit={onSubmit}
         isLoading={overrides.isLoading}
         farm={overrides.farm}
-      />,
+      />
     ),
   };
 }

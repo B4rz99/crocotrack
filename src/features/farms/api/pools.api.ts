@@ -42,7 +42,7 @@ export async function getPoolsByFarm(farmId: string) {
         id, status, opened_at,
         lote_size_compositions ( size_inches, animal_count )
       )
-    `,
+    `
     )
     .eq("farm_id", farmId)
     .eq("is_active", true)
@@ -72,7 +72,7 @@ export async function getPoolsByFarm(farmId: string) {
       capacity: pool.capacity ?? undefined,
       _sync_status: "synced" as const,
       _local_updated_at: now,
-    })),
+    }))
   );
 
   const remoteIds = new Set(data.map((p) => p.id));
@@ -83,7 +83,7 @@ export async function getPoolsByFarm(farmId: string) {
     .toArray();
   if (localPools.length > 0) {
     await db.pools.bulkUpdate(
-      localPools.map((p) => ({ key: p.id, changes: { is_active: false } })),
+      localPools.map((p) => ({ key: p.id, changes: { is_active: false } }))
     );
   }
 

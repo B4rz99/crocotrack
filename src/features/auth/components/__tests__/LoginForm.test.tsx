@@ -11,7 +11,7 @@ function renderLoginForm(onSubmit = vi.fn()) {
     ...render(
       <MemoryRouter>
         <LoginForm onSubmit={onSubmit} />
-      </MemoryRouter>,
+      </MemoryRouter>
     ),
   };
 }
@@ -103,7 +103,7 @@ describe("LoginForm", () => {
     render(
       <MemoryRouter>
         <LoginForm onSubmit={vi.fn()} isLoading />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
 
     expect(screen.getByRole("button", { name: "Ingresar" })).toBeDisabled();

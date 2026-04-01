@@ -22,8 +22,8 @@ describe("PoolSetupStep", () => {
 
     expect(
       screen.getByText(
-        "Genera tus piletas en lote. Define cuántas necesitas, el patrón de numeración y la capacidad por tipo.",
-      ),
+        "Genera tus piletas en lote. Define cuántas necesitas, el patrón de numeración y la capacidad por tipo."
+      )
     ).toBeInTheDocument();
     expect(screen.getByText("Grupo 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Cantidad")).toBeInTheDocument();

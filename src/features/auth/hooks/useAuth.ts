@@ -13,5 +13,5 @@ export const useAuth = () =>
       setSession: state.setSession,
       setProfile: state.setProfile,
       clear: state.clear,
-    })),
+    }))
   );

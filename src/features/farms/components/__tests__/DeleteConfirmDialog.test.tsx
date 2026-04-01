@@ -19,7 +19,7 @@ function renderDialog(overrides: Partial<Parameters<typeof DeleteConfirmDialog>[
         description={overrides.description ?? "Esta accion no se puede deshacer."}
         onConfirm={onConfirm}
         isLoading={overrides.isLoading}
-      />,
+      />
     ),
   };
 }

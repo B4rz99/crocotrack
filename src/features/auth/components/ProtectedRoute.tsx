@@ -14,7 +14,7 @@ export function ProtectedRoute({ requiredRole }: ProtectedRouteProps) {
       isLoading: s.isLoading,
       profile: s.profile,
       onboardingCompleted: s.onboardingCompleted,
-    })),
+    }))
   );
   const location = useLocation();
 
