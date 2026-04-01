@@ -100,6 +100,7 @@ export function useOnboardingWizard() {
           profile.id,
         );
 
+        useAuthStore.getState().setOnboardingCompleted(true);
         reset();
         navigate(ROUTES.DASHBOARD);
       } catch (err) {

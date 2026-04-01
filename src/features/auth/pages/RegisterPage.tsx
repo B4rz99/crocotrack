@@ -6,6 +6,17 @@ import { supabase } from "@/shared/lib/supabase";
 import type { RegisterFormData } from "../components/RegisterForm";
 import { RegisterForm } from "../components/RegisterForm";
 
+const AUTH_ERROR_MAP: Record<string, string> = {
+  "Invalid login credentials": "Correo electrónico o contraseña incorrectos",
+  "Email not confirmed": "Debes confirmar tu correo electrónico antes de iniciar sesión",
+  "User already registered": "Ya existe una cuenta con ese correo electrónico",
+  "Password should be at least 6 characters": "La contraseña debe tener al menos 6 caracteres",
+};
+
+function translateAuthError(message: string): string {
+  return AUTH_ERROR_MAP[message] ?? "Ocurrió un error inesperado. Intenta de nuevo.";
+}
+
 export function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +38,7 @@ export function RegisterPage() {
     });
 
     if (authError) {
-      setError(authError.message);
+      setError(translateAuthError(authError.message));
       setIsLoading(false);
       return;
     }
