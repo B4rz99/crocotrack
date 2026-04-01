@@ -10,3 +10,7 @@ export const createPoolSchema = z.object({
 });
 
 export type CreatePoolInput = z.infer<typeof createPoolSchema>;
+
+export const updatePoolSchema = createPoolSchema;
+
+export type UpdatePoolInput = z.infer<typeof updatePoolSchema>;
