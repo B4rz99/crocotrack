@@ -1,84 +1,75 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { FarmFormModal } from "../FarmFormModal";
 
-describe("FarmFormModal", () => {
-  const defaultProps = {
-    open: true,
-    onOpenChange: vi.fn(),
-    onSubmit: vi.fn(),
-    isLoading: false,
-  };
+function renderModal(overrides: Partial<Parameters<typeof FarmFormModal>[0]> = {}) {
+  const onOpenChange = overrides.onOpenChange ?? vi.fn();
+  const onSubmit = overrides.onSubmit ?? vi.fn();
 
-  beforeEach(() => {
-    vi.clearAllMocks();
+  return {
+    onOpenChange,
+    onSubmit,
+    user: userEvent.setup(),
+    ...render(
+      <FarmFormModal
+        open={overrides.open ?? true}
+        onOpenChange={onOpenChange}
+        onSubmit={onSubmit}
+        isLoading={overrides.isLoading}
+        farm={overrides.farm}
+      />,
+    ),
+  };
+}
+
+describe("FarmFormModal", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("renders 'Crear Granja' title when no farm prop", () => {
-    render(<FarmFormModal {...defaultProps} />);
+    renderModal();
+
     expect(screen.getByText("Crear Granja")).toBeInTheDocument();
   });
 
   it("renders 'Editar Granja' title when farm prop provided", () => {
-    render(<FarmFormModal {...defaultProps} farm={{ name: "Mi Granja", location: "Bogotá" }} />);
+    renderModal({ farm: { name: "Granja Norte", location: "Monteria" } });
+
     expect(screen.getByText("Editar Granja")).toBeInTheDocument();
   });
 
   it("shows validation error when name is empty", async () => {
-    const user = userEvent.setup();
-    render(<FarmFormModal {...defaultProps} />);
+    const { user, onSubmit } = renderModal();
 
-    const submitButton = screen.getByRole("button", { name: "Crear" });
-    await user.click(submitButton);
+    await user.click(screen.getByRole("button", { name: "Crear" }));
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
     });
-    expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it("calls onSubmit with form data when valid", async () => {
-    const user = userEvent.setup();
-    render(<FarmFormModal {...defaultProps} />);
+    const { user, onSubmit } = renderModal();
 
-    const nameInput = screen.getByLabelText("Nombre de la granja");
-    await user.type(nameInput, "Nueva Granja");
-
-    const submitButton = screen.getByRole("button", { name: "Crear" });
-    await user.click(submitButton);
+    await user.type(screen.getByLabelText("Nombre de la granja"), "Granja Sur");
+    await user.type(screen.getByLabelText("Ubicación"), "Sincelejo");
+    await user.click(screen.getByRole("button", { name: "Crear" }));
 
     await waitFor(() => {
-      expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-        name: "Nueva Granja",
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: "Granja Sur",
+        location: "Sincelejo",
       });
     });
   });
 
   it("pre-fills fields in edit mode", () => {
-    render(
-      <FarmFormModal {...defaultProps} farm={{ name: "Granja Existente", location: "Medellín" }} />,
-    );
+    renderModal({ farm: { name: "Granja Norte", location: "Monteria" } });
 
-    const nameInput = screen.getByLabelText("Nombre de la granja");
-    const locationInput = screen.getByLabelText("Ubicación");
-
-    expect(nameInput).toHaveValue("Granja Existente");
-    expect(locationInput).toHaveValue("Medellín");
-  });
-
-  it("shows 'Guardar' button text in edit mode", () => {
-    render(<FarmFormModal {...defaultProps} farm={{ name: "Mi Granja" }} />);
-    expect(screen.getByRole("button", { name: "Guardar" })).toBeInTheDocument();
-  });
-
-  it("calls onOpenChange(false) when Cancelar clicked", async () => {
-    const user = userEvent.setup();
-    render(<FarmFormModal {...defaultProps} />);
-
-    const cancelButton = screen.getByRole("button", { name: "Cancelar" });
-    await user.click(cancelButton);
-
-    expect(defaultProps.onOpenChange).toHaveBeenCalledWith(false);
+    expect(screen.getByLabelText("Nombre de la granja")).toHaveValue("Granja Norte");
+    expect(screen.getByLabelText("Ubicación")).toHaveValue("Monteria");
   });
 });

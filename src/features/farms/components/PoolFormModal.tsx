@@ -100,6 +100,16 @@ export function PoolFormModal({
             <FieldError message={errors.name} />
           </div>
           <div className="space-y-2">
+            <Label htmlFor="pool-code">Código (opcional)</Label>
+            <Input
+              id="pool-code"
+              type="text"
+              maxLength={20}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="pool-type">Tipo de pileta</Label>
             <Select
               value={poolType}
@@ -108,7 +118,7 @@ export function PoolFormModal({
               }}
             >
               <SelectTrigger id="pool-type" className="w-full">
-                <SelectValue>{poolType === "reproductor" ? "Reproductor" : "Crianza"}</SelectValue>
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="crianza">Crianza</SelectItem>

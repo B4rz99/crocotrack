@@ -6,7 +6,15 @@ type SyncOperation = SyncOutboxEntry["operation"];
 
 const MAX_RETRIES = 10;
 
-const SYNCABLE_TABLES = ["organizations", "farms", "pools", "incubators", "food_types"] as const;
+const SYNCABLE_TABLES = [
+  "organizations",
+  "farms",
+  "pools",
+  "incubators",
+  "food_types",
+  "lotes",
+  "lote_size_compositions",
+] as const;
 type SyncableTable = (typeof SYNCABLE_TABLES)[number];
 
 const isSyncableTable = (name: string): name is SyncableTable =>

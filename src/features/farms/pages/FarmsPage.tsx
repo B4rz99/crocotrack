@@ -15,7 +15,7 @@ import { useCreateFarm, useDeleteFarm, useUpdateFarm } from "../hooks/useFarmMut
 import { useFarms } from "../hooks/useFarms";
 
 export function FarmsPage() {
-  const { data: farms, isLoading, error } = useFarms();
+  const { data: farms, isPending, error } = useFarms();
   const createFarm = useCreateFarm();
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
@@ -31,7 +31,7 @@ export function FarmsPage() {
     name: string;
   } | null>(null);
 
-  if (isLoading) {
+  if (isPending) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;
   }
 
@@ -60,7 +60,9 @@ export function FarmsPage() {
                 {farm.name}
               </Link>
               <DropdownMenu>
-                <DropdownMenuTrigger render={<Button variant="ghost" size="icon-sm" />}>
+                <DropdownMenuTrigger
+                  render={<Button variant="ghost" size="icon-sm" aria-label="Acciones" />}
+                >
                   <MoreHorizontalIcon className="size-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
