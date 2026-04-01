@@ -29,7 +29,7 @@
         "noRedeclare": "error"
       },
       "style": {
-        "useNamingConvention": "warn",
+        "useNamingConvention": "error",
         "noParameterAssign": "error"
       },
       "correctness": {
