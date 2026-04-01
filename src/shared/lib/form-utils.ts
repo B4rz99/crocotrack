@@ -5,8 +5,8 @@ export function zodFieldErrors(error: z.ZodError): Record<string, string> {
     error.issues
       .filter(
         (issue): issue is typeof issue & { path: [string, ...unknown[]] } =>
-          typeof issue.path[0] === "string",
+          typeof issue.path[0] === "string"
       )
-      .map((issue) => [issue.path[0], issue.message]),
+      .map((issue) => [issue.path[0], issue.message])
   );
 }

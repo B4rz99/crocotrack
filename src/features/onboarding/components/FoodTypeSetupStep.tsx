@@ -25,7 +25,7 @@ export function FoodTypeSetupStep({ onNext, onBack }: FoodTypeSetupStepProps) {
   const keyCounter = useRef(DEFAULT_FOOD_TYPES.length);
 
   const [foodTypes, setFoodTypes] = useState<readonly KeyedFoodType[]>(
-    DEFAULT_FOOD_TYPES.map((ft, i) => ({ key: i, data: ft })),
+    DEFAULT_FOOD_TYPES.map((ft, i) => ({ key: i, data: ft }))
   );
   const [newName, setNewName] = useState("");
 

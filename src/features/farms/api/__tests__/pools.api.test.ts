@@ -163,7 +163,7 @@ describe("pools.api", () => {
           pool_type: "crianza",
           capacity: 150,
           is_active: true,
-        }),
+        })
       );
 
       // Verify Dexie record
@@ -199,7 +199,7 @@ describe("pools.api", () => {
           org_id: ORG_ID,
           farm_id: FARM_ID,
           name: "Pileta Offline",
-        }),
+        })
       );
     });
   });
@@ -236,7 +236,7 @@ describe("pools.api", () => {
           name: "Pileta Renovada",
           pool_type: "reproductor",
           capacity: 250,
-        }),
+        })
       );
       expect(mockEq).toHaveBeenCalledWith("id", POOL_ID);
 
@@ -318,7 +318,7 @@ describe("pools.api", () => {
       mockFrom.mockReturnValue({ select: mockLotesSelect });
 
       await expect(deletePool(POOL_ID)).rejects.toThrow(
-        "Esta pileta tiene un lote activo. Cierre el lote antes de desactivar la pileta.",
+        "Esta pileta tiene un lote activo. Cierre el lote antes de desactivar la pileta."
       );
 
       // Verify no pool update was attempted (only lotes query)

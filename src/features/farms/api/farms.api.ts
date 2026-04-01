@@ -28,7 +28,7 @@ export async function getFarms(orgId: string) {
       location: farm.location ?? undefined,
       _sync_status: "synced" as const,
       _local_updated_at: now,
-    })),
+    }))
   );
 
   const remoteIds = new Set(data.map((f) => f.id));
@@ -39,7 +39,7 @@ export async function getFarms(orgId: string) {
     .toArray();
   if (localFarms.length > 0) {
     await db.farms.bulkUpdate(
-      localFarms.map((f) => ({ key: f.id, changes: { is_active: false } })),
+      localFarms.map((f) => ({ key: f.id, changes: { is_active: false } }))
     );
   }
 

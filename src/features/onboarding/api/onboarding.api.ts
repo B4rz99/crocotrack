@@ -20,7 +20,7 @@ async function batchInsertWithSync(
   tableName: string,
   entries: readonly Record<string, unknown>[],
   now: string,
-  toLocal?: (entry: Record<string, unknown>) => Record<string, unknown>,
+  toLocal?: (entry: Record<string, unknown>) => Record<string, unknown>
 ): Promise<void> {
   if (entries.length === 0) return;
 
@@ -54,7 +54,7 @@ async function batchInsertWithSync(
 export async function submitOnboarding(
   data: OnboardingData,
   orgId: string,
-  userId: string,
+  userId: string
 ): Promise<void> {
   const now = nowISO();
   const farmId = generateId();
@@ -191,6 +191,6 @@ export async function submitOnboarding(
       if (inviteError) {
         console.error("[onboarding] invitation insert failed:", inviteError.message, inviteError);
       }
-    }),
+    })
   );
 }

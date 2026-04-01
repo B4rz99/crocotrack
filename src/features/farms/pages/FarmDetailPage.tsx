@@ -96,7 +96,7 @@ export function FarmDetailPage() {
             return sortDir === "asc" ? cmp : -cmp;
           })
         : [],
-    [pools, sortKey, sortDir],
+    [pools, sortKey, sortDir]
   );
 
   if (farmLoading || poolsLoading) {
@@ -292,7 +292,7 @@ export function FarmDetailPage() {
           if (!editPool) return;
           updatePool.mutate(
             { poolId: editPool.id, input: data },
-            { onSuccess: () => setEditPool(null) },
+            { onSuccess: () => setEditPool(null) }
           );
         }}
       />

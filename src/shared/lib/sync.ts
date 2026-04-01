@@ -24,7 +24,7 @@ export const addToOutbox = async (
   tableName: string,
   recordId: string,
   operation: SyncOperation,
-  payload: Record<string, unknown>,
+  payload: Record<string, unknown>
 ): Promise<void> => {
   await db.sync_outbox.add({
     table_name: tableName,
@@ -70,7 +70,7 @@ export const flushOutbox = async (): Promise<void> => {
 
     if (entry.retry_count >= MAX_RETRIES) {
       console.error(
-        `[sync] max retries reached for ${entry.table_name}/${entry.record_id}, removing from outbox`,
+        `[sync] max retries reached for ${entry.table_name}/${entry.record_id}, removing from outbox`
       );
       await db.sync_outbox.delete(entryId);
       continue;
@@ -81,7 +81,7 @@ export const flushOutbox = async (): Promise<void> => {
     if (error) {
       console.error(
         `[sync] flush failed for ${entry.table_name}/${entry.record_id}:`,
-        error.message,
+        error.message
       );
       await db.sync_outbox.update(entryId, { retry_count: entry.retry_count + 1 });
     } else {

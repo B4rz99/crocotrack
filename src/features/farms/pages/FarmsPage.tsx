@@ -118,7 +118,7 @@ export function FarmsPage() {
           if (!editFarm) return;
           updateFarm.mutate(
             { farmId: editFarm.id, input: data },
-            { onSuccess: () => setEditFarm(null) },
+            { onSuccess: () => setEditFarm(null) }
           );
         }}
       />

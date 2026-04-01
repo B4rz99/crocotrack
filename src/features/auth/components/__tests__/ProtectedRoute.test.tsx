@@ -22,7 +22,7 @@ const createMockProfile = (overrides: Partial<Profile> = {}): Profile => ({
 
 function renderWithRouter(
   ui: React.ReactElement,
-  { initialEntries = ["/protected"] }: { initialEntries?: string[] } = {},
+  { initialEntries = ["/protected"] }: { initialEntries?: string[] } = {}
 ) {
   return render(<MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>);
 }
@@ -40,7 +40,7 @@ describe("ProtectedRoute", () => {
         <Route element={<ProtectedRoute />}>
           <Route index path="protected" element={<div>Protected Content</div>} />
         </Route>
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.getByRole("status")).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe("ProtectedRoute", () => {
           <Route index path="protected" element={<div>Protected Content</div>} />
         </Route>
         <Route path={ROUTES.LOGIN} element={<div>Login Page</div>} />
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
@@ -77,7 +77,7 @@ describe("ProtectedRoute", () => {
           <Route index path="protected" element={<div>Protected Content</div>} />
         </Route>
         <Route path={ROUTES.ONBOARDING} element={<div>Onboarding</div>} />
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("ProtectedRoute", () => {
         <Route element={<ProtectedRoute />}>
           <Route index path="protected" element={<div>Protected Content</div>} />
         </Route>
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();
@@ -117,7 +117,7 @@ describe("ProtectedRoute", () => {
           <Route index path="protected" element={<div>Owner Content</div>} />
         </Route>
         <Route path={ROUTES.DASHBOARD} element={<div>Dashboard</div>} />
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.queryByText("Owner Content")).not.toBeInTheDocument();
@@ -137,7 +137,7 @@ describe("ProtectedRoute", () => {
         <Route element={<ProtectedRoute requiredRole="owner" />}>
           <Route index path="protected" element={<div>Owner Content</div>} />
         </Route>
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.getByText("Owner Content")).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe("ProtectedRoute", () => {
         <Route element={<ProtectedRoute />}>
           <Route index path="protected" element={<div>Protected Content</div>} />
         </Route>
-      </Routes>,
+      </Routes>
     );
 
     expect(screen.getByText("Protected Content")).toBeInTheDocument();

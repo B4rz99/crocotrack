@@ -38,7 +38,7 @@ export function useOnboardingWizard() {
       setOrgData(data);
       nextStep();
     },
-    [setOrgData, nextStep],
+    [setOrgData, nextStep]
   );
 
   const handleFarmNext = useCallback(
@@ -46,7 +46,7 @@ export function useOnboardingWizard() {
       setFarmData(data);
       nextStep();
     },
-    [setFarmData, nextStep],
+    [setFarmData, nextStep]
   );
 
   const handleFoodTypesNext = useCallback(
@@ -54,7 +54,7 @@ export function useOnboardingWizard() {
       setFoodTypesData(data);
       nextStep();
     },
-    [setFoodTypesData, nextStep],
+    [setFoodTypesData, nextStep]
   );
 
   const handlePoolsNext = useCallback(
@@ -62,7 +62,7 @@ export function useOnboardingWizard() {
       setPoolsData(data);
       nextStep();
     },
-    [setPoolsData, nextStep],
+    [setPoolsData, nextStep]
   );
 
   const handleIncubatorsNext = useCallback(
@@ -70,7 +70,7 @@ export function useOnboardingWizard() {
       setIncubatorsData(data);
       nextStep();
     },
-    [setIncubatorsData, nextStep],
+    [setIncubatorsData, nextStep]
   );
 
   const handleComplete = useCallback(
@@ -97,9 +97,10 @@ export function useOnboardingWizard() {
             inviteEmails: emails,
           },
           profile.org_id,
-          profile.id,
+          profile.id
         );
 
+        useAuthStore.getState().setOnboardingCompleted(true);
         reset();
         navigate(ROUTES.DASHBOARD);
       } catch (err) {
@@ -109,7 +110,7 @@ export function useOnboardingWizard() {
         setIsSubmitting(false);
       }
     },
-    [addInviteEmail, profile, reset, navigate],
+    [addInviteEmail, profile, reset, navigate]
   );
 
   return {

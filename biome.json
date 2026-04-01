@@ -2,14 +2,19 @@
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
   "files": {
-    "ignoreUnknown": true,
-    "includes": ["**", "!**/dist", "!**/node_modules", "!**/.claude"]
+    "ignoreUnknown": false,
+    "includes": ["**", "!**/dist", "!**/build", "!**/node_modules", "!**/.claude"]
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": false,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "bracketSpacing": true,
+    "bracketSameLine": false
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
@@ -18,13 +23,63 @@
       "recommended": true,
       "a11y": {
         "noLabelWithoutControl": "off"
+      },
+      "suspicious": {
+        "noDuplicateObjectKeys": "error",
+        "noRedeclare": "error"
+      },
+      "style": {
+        "useNamingConvention": "warn",
+        "noParameterAssign": "error"
+      },
+      "correctness": {
+        "noConstAssign": "error"
       }
     }
   },
   "javascript": {
-    "formatter": { "quoteStyle": "double", "semicolons": "always" }
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "indentWidth": 2
+    }
   },
   "css": {
-    "parser": { "tailwindDirectives": true }
-  }
+    "parser": { "tailwindDirectives": true },
+    "linter": { "enabled": true }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.css"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUnknownAtRules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/__tests__/**/*.ts",
+        "**/__tests__/**/*.tsx",
+        "**/*.test.ts",
+        "**/*.test.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    }
+  ]
 }

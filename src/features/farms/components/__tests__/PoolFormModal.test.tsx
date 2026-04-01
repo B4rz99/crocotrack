@@ -25,7 +25,7 @@ describe("PoolFormModal", () => {
       <PoolFormModal
         {...defaultProps}
         pool={{ name: "Pileta A", pool_type: "crianza", capacity: 100 }}
-      />,
+      />
     );
     expect(screen.getByText("Editar Pileta")).toBeInTheDocument();
   });
@@ -65,7 +65,7 @@ describe("PoolFormModal", () => {
           name: "Nuevo Pileta",
           pool_type: "crianza",
           capacity: 75,
-        }),
+        })
       );
     });
   });
@@ -75,7 +75,7 @@ describe("PoolFormModal", () => {
       <PoolFormModal
         {...defaultProps}
         pool={{ name: "Pileta Existente", pool_type: "reproductor", capacity: 200 }}
-      />,
+      />
     );
 
     const nameInput = screen.getByLabelText("Nombre de la pileta");
@@ -90,7 +90,7 @@ describe("PoolFormModal", () => {
       <PoolFormModal
         {...defaultProps}
         pool={{ name: "Pileta A", pool_type: "crianza", capacity: 50 }}
-      />,
+      />
     );
     expect(screen.getByRole("button", { name: "Guardar" })).toBeInTheDocument();
   });

@@ -76,26 +76,9 @@ supabase/
 - **Tailwind CSS v4:** Uses `@theme inline` blocks in CSS, not `tailwind.config.js`. The `@tailwindcss/vite` plugin is used instead of PostCSS.
 - **No pg_uuidv7 on Supabase hosted:** The `pg_uuidv7` extension is not available. All UUIDs use `gen_random_uuid()` instead.
 - **IPv6 connectivity:** `supabase db push` fails due to IPv6 routing issues. Run migrations via the Supabase SQL Editor in the dashboard instead.
-- **Supabase project ref:** `rjhkwdrquocbbdeknfwr`
+- **Supabase project ref:** `pfvpvbagrarwmioepupz`
 - **`next-themes` dependency:** Required by the sonner/Toaster component. `Providers` wraps the app in `ThemeProvider` to prevent runtime errors.
 - **`"use client"` directives:** Some shadcn components have `"use client"` directives — these are harmless in a Vite SPA (no RSC) but are dead code.
 - **Path alias:** `@/*` maps to `./src/*` (configured in both `tsconfig.json` and `vite.config.ts`).
 - **All UI strings are hardcoded in Spanish** (Colombia-only MVP). No i18n library is used.
 
-## Commands
-
-```bash
-bun run dev          # Dev server (localhost:5173)
-bun run build        # Production build
-bun run test         # Vitest watch mode
-bun run test:run     # Vitest single run
-bun run lint         # Biome check
-bun run lint:fix     # Biome auto-fix
-bun run typecheck    # tsc --noEmit
-bun run db:types     # Regenerate Supabase types (requires local Supabase)
-```
-
-To regenerate types from remote:
-```bash
-bunx supabase gen types typescript --project-id rjhkwdrquocbbdeknfwr > src/shared/types/database.types.ts
-```

@@ -10,7 +10,7 @@ createRoot(document.getElementById("root")!).render(
     <Providers>
       <App />
     </Providers>
-  </StrictMode>,
+  </StrictMode>
 );
 
 if ("serviceWorker" in navigator) {

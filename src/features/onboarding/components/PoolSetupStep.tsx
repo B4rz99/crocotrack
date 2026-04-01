@@ -31,7 +31,7 @@ const MAX_PREVIEW = 6;
 function generatePoolNames(
   prefix: string,
   startNumber: number,
-  quantity: number,
+  quantity: number
 ): readonly string[] {
   return Array.from({ length: quantity }, (_, i) => `${prefix}${startNumber + i}`);
 }
