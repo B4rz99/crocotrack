@@ -87,17 +87,59 @@ export interface LocalLoteSizeComposition extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalEntrada extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly pool_id: string;
+  readonly lote_id: string;
+  readonly origin_type: "proveedor_persona" | "proveedor_empresa" | "finca_propia" | "incubador";
+  readonly entry_date: string;
+  readonly total_animals: number;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+  // Proveedor persona
+  readonly persona_full_name?: string;
+  readonly persona_document_id?: string;
+  readonly persona_aval_code?: string;
+  readonly persona_aval_file_path?: string;
+  // Proveedor empresa
+  readonly empresa_name?: string;
+  readonly empresa_legal_rep?: string;
+  readonly empresa_nit?: string;
+  readonly empresa_aval_code?: string;
+  readonly empresa_aval_file_path?: string;
+  // Finca propia
+  readonly origin_farm_id?: string;
+  readonly origin_pool_id?: string;
+  // Incubador
+  readonly nido_number?: string;
+  readonly eclosion_date?: string;
+}
+
+export interface LocalEntrySizeGroup extends SyncMeta {
+  readonly id: string;
+  readonly entrada_id: string;
+  readonly size_inches: number;
+  readonly animal_count: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
   readonly record_id: string;
-  readonly operation: "INSERT" | "UPDATE" | "DELETE";
+  readonly operation: "INSERT" | "UPDATE" | "DELETE" | "RPC";
   readonly payload: Record<string, unknown>;
   readonly created_at: string;
   readonly retry_count: number;
 }
 
-class CrocoTrackDB extends Dexie {
+class CrocoTrackDb extends Dexie {
   organizations!: Table<LocalOrganization>;
   farms!: Table<LocalFarm>;
   pools!: Table<LocalPool>;
@@ -105,6 +147,8 @@ class CrocoTrackDB extends Dexie {
   food_types!: Table<LocalFoodType>;
   lotes!: Table<LocalLote>;
   lote_size_compositions!: Table<LocalLoteSizeComposition>;
+  entradas!: Table<LocalEntrada>;
+  entry_size_groups!: Table<LocalEntrySizeGroup>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -121,7 +165,11 @@ class CrocoTrackDB extends Dexie {
       lotes: "id, pool_id, farm_id, org_id, status, _sync_status",
       lote_size_compositions: "id, lote_id, _sync_status",
     });
+    this.version(3).stores({
+      entradas: "id, org_id, farm_id, pool_id, lote_id, origin_type, entry_date, _sync_status",
+      entry_size_groups: "id, entrada_id, _sync_status",
+    });
   }
 }
 
-export const db = new CrocoTrackDB();
+export const db = new CrocoTrackDb();

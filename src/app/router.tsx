@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
+import { CreateEntradaPage } from "@/features/entradas/pages/CreateEntradaPage";
+import { EntradasListPage } from "@/features/entradas/pages/EntradasListPage";
 import { FarmDetailPage } from "@/features/farms/pages/FarmDetailPage";
 import { FarmsPage } from "@/features/farms/pages/FarmsPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
@@ -42,6 +44,8 @@ export const router = createBrowserRouter([
           { index: true, element: <DashboardPage /> },
           { path: ROUTES.FARMS, element: <FarmsPage /> },
           { path: ROUTES.FARM_DETAIL, element: <FarmDetailPage /> },
+          { path: ROUTES.ENTRADAS, element: <EntradasListPage /> },
+          { path: ROUTES.ENTRADA_CREATE, element: <CreateEntradaPage /> },
           { path: ROUTES.SETTINGS, element: <SettingsPage /> },
           { path: ROUTES.SETTINGS_TEAM, element: <SettingsTeamPage /> },
         ],

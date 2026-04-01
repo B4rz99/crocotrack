@@ -33,6 +33,8 @@ export interface PoolWithLotes {
 export async function getPoolsByFarm(farmId: string) {
   // Uses untypedSupabase because lotes/lote_size_compositions are not in
   // generated types until the 00002_lotes migration is applied and types regenerated.
+  // idx_lotes_one_active_per_pool enforces at most one active lote per pool,
+  // so lotes[0] is always the correct active lote when present.
   const { data, error } = (await untypedSupabase
     .from("pools")
     .select(

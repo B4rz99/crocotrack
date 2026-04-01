@@ -142,10 +142,17 @@ export function FarmDetailPage() {
         <h2 className="text-sm font-medium text-muted-foreground">
           Piletas ({sortedPools.length})
         </h2>
-        <Button onClick={() => setCreatePoolOpen(true)} size="sm">
-          <PlusIcon className="mr-1 size-4" />
-          Crear Pileta
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link to={ROUTES.ENTRADAS.replace(":farmId", farmId)}>
+            <Button variant="outline" size="sm">
+              Entradas
+            </Button>
+          </Link>
+          <Button onClick={() => setCreatePoolOpen(true)} size="sm">
+            <PlusIcon className="mr-1 size-4" />
+            Crear Pileta
+          </Button>
+        </div>
       </div>
 
       {sortedPools.length > 0 ? (
