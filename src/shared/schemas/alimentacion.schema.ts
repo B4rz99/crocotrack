@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const notFutureDate = (val: string) => val <= new Date().toLocaleDateString("en-CA");
+const notFutureDate = (val: string) => val <= new Date().toISOString().slice(0, 10);
 
 export const createAlimentacionSchema = z.object({
   pool_id: z.string().uuid("Debe seleccionar una pileta valida"),
