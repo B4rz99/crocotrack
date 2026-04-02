@@ -14,6 +14,8 @@ const SYNCABLE_TABLES = [
   "food_types",
   "lotes",
   "lote_size_compositions",
+  "entradas",
+  "entry_size_groups",
 ] as const;
 type SyncableTable = (typeof SYNCABLE_TABLES)[number];
 
@@ -51,6 +53,12 @@ interface SupabaseResult {
 }
 
 const applyOperation = async (entry: SyncOutboxEntry): Promise<SupabaseResult> => {
+  if (entry.operation === "RPC") {
+    // Strip internal routing key before sending to Supabase
+    const { _entity_table: _et, ...rpcParams } = entry.payload;
+    return untypedSupabase.rpc(entry.table_name, rpcParams);
+  }
+
   if (entry.operation === "DELETE") {
     return untypedSupabase.from(entry.table_name).delete().eq("id", entry.record_id);
   }
@@ -86,7 +94,13 @@ export const flushOutbox = async (): Promise<void> => {
       await db.sync_outbox.update(entryId, { retry_count: entry.retry_count + 1 });
     } else {
       await db.sync_outbox.delete(entryId);
-      if (entry.operation !== "DELETE") {
+      if (entry.operation === "RPC") {
+        // For RPC entries, _entity_table in payload identifies the Dexie table to mark synced
+        const entityTable = entry.payload._entity_table as string | undefined;
+        if (entityTable) {
+          await markSynced(entityTable, entry.record_id);
+        }
+      } else if (entry.operation !== "DELETE") {
         await markSynced(entry.table_name, entry.record_id);
       }
     }

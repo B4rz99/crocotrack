@@ -30,3 +30,6 @@ tsconfig.tsbuildinfo
 
 # Worktrees
 .worktrees/
+
+# npm lockfile (project uses Bun)
+package-lock.json

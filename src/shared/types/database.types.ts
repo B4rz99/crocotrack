@@ -4,10 +4,182 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1";
+    PostgrestVersion: "14.4";
   };
   public: {
     Tables: {
+      entradas: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          eclosion_date: string | null;
+          empresa_aval_code: string | null;
+          empresa_aval_file_path: string | null;
+          empresa_legal_rep: string | null;
+          empresa_name: string | null;
+          empresa_nit: string | null;
+          entry_date: string;
+          farm_id: string;
+          id: string;
+          is_active: boolean;
+          lote_id: string;
+          nido_number: string | null;
+          notes: string | null;
+          org_id: string;
+          origin_farm_id: string | null;
+          origin_pool_id: string | null;
+          origin_type: Database["public"]["Enums"]["entrada_origin_type"];
+          persona_aval_code: string | null;
+          persona_aval_file_path: string | null;
+          persona_document_id: string | null;
+          persona_full_name: string | null;
+          pool_id: string;
+          total_animals: number;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          eclosion_date?: string | null;
+          empresa_aval_code?: string | null;
+          empresa_aval_file_path?: string | null;
+          empresa_legal_rep?: string | null;
+          empresa_name?: string | null;
+          empresa_nit?: string | null;
+          entry_date: string;
+          farm_id: string;
+          id?: string;
+          is_active?: boolean;
+          lote_id: string;
+          nido_number?: string | null;
+          notes?: string | null;
+          org_id: string;
+          origin_farm_id?: string | null;
+          origin_pool_id?: string | null;
+          origin_type: Database["public"]["Enums"]["entrada_origin_type"];
+          persona_aval_code?: string | null;
+          persona_aval_file_path?: string | null;
+          persona_document_id?: string | null;
+          persona_full_name?: string | null;
+          pool_id: string;
+          total_animals: number;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          eclosion_date?: string | null;
+          empresa_aval_code?: string | null;
+          empresa_aval_file_path?: string | null;
+          empresa_legal_rep?: string | null;
+          empresa_name?: string | null;
+          empresa_nit?: string | null;
+          entry_date?: string;
+          farm_id?: string;
+          id?: string;
+          is_active?: boolean;
+          lote_id?: string;
+          nido_number?: string | null;
+          notes?: string | null;
+          org_id?: string;
+          origin_farm_id?: string | null;
+          origin_pool_id?: string | null;
+          origin_type?: Database["public"]["Enums"]["entrada_origin_type"];
+          persona_aval_code?: string | null;
+          persona_aval_file_path?: string | null;
+          persona_document_id?: string | null;
+          persona_full_name?: string | null;
+          pool_id?: string;
+          total_animals?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "entradas_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_farm_id_fkey";
+            columns: ["farm_id"];
+            isOneToOne: false;
+            referencedRelation: "farms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_lote_id_fkey";
+            columns: ["lote_id"];
+            isOneToOne: false;
+            referencedRelation: "lotes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_origin_farm_id_fkey";
+            columns: ["origin_farm_id"];
+            isOneToOne: false;
+            referencedRelation: "farms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_origin_pool_id_fkey";
+            columns: ["origin_pool_id"];
+            isOneToOne: false;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "entradas_pool_id_fkey";
+            columns: ["pool_id"];
+            isOneToOne: false;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      entry_size_groups: {
+        Row: {
+          animal_count: number;
+          created_at: string;
+          entrada_id: string;
+          id: string;
+          size_inches: number;
+          updated_at: string;
+        };
+        Insert: {
+          animal_count: number;
+          created_at?: string;
+          entrada_id: string;
+          id?: string;
+          size_inches: number;
+          updated_at?: string;
+        };
+        Update: {
+          animal_count?: number;
+          created_at?: string;
+          entrada_id?: string;
+          id?: string;
+          size_inches?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "entry_size_groups_entrada_id_fkey";
+            columns: ["entrada_id"];
+            isOneToOne: false;
+            referencedRelation: "entradas";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       farms: {
         Row: {
           created_at: string;
@@ -201,6 +373,109 @@ export type Database = {
           },
         ];
       };
+      lote_size_compositions: {
+        Row: {
+          animal_count: number;
+          created_at: string;
+          id: string;
+          lote_id: string;
+          size_inches: number;
+          updated_at: string;
+        };
+        Insert: {
+          animal_count: number;
+          created_at?: string;
+          id?: string;
+          lote_id: string;
+          size_inches: number;
+          updated_at?: string;
+        };
+        Update: {
+          animal_count?: number;
+          created_at?: string;
+          id?: string;
+          lote_id?: string;
+          size_inches?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lote_size_compositions_lote_id_fkey";
+            columns: ["lote_id"];
+            isOneToOne: false;
+            referencedRelation: "lotes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lotes: {
+        Row: {
+          closed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          farm_id: string;
+          id: string;
+          opened_at: string;
+          org_id: string;
+          pool_id: string;
+          status: Database["public"]["Enums"]["lote_status"];
+          updated_at: string;
+        };
+        Insert: {
+          closed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          farm_id: string;
+          id?: string;
+          opened_at?: string;
+          org_id: string;
+          pool_id: string;
+          status?: Database["public"]["Enums"]["lote_status"];
+          updated_at?: string;
+        };
+        Update: {
+          closed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          farm_id?: string;
+          id?: string;
+          opened_at?: string;
+          org_id?: string;
+          pool_id?: string;
+          status?: Database["public"]["Enums"]["lote_status"];
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lotes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_farm_id_fkey";
+            columns: ["farm_id"];
+            isOneToOne: false;
+            referencedRelation: "farms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lotes_pool_id_fkey";
+            columns: ["pool_id"];
+            isOneToOne: false;
+            referencedRelation: "pools";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       organizations: {
         Row: {
           country: string;
@@ -379,10 +654,39 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_entrada: {
+        Args: {
+          p_compositions: Json;
+          p_eclosion_date?: string;
+          p_empresa_aval_code?: string;
+          p_empresa_aval_file_path?: string;
+          p_empresa_legal_rep?: string;
+          p_empresa_name?: string;
+          p_empresa_nit?: string;
+          p_entry_date: string;
+          p_farm_id: string;
+          p_id: string;
+          p_nido_number?: string;
+          p_notes?: string;
+          p_org_id: string;
+          p_origin_farm_id?: string;
+          p_origin_pool_id?: string;
+          p_origin_type: Database["public"]["Enums"]["entrada_origin_type"];
+          p_persona_aval_code?: string;
+          p_persona_aval_file_path?: string;
+          p_persona_document_id?: string;
+          p_persona_full_name?: string;
+          p_pool_id: string;
+        };
+        Returns: string;
+      };
       get_user_org_id: { Args: never; Returns: string };
       is_owner: { Args: never; Returns: boolean };
+      user_has_farm_access: { Args: { p_farm_id: string }; Returns: boolean };
     };
     Enums: {
+      entrada_origin_type: "proveedor_persona" | "proveedor_empresa" | "finca_propia" | "incubador";
+      lote_status: "activo" | "cerrado";
       pool_type: "crianza" | "reproductor";
     };
     CompositeTypes: {
@@ -509,6 +813,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      entrada_origin_type: ["proveedor_persona", "proveedor_empresa", "finca_propia", "incubador"],
+      lote_status: ["activo", "cerrado"],
       pool_type: ["crianza", "reproductor"],
     },
   },
