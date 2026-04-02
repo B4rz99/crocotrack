@@ -130,9 +130,7 @@ export function AlimentacionForm({
           </SelectContent>
         </Select>
         {foodTypeId && (
-          <p className="text-sm text-muted-foreground">
-            Stock actual: {currentStock} kg
-          </p>
+          <p className="text-sm text-muted-foreground">Stock actual: {currentStock} kg</p>
         )}
         <FieldError message={errors.food_type_id} />
       </div>
