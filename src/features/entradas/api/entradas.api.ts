@@ -54,7 +54,7 @@ export async function getEntradasByFarm(farmId: string): Promise<EntradaWithDeta
       *,
       entry_size_groups ( size_inches, animal_count ),
       profiles ( full_name ),
-      pools ( name )
+      pools!pool_id ( name )
     `
     )
     .eq("farm_id", farmId)

@@ -134,6 +134,11 @@ export function EntradaForm({ farmId, pools, isLoading = false, onSubmit }: Entr
     e.preventDefault();
     setErrors({});
 
+    if (!originType) {
+      setErrors({ origin_type: "Seleccione un tipo de origen" });
+      return;
+    }
+
     const raw = buildRawInput();
     const result = createEntradaSchema.safeParse(raw);
 
@@ -173,6 +178,7 @@ export function EntradaForm({ farmId, pools, isLoading = false, onSubmit }: Entr
           onValueChange={(v) => {
             if (v) setPoolId(v);
           }}
+          items={pools.map((p) => ({ value: p.id, label: p.name }))}
         >
           <SelectTrigger id="pool-select" className="w-full">
             <SelectValue placeholder="Seleccionar pileta" />

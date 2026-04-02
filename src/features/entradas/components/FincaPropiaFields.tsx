@@ -69,7 +69,11 @@ export function FincaPropiaFields({
     <div className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="origin-farm">Granja de origen</Label>
-        <Select value={originFarmId ?? ""} onValueChange={handleFarmChange}>
+        <Select
+          value={originFarmId ?? ""}
+          onValueChange={handleFarmChange}
+          items={availableFarms.map((f) => ({ value: f.id, label: f.name }))}
+        >
           <SelectTrigger id="origin-farm" className="w-full">
             <SelectValue placeholder={farmsLoading ? "Cargando..." : "Seleccionar granja"} />
           </SelectTrigger>
@@ -87,7 +91,11 @@ export function FincaPropiaFields({
       {originFarmId && (
         <div className="space-y-2">
           <Label htmlFor="origin-pool">Pileta de origen</Label>
-          <Select value={originPoolId ?? ""} onValueChange={handlePoolChange}>
+          <Select
+            value={originPoolId ?? ""}
+            onValueChange={handlePoolChange}
+            items={(originPools ?? []).map((p) => ({ value: p.id, label: p.name }))}
+          >
             <SelectTrigger id="origin-pool" className="w-full">
               <SelectValue
                 placeholder={poolsLoading ? "Cargando..." : "Seleccionar pileta con lote activo"}
