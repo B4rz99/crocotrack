@@ -9,7 +9,7 @@ export const generateId = (): string => crypto.randomUUID();
 
 export const nowISO = (): string => new Date().toISOString();
 
-export const todayIsoDate = (): string => new Date().toLocaleDateString("en-CA");
+export const todayIsoDate = new Date().toISOString().slice(0, 10);
 
 export const formatDateDisplay = (dateStr: string): string => {
   const [year, month, day] = dateStr.split("-");
