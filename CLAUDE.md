@@ -81,4 +81,6 @@ supabase/
 - **`"use client"` directives:** Some shadcn components have `"use client"` directives — these are harmless in a Vite SPA (no RSC) but are dead code.
 - **Path alias:** `@/*` maps to `./src/*` (configured in both `tsconfig.json` and `vite.config.ts`).
 - **All UI strings are hardcoded in Spanish** (Colombia-only MVP). No i18n library is used.
+- **`SelectValue` needs a render-function child:** use `<SelectValue>{() => label}</SelectValue>` or it renders the raw value.
+- **Farm routing:** `/farms/:farmId/*` — `FarmLayout`/`SettingsLayout` wrap `AppShell`. `navLinkClass` exported from `AppShell`. Use `useFarmStore.getState()` in async callbacks (avoid stale closure on `lastFarmId`).
 
