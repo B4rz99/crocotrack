@@ -203,7 +203,6 @@ SECURITY INVOKER
 AS $$
 DECLARE
     v_caller_org_id UUID;
-    v_pool_type     public.pool_type;
     v_lote_id       UUID;
 BEGIN
     -- 1. Resolve caller's org (do NOT trust p_org_id)
@@ -212,16 +211,23 @@ BEGIN
         RAISE EXCEPTION 'No se pudo determinar la organizacion del usuario';
     END IF;
 
-    -- 2. Guard: pool belongs to caller's org
-    SELECT pool_type INTO v_pool_type
-    FROM public.pools
-    WHERE id = p_pool_id AND org_id = v_caller_org_id;
+    -- 2. Guard: farm belongs to caller's org
+    IF NOT EXISTS (
+        SELECT 1 FROM public.farms
+        WHERE id = p_farm_id AND org_id = v_caller_org_id
+    ) THEN
+        RAISE EXCEPTION 'La finca no pertenece a su organizacion';
+    END IF;
 
-    IF v_pool_type IS NULL THEN
+    -- 3. Guard: pool belongs to caller's org
+    IF NOT EXISTS (
+        SELECT 1 FROM public.pools
+        WHERE id = p_pool_id AND org_id = v_caller_org_id
+    ) THEN
         RAISE EXCEPTION 'La pileta no pertenece a su organizacion';
     END IF;
 
-    -- 3. Guard: food type belongs to caller's org
+    -- 4. Guard: food type belongs to caller's org
     IF NOT EXISTS (
         SELECT 1 FROM public.food_types
         WHERE id = p_food_type_id AND org_id = v_caller_org_id
@@ -229,17 +235,18 @@ BEGIN
         RAISE EXCEPTION 'El tipo de alimento no pertenece a su organizacion';
     END IF;
 
-    -- 4. Guard: quantity must be positive
+    -- 5. Guard: quantity must be positive
     IF p_quantity_kg <= 0 THEN
         RAISE EXCEPTION 'La cantidad debe ser mayor a 0';
     END IF;
 
-    -- 5. Find active lote (nullable for reproductor pools)
+    -- 6. Find active lote (nullable for reproductor pools)
     SELECT id INTO v_lote_id
     FROM public.lotes
-    WHERE pool_id = p_pool_id AND status = 'activo';
+    WHERE pool_id = p_pool_id AND status = 'activo'
+    FOR UPDATE;
 
-    -- 6. Insert alimentacion record
+    -- 7. Insert alimentacion record
     INSERT INTO public.alimentaciones (
         id, org_id, farm_id, pool_id, lote_id, food_type_id,
         event_date, quantity_kg, notes, created_by, is_active
@@ -248,7 +255,7 @@ BEGIN
         p_event_date, p_quantity_kg, p_notes, auth.uid(), true
     );
 
-    -- 7. Upsert food_stock: decrement (allow negative)
+    -- 8. Upsert food_stock: decrement (allow negative)
     INSERT INTO public.food_stock (org_id, farm_id, food_type_id, current_quantity)
     VALUES (v_caller_org_id, p_farm_id, p_food_type_id, -p_quantity_kg)
     ON CONFLICT (farm_id, food_type_id)
