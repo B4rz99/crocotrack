@@ -4,10 +4,10 @@ export const ROUTES = {
   INVITE: "/invite/:token",
   ONBOARDING: "/onboarding",
   DASHBOARD: "/",
-  FARMS: "/farms",
-  FARM_DETAIL: "/farms/:farmId",
+  FARM_DASHBOARD: "/farms/:farmId",
   ENTRADAS: "/farms/:farmId/entradas",
   ENTRADA_CREATE: "/farms/:farmId/entradas/nueva",
   SETTINGS: "/settings",
   SETTINGS_TEAM: "/settings/team",
+  SETTINGS_FARMS: "/settings/farms",
 } as const;

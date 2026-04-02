@@ -1,6 +1,7 @@
 import { MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { useFarmStore } from "@/features/farms/stores/farm.store";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ export function FarmsPage() {
   const createFarm = useCreateFarm();
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
+  const clearLastFarm = useFarmStore((s) => s.clear);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editFarm, setEditFarm] = useState<{
@@ -54,7 +56,7 @@ export function FarmsPage() {
           {farms.map((farm) => (
             <li key={farm.id} className="flex items-center justify-between px-4 py-3">
               <Link
-                to={ROUTES.FARM_DETAIL.replace(":farmId", farm.id)}
+                to={ROUTES.FARM_DASHBOARD.replace(":farmId", farm.id)}
                 className="text-sm font-medium hover:underline"
               >
                 {farm.name}
@@ -134,7 +136,12 @@ export function FarmsPage() {
         onConfirm={() => {
           if (!deleteFarmTarget) return;
           deleteFarmMutation.mutate(deleteFarmTarget.id, {
-            onSuccess: () => setDeleteFarmTarget(null),
+            onSuccess: () => {
+              if (deleteFarmTarget.id === useFarmStore.getState().lastFarmId) {
+                clearLastFarm();
+              }
+              setDeleteFarmTarget(null);
+            },
           });
         }}
       />

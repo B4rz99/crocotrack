@@ -1,20 +1,21 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
 import { CreateEntradaPage } from "@/features/entradas/pages/CreateEntradaPage";
 import { EntradasListPage } from "@/features/entradas/pages/EntradasListPage";
-import { FarmDetailPage } from "@/features/farms/pages/FarmDetailPage";
+import { FarmDashboardPage } from "@/features/farms/pages/FarmDashboardPage";
 import { FarmsPage } from "@/features/farms/pages/FarmsPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
 import { ROUTES } from "@/shared/constants/routes";
-import { AppLayout } from "./layouts/AppLayout";
+import { RedirectToLastFarm } from "./components/RedirectToLastFarm";
 import { AuthLayout } from "./layouts/AuthLayout";
+import { FarmLayout } from "./layouts/FarmLayout";
 import { OnboardingLayout } from "./layouts/OnboardingLayout";
+import { SettingsLayout } from "./layouts/SettingsLayout";
 
 /* ---------- Placeholder pages ---------- */
 const InvitePage = () => <div>Invite</div>;
-const DashboardPage = () => <div>Dashboard</div>;
 const SettingsPage = () => <div>Settings</div>;
 const SettingsTeamPage = () => <div>Settings Team</div>;
 
@@ -37,17 +38,28 @@ export const router = createBrowserRouter([
         element: <OnboardingLayout />,
         children: [{ index: true, element: <OnboardingPage /> }],
       },
+      // Root: redirect to last farm
+      { path: ROUTES.DASHBOARD, element: <RedirectToLastFarm /> },
+      // Backward-compat: old /farms list now lives at /settings/farms
+      { path: "/farms", element: <Navigate to={ROUTES.SETTINGS_FARMS} replace /> },
+      // Farm-scoped routes
       {
-        path: "/",
-        element: <AppLayout />,
+        path: ROUTES.FARM_DASHBOARD,
+        element: <FarmLayout />,
         children: [
-          { index: true, element: <DashboardPage /> },
-          { path: ROUTES.FARMS, element: <FarmsPage /> },
-          { path: ROUTES.FARM_DETAIL, element: <FarmDetailPage /> },
-          { path: ROUTES.ENTRADAS, element: <EntradasListPage /> },
-          { path: ROUTES.ENTRADA_CREATE, element: <CreateEntradaPage /> },
-          { path: ROUTES.SETTINGS, element: <SettingsPage /> },
-          { path: ROUTES.SETTINGS_TEAM, element: <SettingsTeamPage /> },
+          { index: true, element: <FarmDashboardPage /> },
+          { path: "entradas", element: <EntradasListPage /> },
+          { path: "entradas/nueva", element: <CreateEntradaPage /> },
+        ],
+      },
+      // Settings routes
+      {
+        path: ROUTES.SETTINGS,
+        element: <SettingsLayout />,
+        children: [
+          { index: true, element: <SettingsPage /> },
+          { path: "team", element: <SettingsTeamPage /> },
+          { path: "farms", element: <FarmsPage /> },
         ],
       },
     ],

@@ -1,0 +1,61 @@
+// src/app/layouts/SettingsLayout.tsx
+import { ArrowLeftIcon, LogOutIcon, SettingsIcon, UsersIcon, WarehouseIcon } from "lucide-react";
+import { NavLink, Outlet } from "react-router";
+import { useFarmStore } from "@/features/farms/stores/farm.store";
+import { Button } from "@/shared/components/ui/button";
+import { ROUTES } from "@/shared/constants/routes";
+import { supabase } from "@/shared/lib/supabase";
+import { AppShell, navLinkClass } from "../components/AppShell";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function SettingsLayout() {
+  const lastFarmId = useFarmStore((s) => s.lastFarmId);
+  const backTo =
+    lastFarmId && UUID_RE.test(lastFarmId)
+      ? ROUTES.FARM_DASHBOARD.replace(":farmId", lastFarmId)
+      : ROUTES.DASHBOARD;
+
+  return (
+    <AppShell
+      sidebar={
+        <>
+          <div className="flex h-14 items-center border-b border-sidebar-border px-4">
+            <span className="text-lg font-bold text-sidebar-primary">CrocoTrack</span>
+          </div>
+          <nav className="flex-1 space-y-1 p-3">
+            <NavLink to={ROUTES.SETTINGS} end className={navLinkClass}>
+              <SettingsIcon className="size-4" />
+              General
+            </NavLink>
+            <NavLink to={ROUTES.SETTINGS_TEAM} className={navLinkClass}>
+              <UsersIcon className="size-4" />
+              Equipo
+            </NavLink>
+            <NavLink to={ROUTES.SETTINGS_FARMS} className={navLinkClass}>
+              <WarehouseIcon className="size-4" />
+              Granjas
+            </NavLink>
+            <div className="my-2 border-t border-sidebar-border" />
+            <NavLink to={backTo} className={navLinkClass}>
+              <ArrowLeftIcon className="size-4" />
+              Volver a Granja
+            </NavLink>
+          </nav>
+          <div className="border-t border-sidebar-border p-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50"
+              onClick={() => supabase.auth.signOut()}
+            >
+              <LogOutIcon className="size-4" />
+              Cerrar Sesión
+            </Button>
+          </div>
+        </>
+      }
+    >
+      <Outlet />
+    </AppShell>
+  );
+}
