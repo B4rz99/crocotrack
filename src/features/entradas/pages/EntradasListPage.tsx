@@ -36,7 +36,7 @@ export function EntradasListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const { data: entradas, isLoading, error } = useEntradas(farmId);
 
-  const farmDetailPath = ROUTES.FARM_DETAIL.replace(":farmId", farmId);
+  const farmDetailPath = ROUTES.FARM_DASHBOARD.replace(":farmId", farmId);
   const createPath = ROUTES.ENTRADA_CREATE.replace(":farmId", farmId);
 
   if (isLoading) {
