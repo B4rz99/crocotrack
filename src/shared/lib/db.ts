@@ -153,6 +153,48 @@ export interface LocalMortalidadSizeGroup extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalAlimentacion extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly pool_id: string;
+  readonly lote_id?: string;
+  readonly food_type_id: string;
+  readonly event_date: string;
+  readonly quantity_kg: number;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalFoodStock extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly food_type_id: string;
+  readonly current_quantity: number;
+  readonly low_stock_threshold?: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalFoodPurchase extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly food_type_id: string;
+  readonly purchase_date: string;
+  readonly quantity_kg: number;
+  readonly supplier?: string;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
@@ -175,6 +217,9 @@ class CrocoTrackDb extends Dexie {
   entry_size_groups!: Table<LocalEntrySizeGroup>;
   mortalidades!: Table<LocalMortalidad>;
   mortalidad_size_groups!: Table<LocalMortalidadSizeGroup>;
+  alimentaciones!: Table<LocalAlimentacion>;
+  food_stock!: Table<LocalFoodStock>;
+  food_purchases!: Table<LocalFoodPurchase>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -198,6 +243,12 @@ class CrocoTrackDb extends Dexie {
     this.version(4).stores({
       mortalidades: "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
       mortalidad_size_groups: "id, mortalidad_id, _sync_status",
+    });
+    this.version(5).stores({
+      alimentaciones:
+        "id, org_id, farm_id, pool_id, lote_id, food_type_id, event_date, _sync_status",
+      food_stock: "id, org_id, farm_id, food_type_id, [farm_id+food_type_id], _sync_status",
+      food_purchases: "id, org_id, farm_id, food_type_id, purchase_date, _sync_status",
     });
   }
 }

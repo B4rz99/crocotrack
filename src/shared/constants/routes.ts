@@ -12,4 +12,8 @@ export const ROUTES = {
   SETTINGS: "/settings",
   SETTINGS_TEAM: "/settings/team",
   SETTINGS_FARMS: "/settings/farms",
+  ALIMENTACION: "/farms/:farmId/alimentacion",
+  ALIMENTACION_CREATE: "/farms/:farmId/alimentacion/nueva",
+  FOOD_STOCK: "/farms/:farmId/alimentacion/stock",
+  FOOD_PURCHASE_CREATE: "/farms/:farmId/alimentacion/stock/nueva",
 } as const;

@@ -1,4 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router";
+import { AlimentacionListPage } from "@/features/alimentacion/pages/AlimentacionListPage";
+import { CreateAlimentacionPage } from "@/features/alimentacion/pages/CreateAlimentacionPage";
+import { CreateFoodPurchasePage } from "@/features/alimentacion/pages/CreateFoodPurchasePage";
+import { FoodStockPage } from "@/features/alimentacion/pages/FoodStockPage";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
@@ -54,6 +58,10 @@ export const router = createBrowserRouter([
           { path: "entradas/nueva", element: <CreateEntradaPage /> },
           { path: "mortalidad", element: <MortalidadListPage /> },
           { path: "mortalidad/nueva", element: <CreateMortalidadPage /> },
+          { path: "alimentacion", element: <AlimentacionListPage /> },
+          { path: "alimentacion/nueva", element: <CreateAlimentacionPage /> },
+          { path: "alimentacion/stock", element: <FoodStockPage /> },
+          { path: "alimentacion/stock/nueva", element: <CreateFoodPurchasePage /> },
         ],
       },
       // Settings routes
