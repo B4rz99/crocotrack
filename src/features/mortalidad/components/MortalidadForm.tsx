@@ -43,7 +43,8 @@ export function MortalidadForm({ pools, isLoading = false, onSubmit }: Mortalida
   const activeLoteCompositions = selectedPool?.lotes[0]?.lote_size_compositions ?? [];
   const activeLoteId = selectedPool?.lotes[0]?.id ?? "";
 
-  function handlePoolChange(value: string) {
+  function handlePoolChange(value: string | null) {
+    if (!value) return;
     setPoolId(value);
     setCompositions([]);
     setErrors({});
