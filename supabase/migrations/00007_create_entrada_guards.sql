@@ -146,10 +146,12 @@ BEGIN
             RAISE EXCEPTION 'La pileta de origen no tiene un lote activo';
         END IF;
 
-        -- Guard: origin must have sufficient stock for each size
+        -- Guard: origin must have sufficient stock for each size (aggregate duplicates first)
         FOR v_size, v_count IN
-            SELECT (item->>'size_inches')::SMALLINT, (item->>'animal_count')::INTEGER
+            SELECT (item->>'size_inches')::SMALLINT,
+                   SUM((item->>'animal_count')::INTEGER)
             FROM jsonb_array_elements(p_compositions) AS item
+            GROUP BY (item->>'size_inches')::SMALLINT
         LOOP
             SELECT COALESCE(SUM(animal_count), 0) INTO v_available
             FROM public.lote_size_compositions
@@ -161,10 +163,12 @@ BEGIN
             END IF;
         END LOOP;
 
-        -- Decrement each size group: delete rows that reach 0, update the rest
+        -- Decrement each size group: delete rows that reach 0, update the rest (aggregate duplicates first)
         FOR v_size, v_count IN
-            SELECT (item->>'size_inches')::SMALLINT, (item->>'animal_count')::INTEGER
+            SELECT (item->>'size_inches')::SMALLINT,
+                   SUM((item->>'animal_count')::INTEGER)
             FROM jsonb_array_elements(p_compositions) AS item
+            GROUP BY (item->>'size_inches')::SMALLINT
         LOOP
             -- Remove row when all animals of this size are transferred out
             DELETE FROM public.lote_size_compositions
