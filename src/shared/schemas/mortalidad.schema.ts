@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { sizeCompositionItemSchema } from "./lote.schema";
 
-const notFutureDate = (val: string) => new Date(val) <= new Date();
+const notFutureDate = (val: string) => val <= new Date().toLocaleDateString("en-CA");
 
 export const createMortalidadSchema = z.object({
-  pool_id: z.string().uuid("Debe seleccionar una pileta valida"),
+  pool_id: z.string().uuid("Debe seleccionar una pileta válida"),
   event_date: z
     .string()
     .date("Formato de fecha invalido")
