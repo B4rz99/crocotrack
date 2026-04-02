@@ -5,6 +5,7 @@ import {
   LogOutIcon,
   SettingsIcon,
   SkullIcon,
+  UtensilsIcon,
 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router";
@@ -82,6 +83,10 @@ export function FarmLayout() {
             <NavLink to={ROUTES.MORTALIDAD.replace(":farmId", farmId)} className={navLinkClass}>
               <SkullIcon className="size-4" />
               Mortalidad
+            </NavLink>
+            <NavLink to={ROUTES.ALIMENTACION.replace(":farmId", farmId)} className={navLinkClass}>
+              <UtensilsIcon className="size-4" />
+              Alimentacion
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
             <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>
