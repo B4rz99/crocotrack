@@ -1,4 +1,3 @@
-// src/features/mortalidad/components/MortalidadForm.tsx
 import { type FormEvent, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
 import { Button } from "@/shared/components/ui/button";
@@ -13,6 +12,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
+import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateMortalidadInput } from "@/shared/schemas/mortalidad.schema";
 import { createMortalidadSchema } from "@/shared/schemas/mortalidad.schema";
 import { LoteSizeSelector } from "./LoteSizeSelector";
@@ -23,13 +23,9 @@ interface MortalidadFormProps {
   readonly onSubmit: (data: { input: CreateMortalidadInput; loteId: string }) => void;
 }
 
-function todayIso(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
-}
-
 export function MortalidadForm({ pools, isLoading = false, onSubmit }: MortalidadFormProps) {
   const [poolId, setPoolId] = useState("");
-  const [eventDate, setEventDate] = useState(todayIso);
+  const [eventDate, setEventDate] = useState(todayIsoDate);
   const [compositions, setCompositions] = useState<
     ReadonlyArray<{ size_inches: number; animal_count: number }>
   >([]);
@@ -69,7 +65,7 @@ export function MortalidadForm({ pools, isLoading = false, onSubmit }: Mortalida
     const raw = {
       pool_id: poolId,
       event_date: eventDate,
-      compositions: [...compositions],
+      compositions,
       notes: notes || undefined,
     };
 

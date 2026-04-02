@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
+import { todayIsoDate } from "@/shared/lib/utils";
 import type { EntradaOriginType } from "@/shared/schemas/entrada.schema";
 import { createEntradaSchema } from "@/shared/schemas/entrada.schema";
 import type { SizeCompositionItem } from "@/shared/schemas/lote.schema";
@@ -32,13 +33,9 @@ interface EntradaFormProps {
   }) => void;
 }
 
-function todayIso(): string {
-  return new Date().toISOString().split("T")[0] ?? "";
-}
-
 export function EntradaForm({ farmId, pools, isLoading = false, onSubmit }: EntradaFormProps) {
   const [poolId, setPoolId] = useState("");
-  const [entryDate, setEntryDate] = useState(todayIso);
+  const [entryDate, setEntryDate] = useState(todayIsoDate);
   const [originType, setOriginType] = useState<EntradaOriginType | undefined>(undefined);
   const [compositions, setCompositions] = useState<SizeCompositionItem[]>([
     { size_inches: 0, animal_count: 0 },

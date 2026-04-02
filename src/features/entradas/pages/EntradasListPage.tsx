@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { ROUTES } from "@/shared/constants/routes";
+import { formatDateDisplay } from "@/shared/lib/utils";
 import type { EntradaOriginType } from "@/shared/schemas/entrada.schema";
 import { useEntradas } from "../hooks/useEntradas";
 
@@ -26,11 +27,6 @@ const ORIGIN_COLORS: Record<EntradaOriginType, string> = {
   finca_propia: "bg-green-100 text-green-700",
   incubador: "bg-amber-100 text-amber-700",
 };
-
-function formatDate(dateStr: string): string {
-  const [year, month, day] = dateStr.split("-");
-  return `${day}/${month}/${year}`;
-}
 
 export function EntradasListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
@@ -72,7 +68,7 @@ export function EntradasListPage() {
           <TableBody>
             {entradas.map((entrada) => (
               <TableRow key={entrada.id}>
-                <TableCell>{formatDate(entrada.entry_date)}</TableCell>
+                <TableCell>{formatDateDisplay(entrada.entry_date)}</TableCell>
                 <TableCell>
                   <span
                     className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${

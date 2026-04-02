@@ -10,12 +10,8 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { ROUTES } from "@/shared/constants/routes";
+import { formatDateDisplay } from "@/shared/lib/utils";
 import { useMortalidades } from "../hooks/useMortalidades";
-
-function formatDate(dateStr: string): string {
-  const [year, month, day] = dateStr.split("-");
-  return `${day}/${month}/${year}`;
-}
 
 export function MortalidadListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
@@ -56,7 +52,7 @@ export function MortalidadListPage() {
           <TableBody>
             {mortalidades.map((m) => (
               <TableRow key={m.id}>
-                <TableCell>{formatDate(m.event_date)}</TableCell>
+                <TableCell>{formatDateDisplay(m.event_date)}</TableCell>
                 <TableCell>{m.pools?.name ?? "—"}</TableCell>
                 <TableCell>{m.total_animals}</TableCell>
                 <TableCell>{m.profiles?.full_name ?? "—"}</TableCell>
