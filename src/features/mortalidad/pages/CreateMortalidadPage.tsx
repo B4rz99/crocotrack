@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { usePools } from "@/features/farms/hooks/usePools";
 import { Button } from "@/shared/components/ui/button";
+import { ROUTES } from "@/shared/constants/routes";
 import { MortalidadForm } from "../components/MortalidadForm";
 import { useCreateMortalidad } from "../hooks/useCreateMortalidad";
 
@@ -12,7 +13,7 @@ export function CreateMortalidadPage() {
   const { data: pools = [] } = usePools(farmId);
   const createMortalidad = useCreateMortalidad(farmId);
 
-  const listPath = `/farms/${farmId}/mortalidad`;
+  const listPath = ROUTES.MORTALIDAD.replace(":farmId", farmId);
 
   return (
     <div className="space-y-4">

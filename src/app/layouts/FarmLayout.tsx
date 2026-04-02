@@ -1,5 +1,11 @@
 // src/app/layouts/FarmLayout.tsx
-import { ClipboardListIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
+import {
+  ClipboardListIcon,
+  LayoutDashboardIcon,
+  LogOutIcon,
+  SettingsIcon,
+  SkullIcon,
+} from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router";
 import { FarmSelector } from "@/features/farms/components/FarmSelector";
@@ -72,6 +78,10 @@ export function FarmLayout() {
             <NavLink to={ROUTES.ENTRADAS.replace(":farmId", farmId)} className={navLinkClass}>
               <ClipboardListIcon className="size-4" />
               Entradas
+            </NavLink>
+            <NavLink to={ROUTES.MORTALIDAD.replace(":farmId", farmId)} className={navLinkClass}>
+              <SkullIcon className="size-4" />
+              Mortalidad
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
             <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>

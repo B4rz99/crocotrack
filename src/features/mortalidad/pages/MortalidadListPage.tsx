@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/shared/components/ui/table";
+import { ROUTES } from "@/shared/constants/routes";
 import { useMortalidades } from "../hooks/useMortalidades";
 
 function formatDate(dateStr: string): string {
@@ -20,7 +21,7 @@ export function MortalidadListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const { data: mortalidades, isLoading, error } = useMortalidades(farmId);
 
-  const createPath = `/farms/${farmId}/mortalidad/nueva`;
+  const createPath = ROUTES.MORTALIDAD_CREATE.replace(":farmId", farmId);
 
   if (isLoading) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;

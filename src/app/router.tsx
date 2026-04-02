@@ -6,6 +6,8 @@ import { CreateEntradaPage } from "@/features/entradas/pages/CreateEntradaPage";
 import { EntradasListPage } from "@/features/entradas/pages/EntradasListPage";
 import { FarmDashboardPage } from "@/features/farms/pages/FarmDashboardPage";
 import { FarmsPage } from "@/features/farms/pages/FarmsPage";
+import { CreateMortalidadPage } from "@/features/mortalidad/pages/CreateMortalidadPage";
+import { MortalidadListPage } from "@/features/mortalidad/pages/MortalidadListPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
 import { ROUTES } from "@/shared/constants/routes";
 import { RedirectToLastFarm } from "./components/RedirectToLastFarm";
@@ -50,6 +52,8 @@ export const router = createBrowserRouter([
           { index: true, element: <FarmDashboardPage /> },
           { path: "entradas", element: <EntradasListPage /> },
           { path: "entradas/nueva", element: <CreateEntradaPage /> },
+          { path: "mortalidad", element: <MortalidadListPage /> },
+          { path: "mortalidad/nueva", element: <CreateMortalidadPage /> },
         ],
       },
       // Settings routes
