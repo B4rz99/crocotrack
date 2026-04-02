@@ -33,12 +33,14 @@ export function FarmLayout() {
   useEffect(() => {
     if (!farms || farms.length === 0) return;
     const isValid = farms.some((f) => f.id === farmId);
-    if (!isValid) {
-      navigate(ROUTES.FARM_DASHBOARD.replace(":farmId", farms[0].id), { replace: true });
+    const firstFarm = farms[0];
+    if (!isValid && firstFarm) {
+      navigate(ROUTES.FARM_DASHBOARD.replace(":farmId", firstFarm.id), { replace: true });
     }
   }, [farms, farmId, navigate]);
 
   const handleFarmChange = (newFarmId: string) => {
+    if (!farmId) return;
     const newPath = location.pathname.replace(`/farms/${farmId}`, `/farms/${newFarmId}`);
     navigate(newPath);
   };
@@ -52,7 +54,7 @@ export function FarmLayout() {
           </div>
           <div className="border-b border-sidebar-border px-3 py-2">
             <FarmSelector
-              farms={farms ?? []}
+              farms={farms?.map((f) => ({ ...f, location: f.location ?? null })) ?? []}
               currentFarmId={farmId}
               onFarmChange={handleFarmChange}
             />
@@ -71,7 +73,7 @@ export function FarmLayout() {
               Entradas
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
-            <NavLink to={ROUTES.SETTINGS} end className={navLinkClass}>
+            <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>
               <SettingsIcon className="size-4" />
               Configuración
             </NavLink>
