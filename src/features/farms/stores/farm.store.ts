@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface FarmState {
+export interface FarmState {
   readonly lastFarmId: string | null;
   readonly setLastFarmId: (farmId: string) => void;
   readonly clear: () => void;

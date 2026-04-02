@@ -4,11 +4,11 @@ import { useFarmStore } from "../farm.store";
 describe("useFarmStore", () => {
   beforeEach(() => {
     localStorage.clear();
-    useFarmStore.getState().clear();
+    useFarmStore.setState({ lastFarmId: null });
   });
 
   afterEach(() => {
-    useFarmStore.getState().clear();
+    useFarmStore.setState({ lastFarmId: null });
     localStorage.clear();
   });
 
