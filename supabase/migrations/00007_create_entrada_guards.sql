@@ -151,12 +151,12 @@ BEGIN
             SELECT (item->>'size_inches')::SMALLINT, (item->>'animal_count')::INTEGER
             FROM jsonb_array_elements(p_compositions) AS item
         LOOP
-            SELECT COALESCE(animal_count, 0) INTO v_available
+            SELECT COALESCE(SUM(animal_count), 0) INTO v_available
             FROM public.lote_size_compositions
             WHERE lote_id = v_origin_lote_id AND size_inches = v_size;
 
             IF v_available < v_count THEN
-                RAISE EXCEPTION 'Stock insuficiente para talla %": disponible %, solicitado %',
+                RAISE EXCEPTION 'Stock insuficiente para talla % pulgadas: disponible %, solicitado %',
                     v_size, v_available, v_count;
             END IF;
         END LOOP;
