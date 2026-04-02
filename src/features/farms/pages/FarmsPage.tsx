@@ -1,6 +1,7 @@
 import { MoreHorizontalIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { useFarmStore } from "@/features/farms/stores/farm.store";
 import { Button } from "@/shared/components/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +20,8 @@ export function FarmsPage() {
   const createFarm = useCreateFarm();
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
+  const lastFarmId = useFarmStore((s) => s.lastFarmId);
+  const clearLastFarm = useFarmStore((s) => s.clear);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editFarm, setEditFarm] = useState<{
@@ -134,7 +137,12 @@ export function FarmsPage() {
         onConfirm={() => {
           if (!deleteFarmTarget) return;
           deleteFarmMutation.mutate(deleteFarmTarget.id, {
-            onSuccess: () => setDeleteFarmTarget(null),
+            onSuccess: () => {
+              if (deleteFarmTarget.id === lastFarmId) {
+                clearLastFarm();
+              }
+              setDeleteFarmTarget(null);
+            },
           });
         }}
       />
