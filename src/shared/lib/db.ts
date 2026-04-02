@@ -129,6 +129,30 @@ export interface LocalEntrySizeGroup extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalMortalidad extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly pool_id: string;
+  readonly lote_id: string;
+  readonly event_date: string;
+  readonly total_animals: number;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalMortalidadSizeGroup extends SyncMeta {
+  readonly id: string;
+  readonly mortalidad_id: string;
+  readonly size_inches: number;
+  readonly animal_count: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
@@ -149,6 +173,8 @@ class CrocoTrackDb extends Dexie {
   lote_size_compositions!: Table<LocalLoteSizeComposition>;
   entradas!: Table<LocalEntrada>;
   entry_size_groups!: Table<LocalEntrySizeGroup>;
+  mortalidades!: Table<LocalMortalidad>;
+  mortalidad_size_groups!: Table<LocalMortalidadSizeGroup>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -168,6 +194,10 @@ class CrocoTrackDb extends Dexie {
     this.version(3).stores({
       entradas: "id, org_id, farm_id, pool_id, lote_id, origin_type, entry_date, _sync_status",
       entry_size_groups: "id, entrada_id, _sync_status",
+    });
+    this.version(4).stores({
+      mortalidades: "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
+      mortalidad_size_groups: "id, mortalidad_id, _sync_status",
     });
   }
 }

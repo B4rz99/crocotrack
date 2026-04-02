@@ -16,6 +16,8 @@ const SYNCABLE_TABLES = [
   "lote_size_compositions",
   "entradas",
   "entry_size_groups",
+  "mortalidades",
+  "mortalidad_size_groups",
 ] as const;
 type SyncableTable = (typeof SYNCABLE_TABLES)[number];
 

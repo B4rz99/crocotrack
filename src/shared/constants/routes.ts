@@ -7,6 +7,8 @@ export const ROUTES = {
   FARM_DASHBOARD: "/farms/:farmId",
   ENTRADAS: "/farms/:farmId/entradas",
   ENTRADA_CREATE: "/farms/:farmId/entradas/nueva",
+  MORTALIDAD: "/farms/:farmId/mortalidad",
+  MORTALIDAD_CREATE: "/farms/:farmId/mortalidad/nueva",
   SETTINGS: "/settings",
   SETTINGS_TEAM: "/settings/team",
   SETTINGS_FARMS: "/settings/farms",
