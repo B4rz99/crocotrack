@@ -200,6 +200,7 @@ CREATE OR REPLACE FUNCTION public.create_alimentacion(
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY INVOKER
+SET search_path = public
 AS $$
 DECLARE
     v_caller_org_id UUID;
@@ -219,12 +220,12 @@ BEGIN
         RAISE EXCEPTION 'La finca no pertenece a su organizacion';
     END IF;
 
-    -- 3. Guard: pool belongs to caller's org
+    -- 3. Guard: pool belongs to the specified farm
     IF NOT EXISTS (
         SELECT 1 FROM public.pools
-        WHERE id = p_pool_id AND org_id = v_caller_org_id
+        WHERE id = p_pool_id AND farm_id = p_farm_id
     ) THEN
-        RAISE EXCEPTION 'La pileta no pertenece a su organizacion';
+        RAISE EXCEPTION 'La pileta no pertenece a la finca indicada';
     END IF;
 
     -- 4. Guard: food type belongs to caller's org
@@ -283,6 +284,7 @@ CREATE OR REPLACE FUNCTION public.create_food_purchase(
 RETURNS UUID
 LANGUAGE plpgsql
 SECURITY INVOKER
+SET search_path = public
 AS $$
 DECLARE
     v_caller_org_id UUID;

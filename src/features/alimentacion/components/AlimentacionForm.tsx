@@ -15,12 +15,7 @@ import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateAlimentacionInput } from "@/shared/schemas/alimentacion.schema";
 import { createAlimentacionSchema } from "@/shared/schemas/alimentacion.schema";
-
-interface FoodType {
-  readonly id: string;
-  readonly name: string;
-  readonly unit: string;
-}
+import type { FoodType } from "../types";
 
 interface FoodStockItem {
   readonly food_type_id: string;
@@ -130,7 +125,9 @@ export function AlimentacionForm({
           </SelectContent>
         </Select>
         {foodTypeId && (
-          <p className="text-sm text-muted-foreground">Stock actual: {currentStock} kg</p>
+          <p className="text-sm text-muted-foreground">
+            Stock actual: {currentStock} {selectedFoodType?.unit ?? "kg"}
+          </p>
         )}
         <FieldError message={errors.food_type_id} />
       </div>
@@ -149,7 +146,8 @@ export function AlimentacionForm({
         />
         {stockWarning && (
           <p className="text-sm text-amber-600">
-            La cantidad excede el stock registrado ({currentStock} kg disponibles).
+            La cantidad excede el stock registrado ({currentStock} {selectedFoodType?.unit ?? "kg"}{" "}
+            disponibles).
           </p>
         )}
         <FieldError message={errors.quantity_kg} />

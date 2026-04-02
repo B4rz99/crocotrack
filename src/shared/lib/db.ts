@@ -245,7 +245,8 @@ class CrocoTrackDb extends Dexie {
       mortalidad_size_groups: "id, mortalidad_id, _sync_status",
     });
     this.version(5).stores({
-      alimentaciones: "id, org_id, farm_id, pool_id, lote_id, food_type_id, event_date, _sync_status",
+      alimentaciones:
+        "id, org_id, farm_id, pool_id, lote_id, food_type_id, event_date, _sync_status",
       food_stock: "id, org_id, farm_id, food_type_id, [farm_id+food_type_id], _sync_status",
       food_purchases: "id, org_id, farm_id, food_type_id, purchase_date, _sync_status",
     });

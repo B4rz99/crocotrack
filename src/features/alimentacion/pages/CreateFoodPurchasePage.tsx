@@ -42,9 +42,7 @@ export function CreateFoodPurchasePage() {
               navigate(stockPath);
             },
             onError: (err) => {
-              toast.error(
-                err instanceof Error ? err.message : "Error al registrar la compra"
-              );
+              toast.error(err instanceof Error ? err.message : "Error al registrar la compra");
             },
           });
         }}

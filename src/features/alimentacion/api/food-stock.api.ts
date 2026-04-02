@@ -49,10 +49,7 @@ export async function getFoodStockByFarm(farmId: string): Promise<FoodStockWithT
   };
 
   if (error || !data) {
-    const local = await db.food_stock
-      .where("farm_id")
-      .equals(farmId)
-      .sortBy("created_at");
+    const local = await db.food_stock.where("farm_id").equals(farmId).sortBy("created_at");
     return local.map((s) => ({
       ...s,
       low_stock_threshold: s.low_stock_threshold ?? null,
@@ -73,9 +70,7 @@ export async function getFoodStockByFarm(farmId: string): Promise<FoodStockWithT
   return data;
 }
 
-export async function getFoodPurchasesByFarm(
-  farmId: string
-): Promise<FoodPurchaseWithDetails[]> {
+export async function getFoodPurchasesByFarm(farmId: string): Promise<FoodPurchaseWithDetails[]> {
   const { data, error } = (await untypedSupabase
     .from("food_purchases")
     .select(

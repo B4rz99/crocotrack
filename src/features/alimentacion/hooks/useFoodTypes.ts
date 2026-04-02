@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/shared/lib/db";
 import { untypedSupabase } from "@/shared/lib/supabase";
+import type { FoodType } from "../types";
 
-interface FoodType {
-  readonly id: string;
-  readonly name: string;
-  readonly unit: string;
-  readonly is_active: boolean;
-}
+type FoodTypeRow = FoodType & { readonly is_active: boolean };
 
 async function getFoodTypes(): Promise<FoodType[]> {
   const { data, error } = (await untypedSupabase
@@ -15,19 +11,14 @@ async function getFoodTypes(): Promise<FoodType[]> {
     .select("id, name, unit, is_active")
     .eq("is_active", true)
     .order("name")) as {
-    data: FoodType[] | null;
+    data: FoodTypeRow[] | null;
     error: { message: string } | null;
   };
 
   if (error || !data) {
     // Fallback to Dexie — food_types are seeded during onboarding
     const local = await db.food_types.filter((ft) => ft.is_active).sortBy("name");
-    return local.map((ft) => ({
-      id: ft.id,
-      name: ft.name,
-      unit: ft.unit,
-      is_active: ft.is_active,
-    }));
+    return local.map((ft) => ({ id: ft.id, name: ft.name, unit: ft.unit }));
   }
 
   // Do NOT bulkPut here — food_types are owned by the onboarding flow in Dexie
@@ -39,5 +30,7 @@ export function useFoodTypes() {
   return useQuery({
     queryKey: ["food-types"],
     queryFn: getFoodTypes,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

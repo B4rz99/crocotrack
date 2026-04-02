@@ -14,12 +14,7 @@ import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateFoodPurchaseInput } from "@/shared/schemas/alimentacion.schema";
 import { createFoodPurchaseSchema } from "@/shared/schemas/alimentacion.schema";
-
-interface FoodType {
-  readonly id: string;
-  readonly name: string;
-  readonly unit: string;
-}
+import type { FoodType } from "../types";
 
 interface FoodPurchaseFormProps {
   readonly foodTypes: readonly FoodType[];
