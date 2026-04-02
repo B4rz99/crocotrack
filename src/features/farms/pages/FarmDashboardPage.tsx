@@ -55,6 +55,7 @@ export function FarmDashboardPage() {
   const [editPool, setEditPool] = useState<{
     id: string;
     name: string;
+    // biome-ignore lint/style/useNamingConvention: DB column name
     pool_type: "crianza" | "reproductor";
     capacity?: number | null;
     code?: string | null;
@@ -93,12 +94,16 @@ export function FarmDashboardPage() {
   );
 
   // Summary stats derived from existing hook data
-  const totalAnimals = pools?.reduce((sum, pool) => sum + (getTotalAnimals(pool) ?? 0), 0) ?? 0;
+  const totalAnimals = useMemo(
+    () => pools?.reduce((sum, pool) => sum + (getTotalAnimals(pool) ?? 0), 0) ?? 0,
+    [pools]
+  );
   const totalPiletas = pools?.length ?? 0;
 
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const recentEntradas =
-    entradas?.filter((e) => new Date(e.entry_date) >= thirtyDaysAgo).length ?? 0;
+  const recentEntradas = useMemo(() => {
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return entradas?.filter((e) => new Date(e.entry_date) >= thirtyDaysAgo).length ?? 0;
+  }, [entradas]);
 
   const sortIndicator = (key: SortKey) =>
     sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
@@ -234,6 +239,7 @@ export function FarmDashboardPage() {
                               setEditPool({
                                 id: pool.id,
                                 name: pool.name,
+                                // biome-ignore lint/style/useNamingConvention: DB column name
                                 pool_type: pool.pool_type,
                                 capacity: pool.capacity,
                                 code: pool.code,
