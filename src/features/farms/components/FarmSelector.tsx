@@ -16,6 +16,8 @@ interface FarmSelectorProps {
 }
 
 export function FarmSelector({ farms, currentFarmId, onFarmChange }: FarmSelectorProps) {
+  const currentFarmName = farms.find((f) => f.id === currentFarmId)?.name ?? "Seleccionar granja";
+
   return (
     <Select
       value={currentFarmId}
@@ -24,12 +26,8 @@ export function FarmSelector({ farms, currentFarmId, onFarmChange }: FarmSelecto
       }}
     >
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Seleccionar granja">
-          {(value: string | null) =>
-            value
-              ? (farms.find((f) => f.id === value)?.name ?? "Seleccionar granja")
-              : "Seleccionar granja"
-          }
+        <SelectValue placeholder={currentFarmName}>
+          {() => currentFarmName}
         </SelectValue>
       </SelectTrigger>
       <SelectContent>
