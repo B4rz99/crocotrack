@@ -20,7 +20,6 @@ export function FarmsPage() {
   const createFarm = useCreateFarm();
   const updateFarm = useUpdateFarm();
   const deleteFarmMutation = useDeleteFarm();
-  const lastFarmId = useFarmStore((s) => s.lastFarmId);
   const clearLastFarm = useFarmStore((s) => s.clear);
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -138,7 +137,7 @@ export function FarmsPage() {
           if (!deleteFarmTarget) return;
           deleteFarmMutation.mutate(deleteFarmTarget.id, {
             onSuccess: () => {
-              if (deleteFarmTarget.id === lastFarmId) {
+              if (deleteFarmTarget.id === useFarmStore.getState().lastFarmId) {
                 clearLastFarm();
               }
               setDeleteFarmTarget(null);
