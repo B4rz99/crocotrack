@@ -12,7 +12,7 @@ const compositionsSchema = z
   .array(sizeCompositionItemSchema)
   .min(1, "Debe agregar al menos un grupo de talla");
 
-const notFutureDate = (d: string) => d <= new Date().toISOString().slice(0, 10);
+const notFutureDate = (d: string) => d <= new Date().toLocaleDateString("en-CA");
 
 const baseEntradaSchema = z.object({
   pool_id: z.string().uuid("Debe seleccionar una pileta válida"),

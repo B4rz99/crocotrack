@@ -38,12 +38,14 @@ export function AvalFileInput({
     if (!ACCEPTED_TYPES.includes(selected.type)) {
       setInternalError("Solo se permiten archivos PDF, JPG o PNG.");
       onChange(undefined);
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
 
     if (selected.size > MAX_FILE_SIZE) {
       setInternalError("El archivo no puede superar los 10 MB.");
       onChange(undefined);
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
 
