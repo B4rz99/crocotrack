@@ -26,9 +26,7 @@ export function FarmSelector({ farms, currentFarmId, onFarmChange }: FarmSelecto
       }}
     >
       <SelectTrigger className="w-full">
-        <SelectValue placeholder={currentFarmName}>
-          {() => currentFarmName}
-        </SelectValue>
+        <SelectValue placeholder={currentFarmName}>{() => currentFarmName}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         {farms.map((farm) => (

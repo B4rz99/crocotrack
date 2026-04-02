@@ -1,6 +1,6 @@
 // src/app/layouts/FarmLayout.tsx
 import { ClipboardListIcon, LayoutDashboardIcon, LogOutIcon, SettingsIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate, useParams } from "react-router";
 import { FarmSelector } from "@/features/farms/components/FarmSelector";
 import { useFarms } from "@/features/farms/hooks/useFarms";
@@ -8,14 +8,7 @@ import { useFarmStore } from "@/features/farms/stores/farm.store";
 import { Button } from "@/shared/components/ui/button";
 import { ROUTES } from "@/shared/constants/routes";
 import { supabase } from "@/shared/lib/supabase";
-import { AppShell } from "../components/AppShell";
-
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-    isActive
-      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-  }`;
+import { AppShell, navLinkClass } from "../components/AppShell";
 
 export function FarmLayout() {
   const { farmId = "" } = useParams<{ farmId: string }>();
@@ -24,25 +17,33 @@ export function FarmLayout() {
   const { data: farms } = useFarms();
   const setLastFarmId = useFarmStore((s) => s.setLastFarmId);
 
-  // Keep the store in sync with the URL
-  useEffect(() => {
-    if (farmId) setLastFarmId(farmId);
-  }, [farmId, setLastFarmId]);
-
-  // If farms loaded and current farmId is invalid, redirect to first available
+  // Validate farmId against loaded farms; persist to store only after validation passes
   useEffect(() => {
     if (!farms || farms.length === 0) return;
     const isValid = farms.some((f) => f.id === farmId);
-    const firstFarm = farms[0];
-    if (!isValid && firstFarm) {
-      navigate(ROUTES.FARM_DASHBOARD.replace(":farmId", firstFarm.id), { replace: true });
+    if (isValid) {
+      if (farmId) setLastFarmId(farmId);
+    } else {
+      const firstFarm = farms[0];
+      if (firstFarm) {
+        navigate(ROUTES.FARM_DASHBOARD.replace(":farmId", firstFarm.id), { replace: true });
+      }
     }
-  }, [farms, farmId, navigate]);
+  }, [farms, farmId, navigate, setLastFarmId]);
+
+  // Normalize location: Dexie offline farms have location?: string, FarmSelector expects string | null
+  const normalizedFarms = useMemo(
+    () => farms?.map((f) => ({ ...f, location: f.location ?? null })) ?? [],
+    [farms]
+  );
 
   const handleFarmChange = (newFarmId: string) => {
     if (!farmId) return;
-    const newPath = location.pathname.replace(`/farms/${farmId}`, `/farms/${newFarmId}`);
-    navigate(newPath);
+    const farmPrefix = `/farms/${farmId}`;
+    const suffix = location.pathname.startsWith(farmPrefix)
+      ? location.pathname.slice(farmPrefix.length)
+      : "";
+    navigate(`/farms/${newFarmId}${suffix}`);
   };
 
   return (
@@ -54,7 +55,7 @@ export function FarmLayout() {
           </div>
           <div className="border-b border-sidebar-border px-3 py-2">
             <FarmSelector
-              farms={farms?.map((f) => ({ ...f, location: f.location ?? null })) ?? []}
+              farms={normalizedFarms}
               currentFarmId={farmId}
               onFarmChange={handleFarmChange}
             />

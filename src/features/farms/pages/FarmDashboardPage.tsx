@@ -42,6 +42,9 @@ const getSizesList = (pool: PoolWithLotes): string => {
   return lote.lote_size_compositions.map((c) => `${c.size_inches}"`).join(", ");
 };
 
+const sortIndicator = (key: SortKey, sortKey: SortKey, sortDir: SortDir) =>
+  sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
+
 export function FarmDashboardPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const { data: pools, isLoading: poolsLoading, error: poolsError } = usePools(farmId);
@@ -105,9 +108,6 @@ export function FarmDashboardPage() {
     return entradas?.filter((e) => new Date(e.entry_date) >= thirtyDaysAgo).length ?? 0;
   }, [entradas]);
 
-  const sortIndicator = (key: SortKey) =>
-    sortKey === key ? (sortDir === "asc" ? " ↑" : " ↓") : "";
-
   if (poolsLoading) {
     return <div className="text-sm text-muted-foreground">Cargando...</div>;
   }
@@ -166,19 +166,19 @@ export function FarmDashboardPage() {
                   className="cursor-pointer select-none"
                   onClick={() => handleSort("name")}
                 >
-                  Nombre{sortIndicator("name")}
+                  Nombre{sortIndicator("name", sortKey, sortDir)}
                 </TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
                   onClick={() => handleSort("pool_type")}
                 >
-                  Tipo{sortIndicator("pool_type")}
+                  Tipo{sortIndicator("pool_type", sortKey, sortDir)}
                 </TableHead>
                 <TableHead
                   className="cursor-pointer select-none"
                   onClick={() => handleSort("capacity")}
                 >
-                  Capacidad{sortIndicator("capacity")}
+                  Capacidad{sortIndicator("capacity", sortKey, sortDir)}
                 </TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Animales</TableHead>

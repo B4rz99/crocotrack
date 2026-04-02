@@ -5,20 +5,16 @@ import { useFarmStore } from "@/features/farms/stores/farm.store";
 import { Button } from "@/shared/components/ui/button";
 import { ROUTES } from "@/shared/constants/routes";
 import { supabase } from "@/shared/lib/supabase";
-import { AppShell } from "../components/AppShell";
+import { AppShell, navLinkClass } from "../components/AppShell";
 
-const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-    isActive
-      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-  }`;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function SettingsLayout() {
   const lastFarmId = useFarmStore((s) => s.lastFarmId);
-  const backTo = lastFarmId
-    ? ROUTES.FARM_DASHBOARD.replace(":farmId", lastFarmId)
-    : ROUTES.DASHBOARD;
+  const backTo =
+    lastFarmId && UUID_RE.test(lastFarmId)
+      ? ROUTES.FARM_DASHBOARD.replace(":farmId", lastFarmId)
+      : ROUTES.DASHBOARD;
 
   return (
     <AppShell
