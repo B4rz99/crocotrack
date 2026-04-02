@@ -33,3 +33,6 @@ tsconfig.tsbuildinfo
 
 # npm lockfile (project uses Bun)
 package-lock.json
+
+# Internal planning/spec files
+docs/superpowers/
