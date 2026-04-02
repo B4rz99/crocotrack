@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { Button } from "@/shared/components/ui/button";
 import {
@@ -36,7 +36,6 @@ export function EntradasListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const { data: entradas, isLoading, error } = useEntradas(farmId);
 
-  const farmDetailPath = ROUTES.FARM_DASHBOARD.replace(":farmId", farmId);
   const createPath = ROUTES.ENTRADA_CREATE.replace(":farmId", farmId);
 
   if (isLoading) {
@@ -49,13 +48,8 @@ export function EntradasListPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Link to={farmDetailPath}>
-          <Button variant="ghost" size="icon-sm" aria-label="Volver a granja">
-            <ArrowLeftIcon className="size-4" />
-          </Button>
-        </Link>
-        <h1 className="flex-1 text-xl font-bold">Entradas ({entradas?.length ?? 0})</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Entradas ({entradas?.length ?? 0})</h1>
         <Link to={createPath}>
           <Button size="sm">
             <PlusIcon className="mr-1 size-4" />
