@@ -49,7 +49,9 @@ export function FoodStockTable({ stock, purchaseCreatePath }: FoodStockTableProp
               {s.current_quantity} {s.food_types?.unit ?? "kg"}
             </TableCell>
             <TableCell>
-              {s.low_stock_threshold !== null ? `${s.low_stock_threshold} ${s.food_types?.unit ?? "kg"}` : "—"}
+              {s.low_stock_threshold !== null
+                ? `${s.low_stock_threshold} ${s.food_types?.unit ?? "kg"}`
+                : "—"}
             </TableCell>
             <TableCell>
               <Link to={`${purchaseCreatePath}?food_type_id=${s.food_type_id}`}>
