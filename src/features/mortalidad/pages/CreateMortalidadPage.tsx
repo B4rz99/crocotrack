@@ -1,5 +1,5 @@
 import { ArrowLeftIcon } from "lucide-react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { usePools } from "@/features/farms/hooks/usePools";
 import { Button } from "@/shared/components/ui/button";
@@ -18,11 +18,14 @@ export function CreateMortalidadPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Link to={listPath}>
-          <Button variant="ghost" size="icon-sm" aria-label="Volver a mortalidades">
-            <ArrowLeftIcon className="size-4" />
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Volver a mortalidades"
+          onClick={() => navigate(listPath)}
+        >
+          <ArrowLeftIcon className="size-4" />
+        </Button>
         <h1 className="text-xl font-bold">Registrar Mortalidad</h1>
       </div>
 

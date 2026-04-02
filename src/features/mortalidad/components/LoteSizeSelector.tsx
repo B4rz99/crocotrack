@@ -20,9 +20,7 @@ export function LoteSizeSelector({ compositions, onChange, errors }: LoteSizeSel
   );
 
   if (compositions.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">Sin composición de tallas disponible.</p>
-    );
+    return <p className="text-sm text-muted-foreground">Sin composición de tallas disponible.</p>;
   }
 
   const handleChange = (sizeInches: number, value: number) => {
