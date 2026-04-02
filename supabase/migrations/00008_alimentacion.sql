@@ -55,6 +55,10 @@ CREATE POLICY "alimentaciones_update" ON public.alimentaciones FOR UPDATE
     USING (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+    )
+    WITH CHECK (
+        org_id = (SELECT public.get_user_org_id())
+        AND (SELECT public.user_has_farm_access(farm_id))
     );
 
 CREATE POLICY "alimentaciones_delete" ON public.alimentaciones FOR DELETE
@@ -104,6 +108,10 @@ CREATE POLICY "food_stock_insert" ON public.food_stock FOR INSERT
 CREATE POLICY "food_stock_update" ON public.food_stock FOR UPDATE
     TO authenticated
     USING (
+        org_id = (SELECT public.get_user_org_id())
+        AND (SELECT public.user_has_farm_access(farm_id))
+    )
+    WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
     );
@@ -161,6 +169,10 @@ CREATE POLICY "food_purchases_insert" ON public.food_purchases FOR INSERT
 CREATE POLICY "food_purchases_update" ON public.food_purchases FOR UPDATE
     TO authenticated
     USING (
+        org_id = (SELECT public.get_user_org_id())
+        AND (SELECT public.user_has_farm_access(farm_id))
+    )
+    WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
     );
