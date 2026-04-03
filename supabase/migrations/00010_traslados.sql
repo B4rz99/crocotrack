@@ -295,6 +295,10 @@ BEGIN
     FROM public.lotes
     WHERE pool_id = p_destination_pool_id AND status = 'activo';
 
+    IF v_dest_lote_id IS NULL THEN
+        RAISE EXCEPTION 'La pileta de destino no tiene un lote activo al momento del traslado';
+    END IF;
+
     FOR v_size, v_count IN
         SELECT (item->>'size_inches')::SMALLINT,
                SUM((item->>'animal_count')::INTEGER)
