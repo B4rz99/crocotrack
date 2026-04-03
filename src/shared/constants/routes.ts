@@ -16,4 +16,6 @@ export const ROUTES = {
   ALIMENTACION_CREATE: "/farms/:farmId/alimentacion/nueva",
   FOOD_STOCK: "/farms/:farmId/alimentacion/stock",
   FOOD_PURCHASE_CREATE: "/farms/:farmId/alimentacion/stock/nueva",
+  CLASIFICACION: "/farms/:farmId/clasificacion",
+  CLASIFICACION_CREATE: "/farms/:farmId/clasificacion/nueva",
 } as const;

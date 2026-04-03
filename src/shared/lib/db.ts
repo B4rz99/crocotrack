@@ -195,6 +195,31 @@ export interface LocalFoodPurchase extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalClasificacion extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly pool_id: string;
+  readonly lote_id: string;
+  readonly event_date: string;
+  readonly total_animals: number;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalClasificacionGroup extends SyncMeta {
+  readonly id: string;
+  readonly clasificacion_id: string;
+  readonly size_inches: number;
+  readonly animal_count: number;
+  readonly destination_pool_id: string;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
@@ -220,6 +245,8 @@ class CrocoTrackDb extends Dexie {
   alimentaciones!: Table<LocalAlimentacion>;
   food_stock!: Table<LocalFoodStock>;
   food_purchases!: Table<LocalFoodPurchase>;
+  clasificaciones!: Table<LocalClasificacion>;
+  clasificacion_groups!: Table<LocalClasificacionGroup>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -249,6 +276,10 @@ class CrocoTrackDb extends Dexie {
         "id, org_id, farm_id, pool_id, lote_id, food_type_id, event_date, _sync_status",
       food_stock: "id, org_id, farm_id, food_type_id, [farm_id+food_type_id], _sync_status",
       food_purchases: "id, org_id, farm_id, food_type_id, purchase_date, _sync_status",
+    });
+    this.version(6).stores({
+      clasificaciones: "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
+      clasificacion_groups: "id, clasificacion_id, _sync_status",
     });
   }
 }
