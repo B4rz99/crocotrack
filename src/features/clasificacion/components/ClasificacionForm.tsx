@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import type { z } from "zod";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
@@ -20,6 +21,25 @@ import type {
 import { createClasificacionSchema } from "@/shared/schemas/clasificacion.schema";
 import { ClasificacionGroupEditor } from "./ClasificacionGroupEditor";
 
+/** Extract per-row, per-field errors from groups[i].field Zod paths. */
+function zodGroupErrors(error: z.ZodError): Record<number, Record<string, string>> {
+  return error.issues.reduce(
+    (acc, issue) => {
+      if (
+        issue.path[0] === "groups" &&
+        typeof issue.path[1] === "number" &&
+        typeof issue.path[2] === "string"
+      ) {
+        const idx = issue.path[1];
+        const field = issue.path[2];
+        return { ...acc, [idx]: { ...(acc[idx] ?? {}), [field]: issue.message } };
+      }
+      return acc;
+    },
+    {} as Record<number, Record<string, string>>
+  );
+}
+
 interface ClasificacionFormProps {
   readonly pools: readonly PoolWithLotes[];
   readonly isLoading?: boolean;
@@ -36,8 +56,12 @@ export function ClasificacionForm({
   const [groups, setGroups] = useState<readonly ClasificacionGroupInput[]>([]);
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [groupErrors, setGroupErrors] = useState<Record<number, Record<string, string>>>({});
 
+  // Origin must be a crianza pool with an active lote (something to classify).
+  // Destination can be any active crianza pool — the RPC will create a lote when needed.
   const crianzaPools = pools.filter((p) => p.pool_type === "crianza" && p.lotes.length > 0);
+  const allCrianzaPools = pools.filter((p) => p.pool_type === "crianza");
 
   const selectedPool = crianzaPools.find((p) => p.id === poolId);
   const activeLoteId = selectedPool?.lotes[0]?.id ?? "";
@@ -52,11 +76,13 @@ export function ClasificacionForm({
     setPoolId(value);
     setGroups([]);
     setErrors({});
+    setGroupErrors({});
   }
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErrors({});
+    setGroupErrors({});
 
     const raw = {
       pool_id: poolId,
@@ -69,6 +95,7 @@ export function ClasificacionForm({
 
     if (!result.success) {
       setErrors(zodFieldErrors(result.error));
+      setGroupErrors(zodGroupErrors(result.error));
       return;
     }
 
@@ -131,9 +158,10 @@ export function ClasificacionForm({
         <ClasificacionGroupEditor
           key={poolId}
           originTotal={originTotal}
-          destinationPools={crianzaPools}
+          destinationPools={allCrianzaPools}
           onChange={setGroups}
           errors={errors}
+          groupErrors={groupErrors}
         />
       )}
 

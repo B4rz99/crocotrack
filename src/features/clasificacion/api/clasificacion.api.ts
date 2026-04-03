@@ -86,7 +86,7 @@ export async function createClasificacion(
   farmId: string,
   input: CreateClasificacionInput,
   loteId: string
-): Promise<{ id: string }> {
+): Promise<{ id: string; pending: boolean }> {
   const id = generateId();
   const now = nowISO();
 
@@ -129,5 +129,5 @@ export async function createClasificacion(
     });
   }
 
-  return { id };
+  return { id, pending: !!error };
 }

@@ -36,8 +36,12 @@ export function CreateClasificacionPage() {
           createClasificacion.mutate(
             { input, loteId },
             {
-              onSuccess: () => {
-                toast.success("Clasificación registrada exitosamente");
+              onSuccess: ({ pending }) => {
+                if (pending) {
+                  toast.info("Clasificación guardada localmente. Se sincronizará cuando haya conexión.");
+                } else {
+                  toast.success("Clasificación registrada exitosamente");
+                }
                 navigate(listPath);
               },
               onError: (err) => {

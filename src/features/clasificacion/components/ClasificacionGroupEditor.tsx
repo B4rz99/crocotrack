@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PlusIcon, XIcon } from "lucide-react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
 import { Button } from "@/shared/components/ui/button";
@@ -17,7 +18,10 @@ interface ClasificacionGroupEditorProps {
   readonly originTotal: number;
   readonly destinationPools: readonly PoolWithLotes[];
   readonly onChange: (groups: readonly ClasificacionGroupInput[]) => void;
+  /** Top-level errors (e.g. errors.groups for "at least one group" message) */
   readonly errors?: Record<string, string>;
+  /** Per-row, per-field errors keyed by row index then field name */
+  readonly groupErrors?: Record<number, Record<string, string>>;
 }
 
 type DraftGroup = {
@@ -41,13 +45,12 @@ function toGroupInputs(drafts: readonly DraftGroup[]): readonly ClasificacionGro
   });
 }
 
-import { useState } from "react";
-
 export function ClasificacionGroupEditor({
   originTotal,
   destinationPools,
   onChange,
   errors = {},
+  groupErrors = {},
 }: ClasificacionGroupEditorProps) {
   const [drafts, setDrafts] = useState<readonly DraftGroup[]>([emptyGroup()]);
 
@@ -56,7 +59,9 @@ export function ClasificacionGroupEditor({
     return sum + (Number.isNaN(n) ? 0 : n);
   }, 0);
 
-  const hasMismatch = originTotal > 0 && classifiedTotal !== originTotal;
+  // Warn whenever the classified total doesn't match the origin total,
+  // regardless of whether originTotal is 0 (e.g. empty lote compositions).
+  const hasMismatch = classifiedTotal !== originTotal;
 
   function updateDraft(index: number, patch: Partial<DraftGroup>) {
     const next = drafts.map((d, i) => (i === index ? { ...d, ...patch } : d));
@@ -82,9 +87,7 @@ export function ClasificacionGroupEditor({
       (sum, c) => sum + c.animal_count,
       0
     );
-    return loteTotal !== undefined
-      ? `${pool.name} (${loteTotal} animales)`
-      : pool.name;
+    return loteTotal !== undefined ? `${pool.name} (${loteTotal} animales)` : pool.name;
   };
 
   return (
@@ -101,87 +104,99 @@ export function ClasificacionGroupEditor({
         </span>
       </div>
 
-      {drafts.map((draft, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: draft list has no stable keys
-        <div key={index} className="flex gap-2 items-start">
-          <div className="flex-none w-24 space-y-1">
-            {index === 0 && (
-              <Label htmlFor={`size-${index}`} className="text-xs text-muted-foreground">
-                Talla (pulg.)
-              </Label>
-            )}
-            <Input
-              id={`size-${index}`}
-              type="number"
-              min={1}
-              placeholder="12"
-              value={draft.size_inches}
-              onChange={(e) => updateDraft(index, { size_inches: e.target.value })}
-            />
-          </div>
+      {drafts.map((draft, index) => {
+        const rowErrors = groupErrors[index] ?? {};
+        return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: draft list has no stable keys
+          <div key={index} className="flex gap-2 items-start">
+            <div className="flex-none w-24 space-y-1">
+              {index === 0 && (
+                <Label htmlFor={`size-${index}`} className="text-xs text-muted-foreground">
+                  Talla (pulg.)
+                </Label>
+              )}
+              <Input
+                id={`size-${index}`}
+                type="number"
+                min={1}
+                placeholder="12"
+                value={draft.size_inches}
+                aria-invalid={!!rowErrors.size_inches}
+                onChange={(e) => updateDraft(index, { size_inches: e.target.value })}
+              />
+              <FieldError message={rowErrors.size_inches} />
+            </div>
 
-          <div className="flex-none w-24 space-y-1">
-            {index === 0 && (
-              <Label htmlFor={`count-${index}`} className="text-xs text-muted-foreground">
-                Cantidad
-              </Label>
-            )}
-            <Input
-              id={`count-${index}`}
-              type="number"
-              min={1}
-              placeholder="50"
-              value={draft.animal_count}
-              onChange={(e) => updateDraft(index, { animal_count: e.target.value })}
-            />
-          </div>
+            <div className="flex-none w-24 space-y-1">
+              {index === 0 && (
+                <Label htmlFor={`count-${index}`} className="text-xs text-muted-foreground">
+                  Cantidad
+                </Label>
+              )}
+              <Input
+                id={`count-${index}`}
+                type="number"
+                min={1}
+                placeholder="50"
+                value={draft.animal_count}
+                aria-invalid={!!rowErrors.animal_count}
+                onChange={(e) => updateDraft(index, { animal_count: e.target.value })}
+              />
+              <FieldError message={rowErrors.animal_count} />
+            </div>
 
-          <div className="flex-1 space-y-1">
-            {index === 0 && (
-              <Label htmlFor={`dest-${index}`} className="text-xs text-muted-foreground">
-                Pileta destino
-              </Label>
-            )}
-            <Select
-              value={draft.destination_pool_id}
-              onValueChange={(val) => {
-                if (val) updateDraft(index, { destination_pool_id: val });
-              }}
-            >
-              <SelectTrigger id={`dest-${index}`} className="w-full">
-                <SelectValue>
-                  {() => {
-                    const pool = destinationPools.find(
-                      (p) => p.id === draft.destination_pool_id
-                    );
-                    return pool ? poolLabel(pool) : "Seleccionar pileta";
-                  }}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {destinationPools.map((pool) => (
-                  <SelectItem key={pool.id} value={pool.id}>
-                    {poolLabel(pool)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            <div className="flex-1 space-y-1">
+              {index === 0 && (
+                <Label htmlFor={`dest-${index}`} className="text-xs text-muted-foreground">
+                  Pileta destino
+                </Label>
+              )}
+              <Select
+                value={draft.destination_pool_id}
+                onValueChange={(val) => {
+                  if (val) updateDraft(index, { destination_pool_id: val });
+                }}
+              >
+                <SelectTrigger
+                  id={`dest-${index}`}
+                  className="w-full"
+                  aria-invalid={!!rowErrors.destination_pool_id}
+                >
+                  <SelectValue>
+                    {() => {
+                      const pool = destinationPools.find(
+                        (p) => p.id === draft.destination_pool_id
+                      );
+                      return pool ? poolLabel(pool) : "Seleccionar pileta";
+                    }}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {destinationPools.map((pool) => (
+                    <SelectItem key={pool.id} value={pool.id}>
+                      {poolLabel(pool)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FieldError message={rowErrors.destination_pool_id} />
+            </div>
 
-          <div className={index === 0 ? "mt-6" : ""}>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Eliminar grupo"
-              disabled={drafts.length <= 1}
-              onClick={() => removeGroup(index)}
-            >
-              <XIcon className="size-4" />
-            </Button>
+            <div className={index === 0 ? "mt-6" : ""}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Eliminar grupo"
+                disabled={drafts.length <= 1}
+                onClick={() => removeGroup(index)}
+              >
+                <XIcon className="size-4" />
+              </Button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {errors.groups && <FieldError message={errors.groups} />}
 
