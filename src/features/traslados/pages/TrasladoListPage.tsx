@@ -7,7 +7,7 @@ import { useTraslados } from "../hooks/useTraslados";
 
 export function TrasladoListPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
-  const { data: traslados, isLoading } = useTraslados(farmId);
+  const { data: traslados, isLoading, isError } = useTraslados(farmId);
 
   const createPath = ROUTES.TRASLADO_CREATE.replace(":farmId", farmId);
 
@@ -32,7 +32,13 @@ export function TrasladoListPage() {
         </div>
       )}
 
-      {!isLoading && traslados?.length === 0 && (
+      {isError && (
+        <div className="flex items-center justify-center py-12">
+          <p className="text-sm text-destructive">Error al cargar los traslados.</p>
+        </div>
+      )}
+
+      {!isLoading && !isError && traslados?.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
           <p className="text-sm font-medium">Sin traslados registrados</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -44,7 +50,7 @@ export function TrasladoListPage() {
         </div>
       )}
 
-      {!isLoading && traslados && traslados.length > 0 && (
+      {!isLoading && !isError && traslados && traslados.length > 0 && (
         <div className="space-y-3">
           {traslados.map((traslado) => (
             <div key={traslado.id} className="rounded-lg border bg-card p-4 shadow-sm">
