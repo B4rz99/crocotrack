@@ -221,7 +221,13 @@ BEGIN
         END IF;
     END LOOP;
 
-    -- 6. Deadlock prevention: lock ALL affected lotes sorted by id
+    -- 6. Deadlock prevention: lock ALL affected lotes in id-sorted order
+    PERFORM id FROM public.lotes
+    WHERE pool_id = ANY(v_all_pool_ids) AND status = 'activo'
+    ORDER BY id
+    FOR UPDATE;
+
+    -- 7. Validate origin lote exists (after lock — race-safe)
     SELECT id INTO v_origin_lote_id
     FROM public.lotes
     WHERE pool_id = p_pool_id AND status = 'activo';
@@ -230,12 +236,7 @@ BEGIN
         RAISE EXCEPTION 'La pileta de origen no tiene un lote activo';
     END IF;
 
-    PERFORM id FROM public.lotes
-    WHERE pool_id = ANY(v_all_pool_ids) AND status = 'activo'
-    ORDER BY id
-    FOR UPDATE;
-
-    -- 7. Insert clasificaciones record
+    -- 8. Insert clasificaciones record
     INSERT INTO public.clasificaciones (
         id, org_id, farm_id, pool_id, lote_id, event_date,
         total_animals, notes, created_by, is_active
@@ -244,7 +245,7 @@ BEGIN
         p_event_date, v_total_animals, p_notes, auth.uid(), true
     );
 
-    -- 8. Insert clasificacion_groups
+    -- 9. Insert clasificacion_groups
     INSERT INTO public.clasificacion_groups (
         clasificacion_id, size_inches, animal_count, destination_pool_id
     )
@@ -255,16 +256,16 @@ BEGIN
         (item->>'destination_pool_id')::UUID
     FROM jsonb_array_elements(p_compositions) AS item;
 
-    -- 9. Delete ALL lote_size_compositions for origin lote
+    -- 10. Delete ALL lote_size_compositions for origin lote
     DELETE FROM public.lote_size_compositions
     WHERE lote_id = v_origin_lote_id;
 
-    -- 10. Close origin lote
+    -- 11. Close origin lote
     UPDATE public.lotes
     SET status = 'cerrado', closed_at = NOW(), updated_at = NOW()
     WHERE id = v_origin_lote_id;
 
-    -- 11. If origin pool is also a destination: create a NEW active lote for it
+    -- 12. If origin pool is also a destination: create a NEW active lote for it
     IF p_pool_id = ANY(
         ARRAY(
             SELECT DISTINCT (item->>'destination_pool_id')::UUID
@@ -276,7 +277,7 @@ BEGIN
         VALUES (v_new_lote_id, p_pool_id, v_caller_org_id, p_farm_id, 'activo', NOW(), auth.uid());
     END IF;
 
-    -- 12. Upsert lote_size_compositions for each destination pool
+    -- 13. Upsert lote_size_compositions for each destination pool
     FOR v_dest_pool_id, v_size, v_count IN
         SELECT
             (item->>'destination_pool_id')::UUID,
