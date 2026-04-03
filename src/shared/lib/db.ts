@@ -278,10 +278,8 @@ class CrocoTrackDb extends Dexie {
       food_purchases: "id, org_id, farm_id, food_type_id, purchase_date, _sync_status",
     });
     this.version(6).stores({
-      clasificaciones:
-        "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
-      clasificacion_groups:
-        "id, clasificacion_id, _sync_status",
+      clasificaciones: "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
+      clasificacion_groups: "id, clasificacion_id, _sync_status",
     });
   }
 }

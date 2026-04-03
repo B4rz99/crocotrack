@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { PlusIcon, XIcon } from "lucide-react";
+import { useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
@@ -161,9 +161,7 @@ export function ClasificacionGroupEditor({
                 >
                   <SelectValue>
                     {() => {
-                      const pool = destinationPools.find(
-                        (p) => p.id === draft.destination_pool_id
-                      );
+                      const pool = destinationPools.find((p) => p.id === draft.destination_pool_id);
                       return pool ? poolLabel(pool) : "Seleccionar pileta";
                     }}
                   </SelectValue>

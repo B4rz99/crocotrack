@@ -25,7 +25,7 @@ export function zodArrayFieldErrors(
       ) {
         const idx = issue.path[1];
         const field = issue.path[2];
-        return { ...acc, [idx]: { ...(acc[idx] ?? {}), [field]: issue.message } };
+        acc[idx] = { ...(acc[idx] ?? {}), [field]: issue.message };
       }
       return acc;
     },

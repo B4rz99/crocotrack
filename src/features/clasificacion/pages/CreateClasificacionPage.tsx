@@ -38,7 +38,9 @@ export function CreateClasificacionPage() {
             {
               onSuccess: ({ pending }) => {
                 if (pending) {
-                  toast.info("Clasificación guardada localmente. Se sincronizará cuando haya conexión.");
+                  toast.info(
+                    "Clasificación guardada localmente. Se sincronizará cuando haya conexión."
+                  );
                 } else {
                   toast.success("Clasificación registrada exitosamente");
                 }

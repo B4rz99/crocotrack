@@ -67,15 +67,13 @@ export async function getClasificacionesByFarm(
 
   const now = nowISO();
   await db.clasificaciones.bulkPut(
-    data.map(
-      ({ clasificacion_groups: _cg, profiles: _p, pools: _pools, ...clas }) => ({
-        ...clas,
-        notes: clas.notes ?? undefined,
-        created_by: clas.created_by ?? undefined,
-        _sync_status: "synced" as const,
-        _local_updated_at: now,
-      })
-    )
+    data.map(({ clasificacion_groups: _cg, profiles: _p, pools: _pools, ...clas }) => ({
+      ...clas,
+      notes: clas.notes ?? undefined,
+      created_by: clas.created_by ?? undefined,
+      _sync_status: "synced" as const,
+      _local_updated_at: now,
+    }))
   );
 
   return data;

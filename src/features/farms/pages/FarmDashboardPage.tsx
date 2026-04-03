@@ -58,7 +58,6 @@ export function FarmDashboardPage() {
   const [editPool, setEditPool] = useState<{
     id: string;
     name: string;
-    // biome-ignore lint/style/useNamingConvention: DB column name
     pool_type: "crianza" | "reproductor";
     capacity?: number | null;
     code?: string | null;
@@ -239,7 +238,6 @@ export function FarmDashboardPage() {
                               setEditPool({
                                 id: pool.id,
                                 name: pool.name,
-                                // biome-ignore lint/style/useNamingConvention: DB column name
                                 pool_type: pool.pool_type,
                                 capacity: pool.capacity,
                                 code: pool.code,

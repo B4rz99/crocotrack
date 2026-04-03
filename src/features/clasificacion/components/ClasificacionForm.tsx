@@ -27,18 +27,11 @@ interface ClasificacionFormProps {
 }
 
 function poolOriginLabel(pool: PoolWithLotes): string {
-  const total = pool.lotes[0]?.lote_size_compositions.reduce(
-    (sum, c) => sum + c.animal_count,
-    0
-  );
+  const total = pool.lotes[0]?.lote_size_compositions.reduce((sum, c) => sum + c.animal_count, 0);
   return total !== undefined ? `${pool.name} — ${total} animales` : pool.name;
 }
 
-export function ClasificacionForm({
-  pools,
-  isLoading = false,
-  onSubmit,
-}: ClasificacionFormProps) {
+export function ClasificacionForm({ pools, isLoading = false, onSubmit }: ClasificacionFormProps) {
   const [poolId, setPoolId] = useState("");
   const [eventDate, setEventDate] = useState(todayIsoDate);
   const [groups, setGroups] = useState<readonly ClasificacionGroupInput[]>([]);
@@ -54,10 +47,7 @@ export function ClasificacionForm({
   const selectedPool = crianzaPools.find((p) => p.id === poolId);
   const activeLoteId = selectedPool?.lotes[0]?.id ?? "";
   const originTotal =
-    selectedPool?.lotes[0]?.lote_size_compositions.reduce(
-      (sum, c) => sum + c.animal_count,
-      0
-    ) ?? 0;
+    selectedPool?.lotes[0]?.lote_size_compositions.reduce((sum, c) => sum + c.animal_count, 0) ?? 0;
 
   function handlePoolChange(value: string | null) {
     if (!value) return;
