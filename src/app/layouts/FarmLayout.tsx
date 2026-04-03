@@ -89,10 +89,7 @@ export function FarmLayout() {
               <UtensilsIcon className="size-4" />
               Alimentacion
             </NavLink>
-            <NavLink
-              to={ROUTES.CLASIFICACION.replace(":farmId", farmId)}
-              className={navLinkClass}
-            >
+            <NavLink to={ROUTES.CLASIFICACION.replace(":farmId", farmId)} className={navLinkClass}>
               <ScissorsIcon className="size-4" />
               Clasificación
             </NavLink>
