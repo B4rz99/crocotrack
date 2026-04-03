@@ -18,12 +18,12 @@ export function TrasladoListPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Traslados</h1>
           <p className="text-sm text-muted-foreground">Movimientos de animales entre piletas</p>
         </div>
-        <Button asChild>
-          <Link to={createPath}>
+        <Link to={createPath}>
+          <Button>
             <PlusIcon className="mr-2 h-4 w-4" />
             Nuevo Traslado
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
 
       {isLoading && (
@@ -44,9 +44,11 @@ export function TrasladoListPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Registra el primer movimiento entre piletas.
           </p>
-          <Button asChild className="mt-4" variant="outline">
-            <Link to={createPath}>Registrar Traslado</Link>
-          </Button>
+          <Link to={createPath}>
+            <Button className="mt-4" variant="outline">
+              Registrar Traslado
+            </Button>
+          </Link>
         </div>
       )}
 

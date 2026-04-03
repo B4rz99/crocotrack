@@ -131,6 +131,10 @@ export async function createTraslado(
 
   await db.traslados.put(localTraslado);
 
+  // NOTE: Local lote_size_compositions are not updated on offline create.
+  // A second offline traslado from the same pool may pass client-side
+  // validation but fail on server sync. The outbox retry will surface
+  // the RPC error after connectivity is restored.
   if (error) {
     await addToOutbox("create_traslado", id, "RPC", {
       ...rpcPayload,
