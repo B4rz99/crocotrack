@@ -52,8 +52,6 @@ CREATE TABLE public.clasificacion_groups (
 CREATE UNIQUE INDEX idx_clasificacion_groups_unique
     ON public.clasificacion_groups(clasificacion_id, size_inches, destination_pool_id);
 
-CREATE INDEX idx_clasificacion_groups_clasificacion_id
-    ON public.clasificacion_groups(clasificacion_id);
 CREATE INDEX idx_clasificacion_groups_destination_pool_id
     ON public.clasificacion_groups(destination_pool_id);
 
@@ -184,6 +182,14 @@ BEGIN
         RAISE EXCEPTION 'La pileta no pertenece a su organizacion o no es una pileta de crianza';
     END IF;
 
+    -- 2b. Guard: p_farm_id must match origin pool's actual farm_id
+    IF NOT EXISTS (
+        SELECT 1 FROM public.pools
+        WHERE id = p_pool_id AND farm_id = p_farm_id
+    ) THEN
+        RAISE EXCEPTION 'La finca indicada no corresponde a la pileta de origen';
+    END IF;
+
     -- 3. Calculate total_animals
     SELECT COALESCE(SUM((item->>'animal_count')::INTEGER), 0)
     INTO v_total_animals
@@ -203,6 +209,15 @@ BEGIN
             )
         )
     ) INTO v_all_pool_ids;
+
+    -- 4b. Guard: all destination pools must belong to caller's org
+    IF EXISTS (
+        SELECT 1 FROM public.pools
+        WHERE id = ANY(v_all_pool_ids)
+          AND org_id != v_caller_org_id
+    ) THEN
+        RAISE EXCEPTION 'Una o mas piletas de destino no pertenecen a su organizacion';
+    END IF;
 
     -- 5. For destination pools that have no active lote: create one now
     FOR v_dest_pool_id IN
@@ -252,11 +267,14 @@ BEGIN
     SELECT
         p_id,
         (item->>'size_inches')::SMALLINT,
-        (item->>'animal_count')::INTEGER,
+        SUM((item->>'animal_count')::INTEGER),
         (item->>'destination_pool_id')::UUID
-    FROM jsonb_array_elements(p_compositions) AS item;
+    FROM jsonb_array_elements(p_compositions) AS item
+    GROUP BY (item->>'size_inches')::SMALLINT, (item->>'destination_pool_id')::UUID;
 
-    -- 10. Delete ALL lote_size_compositions for origin lote
+    -- 10. Delete ALL lote_size_compositions for origin lote.
+    --     Clasificación always fully redistributes all animals from the lote
+    --     (no partial deduction). The lote is closed unconditionally after.
     DELETE FROM public.lote_size_compositions
     WHERE lote_id = v_origin_lote_id;
 
@@ -265,6 +283,7 @@ BEGIN
     SET status = 'cerrado', closed_at = NOW(), updated_at = NOW()
     WHERE id = v_origin_lote_id;
 
+    -- 11b. (v_new_lote_id is reused here — a fresh UUID for the origin pool's replacement lote)
     -- 12. If origin pool is also a destination: create a NEW active lote for it
     IF p_pool_id = ANY(
         ARRAY(
@@ -274,7 +293,8 @@ BEGIN
     ) THEN
         v_new_lote_id := gen_random_uuid();
         INSERT INTO public.lotes (id, pool_id, org_id, farm_id, status, opened_at, created_by)
-        VALUES (v_new_lote_id, p_pool_id, v_caller_org_id, p_farm_id, 'activo', NOW(), auth.uid());
+        SELECT v_new_lote_id, p_pool_id, v_caller_org_id, farm_id, 'activo', NOW(), auth.uid()
+        FROM public.pools WHERE id = p_pool_id;
     END IF;
 
     -- 13. Upsert lote_size_compositions for each destination pool
