@@ -11,6 +11,22 @@ export function TrasladoListPage() {
 
   const createPath = ROUTES.TRASLADO_CREATE.replace(":farmId", farmId);
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-muted-foreground">Cargando traslados...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <p className="text-sm text-destructive">Error al cargar los traslados.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -26,19 +42,7 @@ export function TrasladoListPage() {
         </Link>
       </div>
 
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-muted-foreground">Cargando traslados...</p>
-        </div>
-      )}
-
-      {isError && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-destructive">Error al cargar los traslados.</p>
-        </div>
-      )}
-
-      {!isLoading && !isError && traslados?.length === 0 && (
+      {traslados?.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
           <p className="text-sm font-medium">Sin traslados registrados</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -52,7 +56,7 @@ export function TrasladoListPage() {
         </div>
       )}
 
-      {!isLoading && !isError && traslados && traslados.length > 0 && (
+      {traslados && traslados.length > 0 && (
         <div className="space-y-3">
           {traslados.map((traslado) => (
             <div key={traslado.id} className="rounded-lg border bg-card p-4 shadow-sm">

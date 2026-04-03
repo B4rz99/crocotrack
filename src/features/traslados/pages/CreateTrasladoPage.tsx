@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { usePools } from "@/features/farms/hooks/usePools";
 import { ROUTES } from "@/shared/constants/routes";
-import type { CreateTrasladoInput } from "@/shared/schemas/traslado.schema";
 import { TrasladoForm } from "../components/TrasladoForm";
 import { useCreateTraslado } from "../hooks/useCreateTraslado";
 
@@ -10,22 +9,9 @@ export function CreateTrasladoPage() {
   const { farmId = "" } = useParams<{ farmId: string }>();
   const navigate = useNavigate();
   const { data: pools = [], isLoading: poolsLoading, isError: poolsError } = usePools(farmId);
-  const { mutate, isPending } = useCreateTraslado(farmId);
+  const createTraslado = useCreateTraslado(farmId);
 
-  function handleSubmit({ input, loteId }: { input: CreateTrasladoInput; loteId: string }) {
-    mutate(
-      { input, loteId },
-      {
-        onSuccess: () => {
-          toast.success("Traslado registrado");
-          navigate(ROUTES.TRASLADOS.replace(":farmId", farmId));
-        },
-        onError: (err) => {
-          toast.error(err instanceof Error ? err.message : "Error al registrar traslado");
-        },
-      }
-    );
-  }
+  const listPath = ROUTES.TRASLADOS.replace(":farmId", farmId);
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -33,13 +19,28 @@ export function CreateTrasladoPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Nuevo Traslado</h1>
         <p className="text-sm text-muted-foreground">Mueve animales entre piletas de crianza</p>
       </div>
-      {poolsError && (
-        <p className="text-sm text-destructive">Error al cargar piletas.</p>
-      )}
+      {poolsError && <p className="text-sm text-destructive">Error al cargar piletas.</p>}
       {poolsLoading ? (
         <p className="text-sm text-muted-foreground">Cargando piletas...</p>
       ) : (
-        <TrasladoForm pools={pools} isLoading={isPending} onSubmit={handleSubmit} />
+        <TrasladoForm
+          pools={pools}
+          isLoading={createTraslado.isPending}
+          onSubmit={({ input, loteId }) => {
+            createTraslado.mutate(
+              { input, loteId },
+              {
+                onSuccess: () => {
+                  toast.success("Traslado registrado");
+                  navigate(listPath);
+                },
+                onError: (err) => {
+                  toast.error(err instanceof Error ? err.message : "Error al registrar traslado");
+                },
+              }
+            );
+          }}
+        />
       )}
     </div>
   );
