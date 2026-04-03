@@ -278,16 +278,18 @@ BEGIN
         FROM jsonb_array_elements(p_compositions) AS item
         GROUP BY (item->>'size_inches')::SMALLINT
     LOOP
+        -- Delete rows that would reach zero first to avoid CHECK (animal_count > 0)
+        DELETE FROM public.lote_size_compositions
+        WHERE lote_id = v_origin_lote_id
+          AND size_inches = v_size
+          AND animal_count <= v_count;
+
+        -- Decrement the remaining rows
         UPDATE public.lote_size_compositions
         SET animal_count = animal_count - v_count,
             updated_at = NOW()
         WHERE lote_id = v_origin_lote_id
           AND size_inches = v_size;
-
-        DELETE FROM public.lote_size_compositions
-        WHERE lote_id = v_origin_lote_id
-          AND size_inches = v_size
-          AND animal_count = 0;
     END LOOP;
 
     -- 13. Upsert destination lote_size_compositions
