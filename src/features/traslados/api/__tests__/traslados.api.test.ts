@@ -98,9 +98,7 @@ describe("traslados.api", () => {
     it("returns local Dexie data with empty join fields on Supabase error", async () => {
       const mockFrom = await getMockFrom();
 
-      const mockOrder = vi
-        .fn()
-        .mockResolvedValue({ data: null, error: { message: "offline" } });
+      const mockOrder = vi.fn().mockResolvedValue({ data: null, error: { message: "offline" } });
       const mockEqIsActive = vi.fn().mockReturnValue({ order: mockOrder });
       const mockEqFarmId = vi.fn().mockReturnValue({ eq: mockEqIsActive });
       const mockSelect = vi.fn().mockReturnValue({ eq: mockEqFarmId });
