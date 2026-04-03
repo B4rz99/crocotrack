@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { LoteSizeSelector } from "@/shared/components/LoteSizeSelector";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -15,7 +16,6 @@ import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateMortalidadInput } from "@/shared/schemas/mortalidad.schema";
 import { createMortalidadSchema } from "@/shared/schemas/mortalidad.schema";
-import { LoteSizeSelector } from "./LoteSizeSelector";
 
 interface MortalidadFormProps {
   readonly pools: readonly PoolWithLotes[];

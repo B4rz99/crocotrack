@@ -10,11 +10,19 @@ interface SizeComposition {
 
 interface LoteSizeSelectorProps {
   readonly compositions: readonly SizeComposition[];
-  readonly onChange: (deaths: ReadonlyArray<{ size_inches: number; animal_count: number }>) => void;
+  readonly onChange: (
+    selected: ReadonlyArray<{ size_inches: number; animal_count: number }>
+  ) => void;
   readonly errors?: Record<string, string>;
+  readonly label?: string;
 }
 
-export function LoteSizeSelector({ compositions, onChange, errors }: LoteSizeSelectorProps) {
+export function LoteSizeSelector({
+  compositions,
+  onChange,
+  errors,
+  label = "Bajas por talla",
+}: LoteSizeSelectorProps) {
   const [counts, setCounts] = useState<Record<number, number>>(() =>
     Object.fromEntries(compositions.map((c) => [c.size_inches, 0]))
   );
@@ -35,7 +43,7 @@ export function LoteSizeSelector({ compositions, onChange, errors }: LoteSizeSel
 
   return (
     <div className="space-y-3">
-      <Label>Bajas por talla</Label>
+      <Label>{label}</Label>
       {compositions.map((comp) => (
         <div key={comp.size_inches} className="flex items-center gap-3">
           <span className="w-48 text-sm text-muted-foreground">
@@ -48,7 +56,7 @@ export function LoteSizeSelector({ compositions, onChange, errors }: LoteSizeSel
             value={counts[comp.size_inches] ?? 0}
             onChange={(e) => handleChange(comp.size_inches, Number(e.target.value))}
             className="w-24"
-            aria-label={`Bajas de ${comp.size_inches} pulgadas`}
+            aria-label={`${label} de ${comp.size_inches} pulgadas`}
           />
         </div>
       ))}

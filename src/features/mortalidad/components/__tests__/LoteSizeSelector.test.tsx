@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { LoteSizeSelector } from "../LoteSizeSelector";
+import { LoteSizeSelector } from "@/shared/components/LoteSizeSelector";
 
 const compositions = [
   { size_inches: 12, animal_count: 80 },
