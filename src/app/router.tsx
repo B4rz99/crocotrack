@@ -6,6 +6,8 @@ import { FoodStockPage } from "@/features/alimentacion/pages/FoodStockPage";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
 import { RegisterPage } from "@/features/auth/pages/RegisterPage";
+import { ClasificacionListPage } from "@/features/clasificacion/pages/ClasificacionListPage";
+import { CreateClasificacionPage } from "@/features/clasificacion/pages/CreateClasificacionPage";
 import { CreateEntradaPage } from "@/features/entradas/pages/CreateEntradaPage";
 import { EntradasListPage } from "@/features/entradas/pages/EntradasListPage";
 import { FarmDashboardPage } from "@/features/farms/pages/FarmDashboardPage";
@@ -62,6 +64,8 @@ export const router = createBrowserRouter([
           { path: "alimentacion/nueva", element: <CreateAlimentacionPage /> },
           { path: "alimentacion/stock", element: <FoodStockPage /> },
           { path: "alimentacion/stock/nueva", element: <CreateFoodPurchasePage /> },
+          { path: "clasificacion", element: <ClasificacionListPage /> },
+          { path: "clasificacion/nueva", element: <CreateClasificacionPage /> },
         ],
       },
       // Settings routes

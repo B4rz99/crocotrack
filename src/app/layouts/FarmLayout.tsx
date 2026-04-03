@@ -3,6 +3,7 @@ import {
   ClipboardListIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  ScissorsIcon,
   SettingsIcon,
   SkullIcon,
   UtensilsIcon,
@@ -87,6 +88,13 @@ export function FarmLayout() {
             <NavLink to={ROUTES.ALIMENTACION.replace(":farmId", farmId)} className={navLinkClass}>
               <UtensilsIcon className="size-4" />
               Alimentacion
+            </NavLink>
+            <NavLink
+              to={ROUTES.CLASIFICACION.replace(":farmId", farmId)}
+              className={navLinkClass}
+            >
+              <ScissorsIcon className="size-4" />
+              Clasificación
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
             <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>
