@@ -30,11 +30,9 @@ type DraftGroup = {
   destination_pool_id: string;
 };
 
-const emptyGroup = (): DraftGroup => ({
-  size_inches: "",
-  animal_count: "",
-  destination_pool_id: "",
-});
+function emptyGroup(): DraftGroup {
+  return { size_inches: "", animal_count: "", destination_pool_id: "" };
+}
 
 function toGroupInputs(drafts: readonly DraftGroup[]): readonly ClasificacionGroupInput[] {
   return drafts.flatMap((d) => {
@@ -43,6 +41,14 @@ function toGroupInputs(drafts: readonly DraftGroup[]): readonly ClasificacionGro
     if (!d.destination_pool_id || Number.isNaN(size) || Number.isNaN(count)) return [];
     return [{ size_inches: size, animal_count: count, destination_pool_id: d.destination_pool_id }];
   });
+}
+
+function poolLabel(pool: PoolWithLotes): string {
+  const loteTotal = pool.lotes[0]?.lote_size_compositions.reduce(
+    (sum, c) => sum + c.animal_count,
+    0
+  );
+  return loteTotal !== undefined ? `${pool.name} (${loteTotal} animales)` : pool.name;
 }
 
 export function ClasificacionGroupEditor({
@@ -59,36 +65,27 @@ export function ClasificacionGroupEditor({
     return sum + (Number.isNaN(n) ? 0 : n);
   }, 0);
 
-  // Warn whenever the classified total doesn't match the origin total,
-  // regardless of whether originTotal is 0 (e.g. empty lote compositions).
+  // Warn whenever classified total doesn't match origin total,
+  // including when originTotal is 0 (e.g. empty lote compositions).
   const hasMismatch = classifiedTotal !== originTotal;
 
-  function updateDraft(index: number, patch: Partial<DraftGroup>) {
-    const next = drafts.map((d, i) => (i === index ? { ...d, ...patch } : d));
+  function commitDrafts(next: readonly DraftGroup[]) {
     setDrafts(next);
     onChange(toGroupInputs(next));
   }
 
+  function updateDraft(index: number, patch: Partial<DraftGroup>) {
+    commitDrafts(drafts.map((d, i) => (i === index ? { ...d, ...patch } : d)));
+  }
+
   function addGroup() {
-    const next = [...drafts, emptyGroup()];
-    setDrafts(next);
-    onChange(toGroupInputs(next));
+    commitDrafts([...drafts, emptyGroup()]);
   }
 
   function removeGroup(index: number) {
     if (drafts.length <= 1) return;
-    const next = drafts.filter((_, i) => i !== index);
-    setDrafts(next);
-    onChange(toGroupInputs(next));
+    commitDrafts(drafts.filter((_, i) => i !== index));
   }
-
-  const poolLabel = (pool: PoolWithLotes) => {
-    const loteTotal = pool.lotes[0]?.lote_size_compositions.reduce(
-      (sum, c) => sum + c.animal_count,
-      0
-    );
-    return loteTotal !== undefined ? `${pool.name} (${loteTotal} animales)` : pool.name;
-  };
 
   return (
     <div className="space-y-3">

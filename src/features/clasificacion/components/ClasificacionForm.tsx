@@ -1,5 +1,4 @@
 import { type FormEvent, useState } from "react";
-import type { z } from "zod";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { zodFieldErrors } from "@/shared/lib/form-utils";
+import { zodArrayFieldErrors, zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type {
   ClasificacionGroupInput,
@@ -21,29 +20,18 @@ import type {
 import { createClasificacionSchema } from "@/shared/schemas/clasificacion.schema";
 import { ClasificacionGroupEditor } from "./ClasificacionGroupEditor";
 
-/** Extract per-row, per-field errors from groups[i].field Zod paths. */
-function zodGroupErrors(error: z.ZodError): Record<number, Record<string, string>> {
-  return error.issues.reduce(
-    (acc, issue) => {
-      if (
-        issue.path[0] === "groups" &&
-        typeof issue.path[1] === "number" &&
-        typeof issue.path[2] === "string"
-      ) {
-        const idx = issue.path[1];
-        const field = issue.path[2];
-        return { ...acc, [idx]: { ...(acc[idx] ?? {}), [field]: issue.message } };
-      }
-      return acc;
-    },
-    {} as Record<number, Record<string, string>>
-  );
-}
-
 interface ClasificacionFormProps {
   readonly pools: readonly PoolWithLotes[];
   readonly isLoading?: boolean;
   readonly onSubmit: (data: { input: CreateClasificacionInput; loteId: string }) => void;
+}
+
+function poolOriginLabel(pool: PoolWithLotes): string {
+  const total = pool.lotes[0]?.lote_size_compositions.reduce(
+    (sum, c) => sum + c.animal_count,
+    0
+  );
+  return total !== undefined ? `${pool.name} — ${total} animales` : pool.name;
 }
 
 export function ClasificacionForm({
@@ -95,7 +83,7 @@ export function ClasificacionForm({
 
     if (!result.success) {
       setErrors(zodFieldErrors(result.error));
-      setGroupErrors(zodGroupErrors(result.error));
+      setGroupErrors(zodArrayFieldErrors(result.error, "groups"));
       return;
     }
 
@@ -123,27 +111,16 @@ export function ClasificacionForm({
             <SelectValue>
               {() => {
                 const pool = crianzaPools.find((p) => p.id === poolId);
-                if (!pool) return "Seleccionar pileta";
-                const total = pool.lotes[0]?.lote_size_compositions.reduce(
-                  (sum, c) => sum + c.animal_count,
-                  0
-                );
-                return total !== undefined ? `${pool.name} — ${total} animales` : pool.name;
+                return pool ? poolOriginLabel(pool) : "Seleccionar pileta";
               }}
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {crianzaPools.map((pool) => {
-              const total = pool.lotes[0]?.lote_size_compositions.reduce(
-                (sum, c) => sum + c.animal_count,
-                0
-              );
-              return (
-                <SelectItem key={pool.id} value={pool.id}>
-                  {total !== undefined ? `${pool.name} — ${total} animales` : pool.name}
-                </SelectItem>
-              );
-            })}
+            {crianzaPools.map((pool) => (
+              <SelectItem key={pool.id} value={pool.id}>
+                {poolOriginLabel(pool)}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         {crianzaPools.length === 0 && (
