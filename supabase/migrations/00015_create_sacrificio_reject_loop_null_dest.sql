@@ -1,27 +1,9 @@
 -- ============================================
--- Migration 00012: sacrificio hardening
--- Row accounting CHECK (idempotent for DBs that
--- already have it from an updated 00011), unique
--- rechazado rows, aggregated rechazado INSERT in RPC.
+-- Migration 00015: create_sacrificio — bucle rechazados sin destino NULL
+-- Omite filas con destination_pool_id ausente al repartir a lote_size_compositions;
+-- evita WHERE pool_id = NULL (sin coincidencias) y el error engañoso de lote activo.
+-- Idempotente para bases que ya aplicaron 00014 antes de este filtro.
 -- ============================================
-
-DO $migration$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        WHERE conrelid = 'public.sacrificios'::regclass
-          AND conname = 'chk_sacrificios_totals'
-    ) THEN
-        ALTER TABLE public.sacrificios
-            ADD CONSTRAINT chk_sacrificios_totals
-            CHECK (total_sacrificed + total_rejected + total_faltantes = total_animals);
-    END IF;
-END $migration$;
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_sacrificio_size_groups_rechazado_unique
-    ON public.sacrificio_size_groups (sacrificio_id, size_inches, destination_pool_id)
-    WHERE group_type = 'rechazado';
 
 CREATE OR REPLACE FUNCTION public.create_sacrificio(
     p_id            UUID,

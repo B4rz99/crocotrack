@@ -379,6 +379,7 @@ BEGIN
             SUM((item->>'animal_count')::INTEGER)
         FROM jsonb_array_elements(p_rejected) AS item
         WHERE (item->>'animal_count')::INTEGER > 0
+          AND item->>'destination_pool_id' IS NOT NULL
         GROUP BY (item->>'destination_pool_id')::UUID, (item->>'size_inches')::SMALLINT
     LOOP
         SELECT id INTO v_dest_lote_id
