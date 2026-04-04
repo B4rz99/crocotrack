@@ -59,8 +59,10 @@ export function CleaningProductSelector({
   }
 
   function handleQuantityChange(key: number, value: string) {
-    const qty = Math.max(1, Number.parseInt(value, 10) || 1);
-    const updated = rows.map((r) => (r.key === key ? { ...r, quantity: qty } : r));
+    if (value === "") return;
+    const n = Number(value);
+    if (!Number.isInteger(n) || n < 1) return;
+    const updated = rows.map((r) => (r.key === key ? { ...r, quantity: n } : r));
     setRows(updated);
     emitChange(updated);
   }
@@ -89,8 +91,6 @@ export function CleaningProductSelector({
         const availableProducts = productTypes.filter(
           (pt) => pt.id === row.cleaning_product_type_id || !selectedIds.has(pt.id)
         );
-        const selectedProduct = productTypes.find((pt) => pt.id === row.cleaning_product_type_id);
-
         return (
           <div key={row.key} className="flex items-end gap-2">
             <div className="flex-1 space-y-1">
@@ -99,7 +99,11 @@ export function CleaningProductSelector({
                 onValueChange={(val) => handleProductChange(row.key, val)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>{() => selectedProduct?.name ?? "Seleccionar producto"}</SelectValue>
+                  <SelectValue>
+                    {(value) =>
+                      productTypes.find((pt) => pt.id === value)?.name ?? "Seleccionar producto"
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {availableProducts.map((pt) => (

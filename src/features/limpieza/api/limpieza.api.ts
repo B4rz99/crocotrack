@@ -5,8 +5,12 @@ import { generateId, nowISO } from "@/shared/lib/utils";
 import type { CreateLimpiezaInput } from "@/shared/schemas/limpieza.schema";
 
 interface LimpiezaProductDetail {
+  readonly id?: string;
+  readonly limpieza_id?: string;
   readonly cleaning_product_type_id: string;
   readonly quantity: number;
+  readonly created_at?: string;
+  readonly updated_at?: string;
   readonly cleaning_product_types: { readonly name: string } | null;
 }
 
@@ -38,7 +42,15 @@ export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDe
     .select(
       `
       *,
-      limpieza_products ( cleaning_product_type_id, quantity, cleaning_product_types ( name ) ),
+      limpieza_products (
+        id,
+        limpieza_id,
+        cleaning_product_type_id,
+        quantity,
+        created_at,
+        updated_at,
+        cleaning_product_types ( name )
+      ),
       profiles ( full_name ),
       pools!pool_id ( name )
     `
@@ -101,6 +113,35 @@ export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDe
       _local_updated_at: now,
     }))
   );
+
+  const limpiezaIds = data.map((l) => l.id);
+  if (limpiezaIds.length > 0) {
+    await db.limpieza_products.where("limpieza_id").anyOf(limpiezaIds).delete();
+  }
+
+  const productRows = data.flatMap((lim) =>
+    (lim.limpieza_products ?? []).flatMap((lp) => {
+      if (lp.id === undefined || lp.created_at === undefined || lp.updated_at === undefined) {
+        return [];
+      }
+      return [
+        {
+          id: lp.id,
+          limpieza_id: lp.limpieza_id ?? lim.id,
+          cleaning_product_type_id: lp.cleaning_product_type_id,
+          quantity: lp.quantity,
+          created_at: lp.created_at,
+          updated_at: lp.updated_at,
+          _sync_status: "synced" as const,
+          _local_updated_at: now,
+        },
+      ];
+    })
+  );
+
+  if (productRows.length > 0) {
+    await db.limpieza_products.bulkPut(productRows);
+  }
 
   return data;
 }

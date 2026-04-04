@@ -40,7 +40,6 @@ export function LimpiezaForm({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const activePools = pools.filter((p) => p.is_active);
-  const selectedPool = activePools.find((p) => p.id === poolId);
 
   function handlePoolChange(value: string | null) {
     if (!value) return;
@@ -87,7 +86,9 @@ export function LimpiezaForm({
         <Label htmlFor="pool-select">Pileta</Label>
         <Select value={poolId} onValueChange={handlePoolChange}>
           <SelectTrigger id="pool-select" className="w-full" aria-invalid={!!errors.pool_id}>
-            <SelectValue>{() => selectedPool?.name ?? "Seleccionar pileta"}</SelectValue>
+            <SelectValue>
+              {(value) => activePools.find((p) => p.id === value)?.name ?? "Seleccionar pileta"}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {activePools.map((pool) => (

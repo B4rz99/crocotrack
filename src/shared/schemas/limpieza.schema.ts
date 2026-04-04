@@ -1,6 +1,5 @@
 import { z } from "zod";
-
-const notFutureDate = (val: string) => val <= new Date().toLocaleDateString("en-CA");
+import { isoDateUtcNotAfterToday } from "@/shared/lib/iso-date";
 
 const limpiezaProductItemSchema = z.object({
   cleaning_product_type_id: z.string().uuid("Debe seleccionar un producto"),
@@ -15,7 +14,7 @@ export const createLimpiezaSchema = z.object({
   event_date: z
     .string()
     .date("Formato de fecha invalido")
-    .refine(notFutureDate, "La fecha no puede ser futura"),
+    .refine(isoDateUtcNotAfterToday, "La fecha no puede ser futura"),
   products: z.array(limpiezaProductItemSchema).min(1, "Debe agregar al menos un producto"),
   notes: z.string().max(2000).optional(),
 });

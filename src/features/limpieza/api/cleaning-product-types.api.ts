@@ -16,7 +16,6 @@ export async function getCleaningProductTypes(): Promise<CleaningProductType[]> 
   const { data, error } = (await untypedSupabase
     .from("cleaning_product_types")
     .select("*")
-    .eq("is_active", true)
     .order("name")) as {
     data: CleaningProductType[] | null;
     error: { message: string } | null;
@@ -36,5 +35,5 @@ export async function getCleaningProductTypes(): Promise<CleaningProductType[]> 
     }))
   );
 
-  return data;
+  return data.filter((t) => t.is_active);
 }

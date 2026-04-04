@@ -186,6 +186,8 @@ describe("onboarding store", () => {
       useOnboardingStore.getState().addPool({ name: "P", pool_type: "crianza", capacity: 10 });
       useOnboardingStore.getState().addFoodType({ name: "F", unit: "kg" });
       useOnboardingStore.getState().setIncubatorsData([{ name: "I", capacity: 50 }]);
+      useOnboardingStore.getState().setCleaningProductsData([{ name: "Detergente" }]);
+      useOnboardingStore.getState().setCleaningFrequencyDays(14);
       useOnboardingStore.getState().addInviteEmail("x@test.com");
       useOnboardingStore.getState().nextStep();
 

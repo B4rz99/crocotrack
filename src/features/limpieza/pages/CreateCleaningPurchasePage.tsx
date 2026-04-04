@@ -35,8 +35,6 @@ export function CreateCleaningPurchasePage() {
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const selectedProduct = productTypes.find((pt) => pt.id === productTypeId);
-
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setErrors({});
@@ -90,7 +88,11 @@ export function CreateCleaningPurchasePage() {
               className="w-full"
               aria-invalid={!!errors.cleaning_product_type_id}
             >
-              <SelectValue>{() => selectedProduct?.name ?? "Seleccionar producto"}</SelectValue>
+              <SelectValue>
+                {(value) =>
+                  productTypes.find((pt) => pt.id === value)?.name ?? "Seleccionar producto"
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {productTypes.map((pt) => (
@@ -122,7 +124,12 @@ export function CreateCleaningPurchasePage() {
             type="number"
             min={1}
             value={quantity}
-            onChange={(e) => setQuantity(Number.parseInt(e.target.value, 10) || 1)}
+            onChange={(e) => {
+              const raw = e.target.value;
+              if (raw === "") return;
+              const n = e.target.valueAsNumber;
+              if (Number.isInteger(n) && n >= 1) setQuantity(n);
+            }}
             aria-invalid={!!errors.quantity}
           />
           <FieldError message={errors.quantity} />

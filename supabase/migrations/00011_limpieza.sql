@@ -79,6 +79,11 @@ CREATE POLICY "cleaning_product_stock_insert" ON public.cleaning_product_stock F
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.cleaning_product_types cpt
+            WHERE cpt.id = cleaning_product_type_id
+              AND cpt.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "cleaning_product_stock_update" ON public.cleaning_product_stock FOR UPDATE
@@ -90,6 +95,11 @@ CREATE POLICY "cleaning_product_stock_update" ON public.cleaning_product_stock F
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.cleaning_product_types cpt
+            WHERE cpt.id = cleaning_product_type_id
+              AND cpt.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "cleaning_product_stock_delete" ON public.cleaning_product_stock FOR DELETE
@@ -141,6 +151,11 @@ CREATE POLICY "cleaning_product_purchases_insert" ON public.cleaning_product_pur
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.cleaning_product_types cpt
+            WHERE cpt.id = cleaning_product_type_id
+              AND cpt.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "cleaning_product_purchases_update" ON public.cleaning_product_purchases FOR UPDATE
@@ -152,6 +167,11 @@ CREATE POLICY "cleaning_product_purchases_update" ON public.cleaning_product_pur
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.cleaning_product_types cpt
+            WHERE cpt.id = cleaning_product_type_id
+              AND cpt.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "cleaning_product_purchases_delete" ON public.cleaning_product_purchases FOR DELETE
@@ -201,6 +221,12 @@ CREATE POLICY "limpiezas_insert" ON public.limpiezas FOR INSERT
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.pools p
+            WHERE p.id = pool_id
+              AND p.farm_id = farm_id
+              AND p.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "limpiezas_update" ON public.limpiezas FOR UPDATE
@@ -208,6 +234,16 @@ CREATE POLICY "limpiezas_update" ON public.limpiezas FOR UPDATE
     USING (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
+    )
+    WITH CHECK (
+        org_id = (SELECT public.get_user_org_id())
+        AND (SELECT public.user_has_farm_access(farm_id))
+        AND EXISTS (
+            SELECT 1 FROM public.pools p
+            WHERE p.id = pool_id
+              AND p.farm_id = farm_id
+              AND p.org_id = (SELECT public.get_user_org_id())
+        )
     );
 
 CREATE POLICY "limpiezas_delete" ON public.limpiezas FOR DELETE
@@ -332,7 +368,7 @@ BEGIN
         RAISE EXCEPTION 'Debe incluir al menos un producto de limpieza';
     END IF;
 
-    SELECT COUNT(*) - COUNT(DISTINCT item->>'cleaning_product_type_id')
+    SELECT COUNT(*) - COUNT(DISTINCT (item->>'cleaning_product_type_id')::uuid)
     INTO v_dup_count
     FROM jsonb_array_elements(p_products) AS item;
 

@@ -1,3 +1,5 @@
+import { addDaysIsoUtc, todayIsoDateUtc } from "@/shared/lib/iso-date";
+
 export interface PoolCleaningStatus {
   readonly poolId: string;
   readonly poolName: string;
@@ -14,16 +16,6 @@ interface PoolInfo {
 interface LimpiezaInfo {
   readonly pool_id: string;
   readonly event_date: string;
-}
-
-function addDays(dateStr: string, days: number): string {
-  const date = new Date(dateStr);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().split("T")[0] ?? dateStr;
-}
-
-function todayStr(): string {
-  return new Date().toLocaleDateString("en-CA");
 }
 
 export function getPoolCleaningStatuses(
@@ -61,8 +53,8 @@ export function getPoolCleaningStatuses(
       };
     }
 
-    const nextDueDate = addDays(lastCleaningDate, cleaningFrequencyDays);
-    const isOverdue = nextDueDate < todayStr();
+    const nextDueDate = addDaysIsoUtc(lastCleaningDate, cleaningFrequencyDays);
+    const isOverdue = nextDueDate < todayIsoDateUtc();
 
     return {
       poolId: pool.id,
