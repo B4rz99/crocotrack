@@ -1,4 +1,4 @@
-import { db } from "@/shared/lib/db";
+import { db, type LocalSacrificio, type LocalSacrificioSizeGroup } from "@/shared/lib/db";
 import { untypedSupabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
 import { generateId, nowISO } from "@/shared/lib/utils";
@@ -81,7 +81,41 @@ export async function getSacrificiosByFarm(farmId: string): Promise<SacrificioWi
   return data;
 }
 
-export async function getSacrificioById(id: string): Promise<SacrificioWithDetails | null> {
+function sacrificioFromLocal(
+  row: LocalSacrificio,
+  groups: readonly LocalSacrificioSizeGroup[]
+): SacrificioWithDetails {
+  return {
+    id: row.id,
+    org_id: row.org_id,
+    farm_id: row.farm_id,
+    pool_id: row.pool_id,
+    lote_id: row.lote_id,
+    event_date: row.event_date,
+    total_animals: row.total_animals,
+    total_sacrificed: row.total_sacrificed,
+    total_rejected: row.total_rejected,
+    total_faltantes: row.total_faltantes,
+    notes: row.notes ?? null,
+    is_active: row.is_active,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    created_by: row.created_by ?? null,
+    sacrificio_size_groups: groups.map((g) => ({
+      group_type: g.group_type,
+      size_inches: g.size_inches,
+      animal_count: g.animal_count,
+      destination_pool_id: g.destination_pool_id ?? null,
+    })),
+    profiles: null,
+    pools: null,
+  };
+}
+
+export async function getSacrificioById(
+  id: string,
+  farmId: string
+): Promise<SacrificioWithDetails | null> {
   const { data, error } = (await untypedSupabase
     .from("sacrificios")
     .select(
@@ -93,13 +127,33 @@ export async function getSacrificioById(id: string): Promise<SacrificioWithDetai
     `
     )
     .eq("id", id)
+    .eq("farm_id", farmId)
     .maybeSingle()) as {
     data: SacrificioWithDetails | null;
     error: { message: string } | null;
   };
 
-  if (error || !data) return null;
-  return data;
+  if (data) {
+    const now = nowISO();
+    const { sacrificio_size_groups: _sg, profiles: _p, pools: _pools, ...sacrificio } = data;
+    await db.sacrificios.put({
+      ...sacrificio,
+      notes: sacrificio.notes ?? undefined,
+      created_by: sacrificio.created_by ?? undefined,
+      _sync_status: "synced",
+      _local_updated_at: now,
+    });
+    return data;
+  }
+
+  if (!error) return null;
+
+  const localRow = await db.sacrificios.get(id);
+  if (!localRow || localRow.farm_id !== farmId || !localRow.is_active) return null;
+
+  const localGroups = await db.sacrificio_size_groups.where("sacrificio_id").equals(id).toArray();
+
+  return sacrificioFromLocal(localRow, localGroups);
 }
 
 export async function createSacrificio(

@@ -1,6 +1,18 @@
 import { z } from "zod";
 
-const notFutureDate = (val: string) => val <= new Date().toLocaleDateString("en-CA");
+/** ISO `YYYY-MM-DD` must not be after the user's local calendar today. */
+function isNotFutureYmd(val: string): boolean {
+  const parts = val.split("-");
+  if (parts.length !== 3) return false;
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return false;
+  const eventDay = new Date(y, m - 1, d);
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return eventDay.getTime() <= todayStart.getTime();
+}
 
 export const rejectedGroupSchema = z.object({
   animal_count: z.number().int().positive("La cantidad debe ser mayor a 0"),
@@ -34,7 +46,7 @@ export const createSacrificioSchema = z
     event_date: z
       .string()
       .date("Formato de fecha inválido")
-      .refine(notFutureDate, "La fecha no puede ser futura"),
+      .refine(isNotFutureYmd, "La fecha no puede ser futura"),
     groups: z.array(sacrificioGroupSchema).min(1, "Debe agregar al menos un grupo de talla"),
     notes: z.string().max(2000).optional(),
   })

@@ -74,4 +74,18 @@ describe("createSacrificioSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects event_date in the future (local calendar)", () => {
+    const t = new Date();
+    t.setDate(t.getDate() + 2);
+    const y = t.getFullYear();
+    const mo = String(t.getMonth() + 1).padStart(2, "0");
+    const da = String(t.getDate()).padStart(2, "0");
+    const future = `${y}-${mo}-${da}`;
+    const result = createSacrificioSchema.safeParse({
+      ...base,
+      event_date: future,
+    });
+    expect(result.success).toBe(false);
+  });
 });

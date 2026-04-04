@@ -12,7 +12,7 @@ export function SacrificioDetailPage() {
     farmId: string;
     sacrificioId: string;
   }>();
-  const { data: sacrificio, isLoading, isError } = useSacrificioDetail(sacrificioId);
+  const { data: sacrificio, isLoading, isError } = useSacrificioDetail(sacrificioId, farmId);
   const { data: pools = [] } = usePools(farmId);
 
   const poolNames = useMemo(() => new Map(pools.map((p) => [p.id, p.name])), [pools]);

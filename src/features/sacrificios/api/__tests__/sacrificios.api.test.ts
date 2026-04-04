@@ -18,7 +18,7 @@ vi.mock("@/shared/lib/sync", () => ({
 import { db } from "@/shared/lib/db";
 import { addToOutbox } from "@/shared/lib/sync";
 import type { CreateSacrificioInput } from "@/shared/schemas/sacrificio.schema";
-import { createSacrificio, getSacrificiosByFarm } from "../sacrificios.api";
+import { createSacrificio, getSacrificioById, getSacrificiosByFarm } from "../sacrificios.api";
 
 async function getMockFrom() {
   const mod = await import("@/shared/lib/supabase");
@@ -122,6 +122,103 @@ describe("sacrificios.api", () => {
       expect(cached).toBeDefined();
       expect(cached?._sync_status).toBe("synced");
       expect(cached?.total_sacrificed).toBe(3);
+    });
+  });
+
+  describe("getSacrificioById", () => {
+    it("filters by farm_id on Supabase", async () => {
+      const mockFrom = await getMockFrom();
+      const row = makeSacrificio();
+      const mockMaybeSingle = vi.fn().mockResolvedValue({ data: row, error: null });
+      const mockEqFarm = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+      const mockEqId = vi.fn().mockReturnValue({ eq: mockEqFarm });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEqId });
+      mockFrom.mockReturnValue({ select: mockSelect });
+
+      const result = await getSacrificioById("sacrificio-001", FARM_ID);
+
+      expect(mockEqId).toHaveBeenCalledWith("id", "sacrificio-001");
+      expect(mockEqFarm).toHaveBeenCalledWith("farm_id", FARM_ID);
+      expect(result).toEqual(row);
+    });
+
+    it("falls back to Dexie when Supabase returns an error", async () => {
+      const mockFrom = await getMockFrom();
+      const mockMaybeSingle = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: "offline" } });
+      const mockEqFarm = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+      const mockEqId = vi.fn().mockReturnValue({ eq: mockEqFarm });
+      const mockSelect = vi.fn().mockReturnValue({ eq: mockEqId });
+      mockFrom.mockReturnValue({ select: mockSelect });
+
+      const now = "2026-04-02T10:00:00.000Z";
+      await db.sacrificios.put({
+        id: "sacrificio-001",
+        org_id: ORG_ID,
+        farm_id: FARM_ID,
+        pool_id: POOL_ID,
+        lote_id: LOTE_ID,
+        event_date: "2026-04-02",
+        total_animals: 10,
+        total_sacrificed: 3,
+        total_rejected: 2,
+        total_faltantes: 5,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+        _sync_status: "synced",
+        _local_updated_at: now,
+      });
+      await db.sacrificio_size_groups.add({
+        id: "sg-1",
+        sacrificio_id: "sacrificio-001",
+        group_type: "sacrificado",
+        size_inches: 12,
+        animal_count: 3,
+        created_at: now,
+        updated_at: now,
+        _sync_status: "synced",
+        _local_updated_at: now,
+      });
+
+      const result = await getSacrificioById("sacrificio-001", FARM_ID);
+
+      expect(result?.id).toBe("sacrificio-001");
+      expect(result?.sacrificio_size_groups).toHaveLength(1);
+      expect(result?.sacrificio_size_groups[0]?.animal_count).toBe(3);
+    });
+
+    it("returns null on Supabase error when Dexie row is for another farm", async () => {
+      const mockFrom = await getMockFrom();
+      const mockMaybeSingle = vi
+        .fn()
+        .mockResolvedValue({ data: null, error: { message: "offline" } });
+      const mockEqFarm = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+      const mockEqId = vi.fn().mockReturnValue({ eq: mockEqFarm });
+      mockFrom.mockReturnValue({ select: vi.fn().mockReturnValue({ eq: mockEqId }) });
+
+      const now = "2026-04-02T10:00:00.000Z";
+      await db.sacrificios.put({
+        id: "sacrificio-001",
+        org_id: ORG_ID,
+        farm_id: "other-farm",
+        pool_id: POOL_ID,
+        lote_id: LOTE_ID,
+        event_date: "2026-04-02",
+        total_animals: 10,
+        total_sacrificed: 3,
+        total_rejected: 2,
+        total_faltantes: 5,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+        _sync_status: "synced",
+        _local_updated_at: now,
+      });
+
+      const result = await getSacrificioById("sacrificio-001", FARM_ID);
+      expect(result).toBeNull();
     });
   });
 
