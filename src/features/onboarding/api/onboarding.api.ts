@@ -191,6 +191,19 @@ export async function submitOnboarding(
     })),
   ]);
 
+  if (data.cleaningFrequencyDays !== null) {
+    const { error: freqError } = await untypedSupabase
+      .from("farms")
+      .update({ cleaning_frequency_days: data.cleaningFrequencyDays })
+      .eq("id", farmId);
+
+    if (freqError) {
+      console.error("[onboarding] cleaning frequency update failed:", freqError.message);
+    } else {
+      await db.farms.update(farmId, { cleaning_frequency_days: data.cleaningFrequencyDays });
+    }
+  }
+
   // 4. Insert invitations individually (best effort, no offline fallback)
   await Promise.all(
     data.inviteEmails.map(async (email) => {
