@@ -1,5 +1,6 @@
 // src/app/layouts/FarmLayout.tsx
 import {
+  ArrowLeftRightIcon,
   ClipboardListIcon,
   LayoutDashboardIcon,
   LogOutIcon,
@@ -92,6 +93,10 @@ export function FarmLayout() {
             <NavLink to={ROUTES.CLASIFICACION.replace(":farmId", farmId)} className={navLinkClass}>
               <ScissorsIcon className="size-4" />
               Clasificación
+            </NavLink>
+            <NavLink to={ROUTES.TRASLADOS.replace(":farmId", farmId)} className={navLinkClass}>
+              <ArrowLeftRightIcon className="size-4" />
+              Traslados
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
             <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>

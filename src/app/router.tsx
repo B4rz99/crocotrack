@@ -15,6 +15,8 @@ import { FarmsPage } from "@/features/farms/pages/FarmsPage";
 import { CreateMortalidadPage } from "@/features/mortalidad/pages/CreateMortalidadPage";
 import { MortalidadListPage } from "@/features/mortalidad/pages/MortalidadListPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
+import { CreateTrasladoPage } from "@/features/traslados/pages/CreateTrasladoPage";
+import { TrasladoListPage } from "@/features/traslados/pages/TrasladoListPage";
 import { ROUTES } from "@/shared/constants/routes";
 import { RedirectToLastFarm } from "./components/RedirectToLastFarm";
 import { AuthLayout } from "./layouts/AuthLayout";
@@ -66,6 +68,8 @@ export const router = createBrowserRouter([
           { path: "alimentacion/stock/nueva", element: <CreateFoodPurchasePage /> },
           { path: "clasificacion", element: <ClasificacionListPage /> },
           { path: "clasificacion/nueva", element: <CreateClasificacionPage /> },
+          { path: "traslados", element: <TrasladoListPage /> },
+          { path: "traslados/nuevo", element: <CreateTrasladoPage /> },
         ],
       },
       // Settings routes
