@@ -163,11 +163,18 @@ BEGIN
     SELECT
         p_id,
         'sacrificado',
-        (item->>'size_inches')::SMALLINT,
-        (item->>'animal_count')::INTEGER,
+        sz,
+        cnt,
         NULL
-    FROM jsonb_array_elements(p_sacrificed) AS item
-    WHERE (item->>'animal_count')::INTEGER > 0;
+    FROM (
+        SELECT
+            (item->>'size_inches')::SMALLINT AS sz,
+            SUM((item->>'animal_count')::INTEGER) AS cnt
+        FROM jsonb_array_elements(p_sacrificed) AS item
+        WHERE (item->>'animal_count')::INTEGER > 0
+        GROUP BY (item->>'size_inches')::SMALLINT
+    ) AS sacrificado_agg
+    WHERE cnt > 0;
 
     INSERT INTO public.sacrificio_size_groups (
         sacrificio_id, group_type, size_inches, animal_count, destination_pool_id

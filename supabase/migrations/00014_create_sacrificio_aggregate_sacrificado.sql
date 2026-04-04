@@ -1,7 +1,8 @@
 -- ============================================
--- Migration 00013: sacrificio — tallas como medición
--- Elimina validación de stock por talla en create_sacrificio.
--- El límite sigue siendo: sacrificados + rechazados <= total del lote.
+-- Migration 00014: create_sacrificio — agrupar sacrificados por talla
+-- Corrige inserción duplicada frente a idx_sacrificio_size_groups_sacrificado_unique
+-- cuando p_sacrificed repite size_inches (p. ej. RPC directo). Idempotente para
+-- bases que ya aplicaron 00013; el cuerpo coincide con 00013 salvo este INSERT.
 -- ============================================
 
 CREATE OR REPLACE FUNCTION public.create_sacrificio(

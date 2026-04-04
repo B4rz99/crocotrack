@@ -307,18 +307,25 @@ BEGIN
         p_notes, auth.uid(), true
     );
 
-    -- 12. Insert sacrificio_size_groups — sacrificados
+    -- 12. Insert sacrificio_size_groups — sacrificados (agrupado por talla; índice único)
     INSERT INTO public.sacrificio_size_groups (
         sacrificio_id, group_type, size_inches, animal_count, destination_pool_id
     )
     SELECT
         p_id,
         'sacrificado',
-        (item->>'size_inches')::SMALLINT,
-        (item->>'animal_count')::INTEGER,
+        sz,
+        cnt,
         NULL
-    FROM jsonb_array_elements(p_sacrificed) AS item
-    WHERE (item->>'animal_count')::INTEGER > 0;
+    FROM (
+        SELECT
+            (item->>'size_inches')::SMALLINT AS sz,
+            SUM((item->>'animal_count')::INTEGER) AS cnt
+        FROM jsonb_array_elements(p_sacrificed) AS item
+        WHERE (item->>'animal_count')::INTEGER > 0
+        GROUP BY (item->>'size_inches')::SMALLINT
+    ) AS sacrificado_agg
+    WHERE cnt > 0;
 
     -- 13. Insert sacrificio_size_groups — rechazados (una fila por talla + destino)
     INSERT INTO public.sacrificio_size_groups (
