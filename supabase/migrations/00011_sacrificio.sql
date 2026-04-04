@@ -62,6 +62,10 @@ CREATE INDEX idx_sacrificio_size_groups_sacrificio_id
 CREATE INDEX idx_sacrificio_size_groups_destination_pool_id
     ON public.sacrificio_size_groups(destination_pool_id);
 
+CREATE UNIQUE INDEX idx_sacrificio_size_groups_sacrificado_unique
+    ON public.sacrificio_size_groups(sacrificio_id, size_inches)
+    WHERE group_type = 'sacrificado';
+
 CREATE TRIGGER sacrificio_size_groups_updated_at
     BEFORE UPDATE ON public.sacrificio_size_groups
     FOR EACH ROW EXECUTE FUNCTION moddatetime(updated_at);
@@ -355,6 +359,10 @@ BEGIN
         SELECT id INTO v_dest_lote_id
         FROM public.lotes
         WHERE pool_id = v_dest_pool_id AND status = 'activo';
+
+        IF v_dest_lote_id IS NULL THEN
+            RAISE EXCEPTION 'La pileta de destino % no tiene un lote activo', v_dest_pool_id;
+        END IF;
 
         INSERT INTO public.lote_size_compositions (lote_id, size_inches, animal_count)
         VALUES (v_dest_lote_id, v_size, v_count)
