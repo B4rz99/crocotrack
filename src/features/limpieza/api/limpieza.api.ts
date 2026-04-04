@@ -26,6 +26,12 @@ export interface LimpiezaWithDetails {
   readonly pools: { readonly name: string } | null;
 }
 
+type LocalProductDetail = {
+  readonly cleaning_product_type_id: string;
+  readonly quantity: number;
+  readonly cleaning_product_types: null;
+};
+
 export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDetails[]> {
   const { data, error } = (await untypedSupabase
     .from("limpiezas")
@@ -51,11 +57,35 @@ export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDe
       .filter((l) => l.is_active)
       .reverse()
       .sortBy("event_date");
+
+    const localProducts = await db.limpieza_products
+      .where("limpieza_id")
+      .anyOf(local.map((l) => l.id))
+      .toArray();
+
+    const productsByLimpieza = localProducts.reduce<Record<string, LocalProductDetail[]>>(
+      (acc, p) => {
+        const list = acc[p.limpieza_id] ?? [];
+        return {
+          ...acc,
+          [p.limpieza_id]: [
+            ...list,
+            {
+              cleaning_product_type_id: p.cleaning_product_type_id,
+              quantity: p.quantity,
+              cleaning_product_types: null,
+            },
+          ],
+        };
+      },
+      {}
+    );
+
     return local.map((l) => ({
       ...l,
       notes: l.notes ?? null,
       created_by: l.created_by ?? null,
-      limpieza_products: [],
+      limpieza_products: productsByLimpieza[l.id] ?? [],
       profiles: null,
       pools: null,
     }));
@@ -95,6 +125,7 @@ export async function createLimpieza(
 
   const { error } = await untypedSupabase.rpc("create_limpieza", rpcPayload);
 
+  const syncStatus = error ? ("pending" as const) : ("synced" as const);
   const localLimpieza = {
     id,
     org_id: orgId,
@@ -105,11 +136,24 @@ export async function createLimpieza(
     notes: input.notes,
     created_at: now,
     updated_at: now,
-    _sync_status: error ? ("pending" as const) : ("synced" as const),
+    _sync_status: syncStatus,
     _local_updated_at: now,
   };
 
   await db.limpiezas.put(localLimpieza);
+
+  await db.limpieza_products.bulkPut(
+    input.products.map((p) => ({
+      id: generateId(),
+      limpieza_id: id,
+      cleaning_product_type_id: p.cleaning_product_type_id,
+      quantity: p.quantity,
+      created_at: now,
+      updated_at: now,
+      _sync_status: syncStatus,
+      _local_updated_at: now,
+    }))
+  );
 
   if (error) {
     await addToOutbox("create_limpieza", id, "RPC", {

@@ -26,11 +26,14 @@ export function LimpiezaListPage() {
   const stockPath = ROUTES.LIMPIEZA_STOCK.replace(":farmId", farmId);
 
   const currentFarm = farms?.find((f) => f.id === farmId);
-  const cleaningFrequencyDays = (currentFarm as Record<string, unknown> | undefined)
-    ?.cleaning_frequency_days as number | null | undefined;
+  // cleaning_frequency_days is not yet in generated Supabase types; cast until types are regenerated
+  const cleaningFrequencyDays =
+    (currentFarm as { cleaning_frequency_days?: number } | undefined)?.cleaning_frequency_days ??
+    null;
 
   const allPools = pools?.map((p) => ({ id: p.id, name: p.name })) ?? [];
-  const limpiezaInfos = limpiezas?.map((l) => ({ pool_id: l.pool_id, event_date: l.event_date })) ?? [];
+  const limpiezaInfos =
+    limpiezas?.map((l) => ({ pool_id: l.pool_id, event_date: l.event_date })) ?? [];
   const statuses = getPoolCleaningStatuses(allPools, limpiezaInfos, cleaningFrequencyDays ?? null);
   const overdueCount = countOverduePools(statuses);
 

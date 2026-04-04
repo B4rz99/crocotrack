@@ -23,9 +23,7 @@ export async function getCleaningProductTypes(): Promise<CleaningProductType[]> 
   };
 
   if (error || !data) {
-    const local = await db.cleaning_product_types
-      .filter((t) => t.is_active)
-      .sortBy("name");
+    const local = await db.cleaning_product_types.filter((t) => t.is_active).sortBy("name");
     return local;
   }
 

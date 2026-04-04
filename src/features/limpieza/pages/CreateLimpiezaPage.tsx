@@ -42,9 +42,7 @@ export function CreateLimpiezaPage() {
               navigate(listPath);
             },
             onError: (err) => {
-              toast.error(
-                err instanceof Error ? err.message : "Error al registrar la limpieza"
-              );
+              toast.error(err instanceof Error ? err.message : "Error al registrar la limpieza");
             },
           });
         }}

@@ -99,9 +99,7 @@ export function CleaningProductSelector({
                 onValueChange={(val) => handleProductChange(row.key, val)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {() => selectedProduct?.name ?? "Seleccionar producto"}
-                  </SelectValue>
+                  <SelectValue>{() => selectedProduct?.name ?? "Seleccionar producto"}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {availableProducts.map((pt) => (

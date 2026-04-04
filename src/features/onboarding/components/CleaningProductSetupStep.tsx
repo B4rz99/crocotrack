@@ -34,10 +34,7 @@ export function CleaningProductSetupStep({ onNext, onBack }: CleaningProductSetu
     if (!newName.trim()) return;
 
     keyCounter.current += 1;
-    setProducts((prev) => [
-      ...prev,
-      { key: keyCounter.current, data: { name: newName.trim() } },
-    ]);
+    setProducts((prev) => [...prev, { key: keyCounter.current, data: { name: newName.trim() } }]);
     setNewName("");
   }
 
