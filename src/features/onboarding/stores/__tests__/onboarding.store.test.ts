@@ -31,6 +31,14 @@ describe("onboarding store", () => {
       expect(useOnboardingStore.getState().foodTypesData).toEqual([]);
     });
 
+    it("has cleaningProductsData as empty array", () => {
+      expect(useOnboardingStore.getState().cleaningProductsData).toEqual([]);
+    });
+
+    it("has cleaningFrequencyDays as null", () => {
+      expect(useOnboardingStore.getState().cleaningFrequencyDays).toBeNull();
+    });
+
     it("has inviteEmails as empty array", () => {
       expect(useOnboardingStore.getState().inviteEmails).toEqual([]);
     });
@@ -151,11 +159,11 @@ describe("onboarding store", () => {
       expect(useOnboardingStore.getState().currentStep).toBe(1);
     });
 
-    it("does not exceed max step (5)", () => {
-      for (let i = 0; i < 10; i++) {
+    it("does not exceed max step (7)", () => {
+      for (let i = 0; i < 20; i++) {
         useOnboardingStore.getState().nextStep();
       }
-      expect(useOnboardingStore.getState().currentStep).toBe(5);
+      expect(useOnboardingStore.getState().currentStep).toBe(7);
     });
 
     it("decrements currentStep", () => {
@@ -190,6 +198,8 @@ describe("onboarding store", () => {
       expect(state.poolsData).toEqual([]);
       expect(state.incubatorsData).toEqual([]);
       expect(state.foodTypesData).toEqual([]);
+      expect(state.cleaningProductsData).toEqual([]);
+      expect(state.cleaningFrequencyDays).toBeNull();
       expect(state.inviteEmails).toEqual([]);
     });
   });

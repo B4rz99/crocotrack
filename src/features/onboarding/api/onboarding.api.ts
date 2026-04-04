@@ -2,6 +2,7 @@ import { db } from "@/shared/lib/db";
 import { untypedSupabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
 import { generateId, nowISO } from "@/shared/lib/utils";
+import type { CreateCleaningProductTypeInput } from "@/shared/schemas/cleaning-product-type.schema";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
 import type { CreateOrgInput } from "@/shared/schemas/org.schema";
@@ -11,6 +12,8 @@ interface OnboardingData {
   readonly orgData: CreateOrgInput;
   readonly farmData: { readonly name: string; readonly location?: string };
   readonly foodTypesData: readonly CreateFoodTypeInput[];
+  readonly cleaningProductsData: readonly CreateCleaningProductTypeInput[];
+  readonly cleaningFrequencyDays: number | null;
   readonly poolsData: readonly CreatePoolInput[];
   readonly incubatorsData: readonly CreateIncubatorInput[];
   readonly inviteEmails: readonly string[];
@@ -138,6 +141,16 @@ export async function submitOnboarding(
     updated_at: now,
   }));
 
+  const cleaningProductEntries = data.cleaningProductsData.map((p) => ({
+    id: generateId(),
+    org_id: orgId,
+    name: p.name,
+    is_default: false,
+    is_active: true,
+    created_at: now,
+    updated_at: now,
+  }));
+
   const poolEntries = data.poolsData.map((pool) => ({
     id: generateId(),
     org_id: orgId,
@@ -164,6 +177,7 @@ export async function submitOnboarding(
 
   await Promise.all([
     batchInsertWithSync("food_types", foodTypeEntries, now),
+    batchInsertWithSync("cleaning_product_types", cleaningProductEntries, now),
     batchInsertWithSync("pools", poolEntries, now, (entry) => ({
       ...entry,
       code: (entry.code as string | null) ?? undefined,
@@ -174,6 +188,19 @@ export async function submitOnboarding(
       capacity: (entry.capacity as number | null) ?? undefined,
     })),
   ]);
+
+  if (data.cleaningFrequencyDays !== null) {
+    const { error: freqError } = await untypedSupabase
+      .from("farms")
+      .update({ cleaning_frequency_days: data.cleaningFrequencyDays })
+      .eq("id", farmId);
+
+    if (freqError) {
+      console.error("[onboarding] cleaning frequency update failed:", freqError.message);
+    } else {
+      await db.farms.update(farmId, { cleaning_frequency_days: data.cleaningFrequencyDays });
+    }
+  }
 
   // 4. Insert invitations individually (best effort, no offline fallback)
   await Promise.all(

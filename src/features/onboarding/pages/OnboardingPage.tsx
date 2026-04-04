@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card";
 import { Progress } from "@/shared/components/ui/progress";
+import { CleaningFrequencyStep } from "../components/CleaningFrequencyStep";
+import { CleaningProductSetupStep } from "../components/CleaningProductSetupStep";
 import { FarmSetupStep } from "../components/FarmSetupStep";
 import { FoodTypeSetupStep } from "../components/FoodTypeSetupStep";
 import { IncubatorSetupStep } from "../components/IncubatorSetupStep";
@@ -12,6 +14,8 @@ const STEP_LABELS = [
   "Organización",
   "Granja",
   "Tipos de Alimento",
+  "Productos de Limpieza",
+  "Frecuencia de Limpieza",
   "Piletas",
   "Incubadoras",
   "Invitar Equipo",
@@ -27,6 +31,8 @@ export function OnboardingPage() {
     handleOrgNext,
     handleFarmNext,
     handleFoodTypesNext,
+    handleCleaningProductsNext,
+    handleCleaningFrequencyNext,
     handlePoolsNext,
     handleIncubatorsNext,
     handleComplete,
@@ -74,11 +80,17 @@ export function OnboardingPage() {
           {currentStep === 2 && (
             <FoodTypeSetupStep onNext={handleFoodTypesNext} onBack={prevStep} />
           )}
-          {currentStep === 3 && <PoolSetupStep onNext={handlePoolsNext} onBack={prevStep} />}
+          {currentStep === 3 && (
+            <CleaningProductSetupStep onNext={handleCleaningProductsNext} onBack={prevStep} />
+          )}
           {currentStep === 4 && (
+            <CleaningFrequencyStep onNext={handleCleaningFrequencyNext} onBack={prevStep} />
+          )}
+          {currentStep === 5 && <PoolSetupStep onNext={handlePoolsNext} onBack={prevStep} />}
+          {currentStep === 6 && (
             <IncubatorSetupStep onNext={handleIncubatorsNext} onBack={prevStep} />
           )}
-          {currentStep === 5 && <InviteWorkerStep onComplete={handleComplete} onBack={prevStep} />}
+          {currentStep === 7 && <InviteWorkerStep onComplete={handleComplete} onBack={prevStep} />}
           {isSubmitting && (
             <div className="mt-4 text-center text-sm text-muted-foreground">
               Tu criadero está listo para ser gestionado

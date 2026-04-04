@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { ROUTES } from "@/shared/constants/routes";
+import type { CreateCleaningProductTypeInput } from "@/shared/schemas/cleaning-product-type.schema";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
 import type { CreateOrgInput } from "@/shared/schemas/org.schema";
@@ -26,6 +27,8 @@ export function useOnboardingWizard() {
     setFarmData,
     setPoolsData,
     setFoodTypesData,
+    setCleaningProductsData,
+    setCleaningFrequencyDays,
     setIncubatorsData,
     addInviteEmail,
     nextStep,
@@ -55,6 +58,22 @@ export function useOnboardingWizard() {
       nextStep();
     },
     [setFoodTypesData, nextStep]
+  );
+
+  const handleCleaningProductsNext = useCallback(
+    (data: readonly CreateCleaningProductTypeInput[]) => {
+      setCleaningProductsData(data);
+      nextStep();
+    },
+    [setCleaningProductsData, nextStep]
+  );
+
+  const handleCleaningFrequencyNext = useCallback(
+    (days: number | null) => {
+      setCleaningFrequencyDays(days);
+      nextStep();
+    },
+    [setCleaningFrequencyDays, nextStep]
   );
 
   const handlePoolsNext = useCallback(
@@ -92,6 +111,8 @@ export function useOnboardingWizard() {
             orgData: state.orgData,
             farmData: state.farmData,
             foodTypesData: state.foodTypesData,
+            cleaningProductsData: state.cleaningProductsData,
+            cleaningFrequencyDays: state.cleaningFrequencyDays,
             poolsData: state.poolsData,
             incubatorsData: state.incubatorsData,
             inviteEmails: emails,
@@ -120,6 +141,8 @@ export function useOnboardingWizard() {
     handleOrgNext,
     handleFarmNext,
     handleFoodTypesNext,
+    handleCleaningProductsNext,
+    handleCleaningFrequencyNext,
     handlePoolsNext,
     handleIncubatorsNext,
     handleComplete,
