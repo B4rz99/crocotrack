@@ -141,6 +141,11 @@ export async function createSacrificio(
 
   const { error } = await untypedSupabase.rpc("create_sacrificio", rpcPayload);
 
+  const isOnline = typeof navigator === "undefined" ? true : navigator.onLine;
+  if (error && isOnline) {
+    throw new Error(error.message);
+  }
+
   const localSacrificio = {
     id,
     org_id: orgId,

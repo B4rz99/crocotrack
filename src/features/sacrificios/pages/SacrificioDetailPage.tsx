@@ -27,7 +27,7 @@ export function SacrificioDetailPage() {
     );
   }
 
-  if (isError || !sacrificio) {
+  if (isError || !sacrificio || sacrificio.farm_id !== farmId) {
     return (
       <div className="flex items-center justify-center py-12">
         <p className="text-sm text-destructive">No se encontró el sacrificio.</p>

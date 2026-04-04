@@ -179,6 +179,7 @@ DECLARE
     v_dest_lote_id      UUID;
     v_size              SMALLINT;
     v_count             INTEGER;
+    v_available         INTEGER;
     v_new_lote_id       UUID;
 BEGIN
     -- 1. Resolve caller org (do NOT trust p_org_id)
@@ -276,6 +277,32 @@ BEGIN
     SELECT COALESCE(SUM(animal_count), 0) INTO v_lote_total
     FROM public.lote_size_compositions
     WHERE lote_id = v_origin_lote_id;
+
+    -- 8b. Validate sufficient stock per size (sacrificados + rechazados)
+    FOR v_size, v_count IN
+        SELECT sz, SUM(c)::INTEGER
+        FROM (
+            SELECT (item->>'size_inches')::SMALLINT AS sz,
+                   (item->>'animal_count')::INTEGER AS c
+            FROM jsonb_array_elements(p_sacrificed) AS item
+            WHERE (item->>'animal_count')::INTEGER > 0
+            UNION ALL
+            SELECT (item->>'size_inches')::SMALLINT,
+                   (item->>'animal_count')::INTEGER
+            FROM jsonb_array_elements(p_rejected) AS item
+            WHERE (item->>'animal_count')::INTEGER > 0
+        ) AS per_row
+        GROUP BY sz
+    LOOP
+        SELECT COALESCE(SUM(animal_count), 0) INTO v_available
+        FROM public.lote_size_compositions
+        WHERE lote_id = v_origin_lote_id AND size_inches = v_size;
+
+        IF v_available < v_count THEN
+            RAISE EXCEPTION 'Stock insuficiente para talla % pulgadas: disponible %, solicitado %',
+                v_size, v_available, v_count;
+        END IF;
+    END LOOP;
 
     -- 9. Validate: processed <= lote total
     IF v_total_sacrificed + v_total_rejected > v_lote_total THEN
