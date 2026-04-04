@@ -28,6 +28,7 @@ export interface LocalFarm extends SyncMeta {
   readonly is_active: boolean;
   readonly created_at: string;
   readonly updated_at: string;
+  readonly cleaning_frequency_days?: number;
 }
 
 export interface LocalPool extends SyncMeta {
@@ -274,6 +275,64 @@ export interface LocalSacrificioSizeGroup extends SyncMeta {
   readonly updated_at: string;
 }
 
+export interface LocalCleaningProductType extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly name: string;
+  readonly is_default: boolean;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalCleaningProductStock extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly cleaning_product_type_id: string;
+  readonly current_quantity: number;
+  readonly low_stock_threshold?: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalCleaningProductPurchase extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly cleaning_product_type_id: string;
+  readonly purchase_date: string;
+  readonly quantity: number;
+  readonly supplier?: string;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalLimpieza extends SyncMeta {
+  readonly id: string;
+  readonly org_id: string;
+  readonly farm_id: string;
+  readonly pool_id: string;
+  readonly event_date: string;
+  readonly notes?: string;
+  readonly created_by?: string;
+  readonly is_active: boolean;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
+export interface LocalLimpiezaProduct extends SyncMeta {
+  readonly id: string;
+  readonly limpieza_id: string;
+  readonly cleaning_product_type_id: string;
+  readonly quantity: number;
+  readonly created_at: string;
+  readonly updated_at: string;
+}
+
 export interface SyncOutboxEntry {
   readonly id?: number;
   readonly table_name: string;
@@ -305,6 +364,11 @@ class CrocoTrackDb extends Dexie {
   traslado_size_groups!: Table<LocalTrasladoSizeGroup>;
   sacrificios!: Table<LocalSacrificio>;
   sacrificio_size_groups!: Table<LocalSacrificioSizeGroup>;
+  cleaning_product_types!: Table<LocalCleaningProductType>;
+  cleaning_product_stock!: Table<LocalCleaningProductStock>;
+  cleaning_product_purchases!: Table<LocalCleaningProductPurchase>;
+  limpiezas!: Table<LocalLimpieza>;
+  limpieza_products!: Table<LocalLimpiezaProduct>;
   sync_outbox!: Table<SyncOutboxEntry>;
 
   constructor() {
@@ -347,6 +411,15 @@ class CrocoTrackDb extends Dexie {
     this.version(8).stores({
       sacrificios: "id, org_id, farm_id, pool_id, lote_id, event_date, _sync_status",
       sacrificio_size_groups: "id, sacrificio_id, _sync_status",
+    });
+    this.version(9).stores({
+      cleaning_product_types: "id, org_id, _sync_status",
+      cleaning_product_stock:
+        "id, org_id, farm_id, cleaning_product_type_id, [farm_id+cleaning_product_type_id], _sync_status",
+      cleaning_product_purchases:
+        "id, org_id, farm_id, cleaning_product_type_id, purchase_date, _sync_status",
+      limpiezas: "id, org_id, farm_id, pool_id, event_date, _sync_status",
+      limpieza_products: "id, limpieza_id, _sync_status",
     });
   }
 }
