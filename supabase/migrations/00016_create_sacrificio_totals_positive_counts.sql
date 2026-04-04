@@ -1,8 +1,8 @@
 -- ============================================
--- Migration 00015: create_sacrificio — bucle rechazados sin destino NULL
--- Omite filas con destination_pool_id ausente al repartir a lote_size_compositions;
--- evita WHERE pool_id = NULL (sin coincidencias) y el error engañoso de lote activo.
--- Idempotente para bases que ya aplicaron 00014 antes de este filtro.
+-- Migration 00016: create_sacrificio — totales solo con animal_count > 0
+-- Alinea SUM de sacrificados/rechazados con filas en sacrificio_size_groups
+-- (evita inconsistencia si el JSON trae conteos negativos o cero).
+-- Idempotente para bases que ya aplicaron 00015 antes de este cambio.
 -- ============================================
 
 CREATE OR REPLACE FUNCTION public.create_sacrificio(

@@ -55,11 +55,13 @@ BEGIN
 
     SELECT COALESCE(SUM((item->>'animal_count')::INTEGER), 0)
     INTO v_total_sacrificed
-    FROM jsonb_array_elements(p_sacrificed) AS item;
+    FROM jsonb_array_elements(p_sacrificed) AS item
+    WHERE (item->>'animal_count')::INTEGER > 0;
 
     SELECT COALESCE(SUM((item->>'animal_count')::INTEGER), 0)
     INTO v_total_rejected
-    FROM jsonb_array_elements(p_rejected) AS item;
+    FROM jsonb_array_elements(p_rejected) AS item
+    WHERE (item->>'animal_count')::INTEGER > 0;
 
     IF v_total_sacrificed + v_total_rejected <= 0 THEN
         RAISE EXCEPTION 'Debe registrar al menos un animal sacrificado o rechazado';

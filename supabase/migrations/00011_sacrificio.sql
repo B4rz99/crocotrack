@@ -212,14 +212,16 @@ BEGIN
         RAISE EXCEPTION 'La finca indicada no corresponde a la pileta de origen';
     END IF;
 
-    -- 3. Calculate totals
+    -- 3. Calculate totals (mismo criterio > 0 que sacrificio_size_groups)
     SELECT COALESCE(SUM((item->>'animal_count')::INTEGER), 0)
     INTO v_total_sacrificed
-    FROM jsonb_array_elements(p_sacrificed) AS item;
+    FROM jsonb_array_elements(p_sacrificed) AS item
+    WHERE (item->>'animal_count')::INTEGER > 0;
 
     SELECT COALESCE(SUM((item->>'animal_count')::INTEGER), 0)
     INTO v_total_rejected
-    FROM jsonb_array_elements(p_rejected) AS item;
+    FROM jsonb_array_elements(p_rejected) AS item
+    WHERE (item->>'animal_count')::INTEGER > 0;
 
     IF v_total_sacrificed + v_total_rejected <= 0 THEN
         RAISE EXCEPTION 'Debe registrar al menos un animal sacrificado o rechazado';
