@@ -147,8 +147,12 @@ export function SacrificioGroupEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="space-y-1">
         <Label>Grupos de talla medidos</Label>
+        <p className="text-xs text-muted-foreground">
+          La talla es la medición en el momento del proceso; puede ser distinta a las tallas
+          registradas antes en el inventario del lote.
+        </p>
       </div>
 
       {drafts.map((draft, index) => {
