@@ -15,6 +15,9 @@ import { FarmsPage } from "@/features/farms/pages/FarmsPage";
 import { CreateMortalidadPage } from "@/features/mortalidad/pages/CreateMortalidadPage";
 import { MortalidadListPage } from "@/features/mortalidad/pages/MortalidadListPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
+import { CreateSacrificioPage } from "@/features/sacrificios/pages/CreateSacrificioPage";
+import { SacrificioDetailPage } from "@/features/sacrificios/pages/SacrificioDetailPage";
+import { SacrificioListPage } from "@/features/sacrificios/pages/SacrificioListPage";
 import { CreateTrasladoPage } from "@/features/traslados/pages/CreateTrasladoPage";
 import { TrasladoListPage } from "@/features/traslados/pages/TrasladoListPage";
 import { ROUTES } from "@/shared/constants/routes";
@@ -70,6 +73,9 @@ export const router = createBrowserRouter([
           { path: "clasificacion/nueva", element: <CreateClasificacionPage /> },
           { path: "traslados", element: <TrasladoListPage /> },
           { path: "traslados/nuevo", element: <CreateTrasladoPage /> },
+          { path: "sacrificios", element: <SacrificioListPage /> },
+          { path: "sacrificios/nuevo", element: <CreateSacrificioPage /> },
+          { path: "sacrificios/:sacrificioId", element: <SacrificioDetailPage /> },
         ],
       },
       // Settings routes

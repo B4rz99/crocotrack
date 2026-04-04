@@ -20,4 +20,7 @@ export const ROUTES = {
   CLASIFICACION_CREATE: "/farms/:farmId/clasificacion/nueva",
   TRASLADOS: "/farms/:farmId/traslados",
   TRASLADO_CREATE: "/farms/:farmId/traslados/nuevo",
+  SACRIFICIOS: "/farms/:farmId/sacrificios",
+  SACRIFICIO_CREATE: "/farms/:farmId/sacrificios/nuevo",
+  SACRIFICIO_DETAIL: "/farms/:farmId/sacrificios/:sacrificioId",
 } as const;
