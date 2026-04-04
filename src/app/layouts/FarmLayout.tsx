@@ -7,6 +7,7 @@ import {
   ScissorsIcon,
   SettingsIcon,
   SkullIcon,
+  SprayCanIcon,
   SyringeIcon,
   UtensilsIcon,
 } from "lucide-react";
@@ -102,6 +103,10 @@ export function FarmLayout() {
             <NavLink to={ROUTES.SACRIFICIOS.replace(":farmId", farmId)} className={navLinkClass}>
               <SyringeIcon className="size-4" />
               Sacrificios
+            </NavLink>
+            <NavLink to={ROUTES.LIMPIEZA.replace(":farmId", farmId)} className={navLinkClass}>
+              <SprayCanIcon className="size-4" />
+              Limpieza
             </NavLink>
             <div className="my-2 border-t border-sidebar-border" />
             <NavLink to={ROUTES.SETTINGS} className={navLinkClass}>
