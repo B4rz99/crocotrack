@@ -212,6 +212,23 @@ CREATE TRIGGER limpiezas_updated_at
 ALTER TABLE public.limpiezas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.limpiezas FORCE ROW LEVEL SECURITY;
 
+-- Helper to check pool-to-farm ownership without subquery column-name ambiguity.
+-- In a correlated EXISTS subquery, an unqualified `farm_id` resolves to the nearest
+-- FROM-clause table first (pools also has farm_id), making the check vacuous.
+-- Passing as explicit function parameters avoids that scoping issue.
+CREATE OR REPLACE FUNCTION public.pool_in_farm(p_pool_id UUID, p_farm_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY INVOKER
+SET search_path = public
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM public.pools
+        WHERE id = p_pool_id AND farm_id = p_farm_id
+    );
+$$;
+
 CREATE POLICY "limpiezas_select" ON public.limpiezas FOR SELECT
     TO authenticated
     USING (org_id = (SELECT public.get_user_org_id()));
@@ -221,12 +238,7 @@ CREATE POLICY "limpiezas_insert" ON public.limpiezas FOR INSERT
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
-        AND EXISTS (
-            SELECT 1 FROM public.pools p
-            WHERE p.id = pool_id
-              AND p.farm_id = farm_id
-              AND p.org_id = (SELECT public.get_user_org_id())
-        )
+        AND (SELECT public.pool_in_farm(pool_id, farm_id))
     );
 
 CREATE POLICY "limpiezas_update" ON public.limpiezas FOR UPDATE
@@ -238,12 +250,7 @@ CREATE POLICY "limpiezas_update" ON public.limpiezas FOR UPDATE
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
-        AND EXISTS (
-            SELECT 1 FROM public.pools p
-            WHERE p.id = pool_id
-              AND p.farm_id = farm_id
-              AND p.org_id = (SELECT public.get_user_org_id())
-        )
+        AND (SELECT public.pool_in_farm(pool_id, farm_id))
     );
 
 CREATE POLICY "limpiezas_delete" ON public.limpiezas FOR DELETE

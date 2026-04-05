@@ -10,6 +10,16 @@ export function isoDateUtcNotAfterToday(val: string): boolean {
   const d = Number(match[3]);
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return false;
   const inputMs = Date.UTC(y, m - 1, d);
+  // Date.UTC auto-normalises out-of-range values (e.g. Feb 31 → Mar 2).
+  // Reject the input when the reconstructed date doesn't match the parsed digits.
+  const reconstructed = new Date(inputMs);
+  if (
+    reconstructed.getUTCFullYear() !== y ||
+    reconstructed.getUTCMonth() + 1 !== m ||
+    reconstructed.getUTCDate() !== d
+  ) {
+    return false;
+  }
   const now = new Date();
   const todayMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   return inputMs <= todayMs;

@@ -104,21 +104,16 @@ export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDe
   }
 
   const now = nowISO();
-  await db.limpiezas.bulkPut(
-    data.map(({ limpieza_products: _lp, profiles: _p, pools: _pools, ...limpieza }) => ({
+  const limpiezaIds = data.map((l) => l.id);
+  const limpiezaRows = data.map(
+    ({ limpieza_products: _lp, profiles: _p, pools: _pools, ...limpieza }) => ({
       ...limpieza,
       notes: limpieza.notes ?? undefined,
       created_by: limpieza.created_by ?? undefined,
       _sync_status: "synced" as const,
       _local_updated_at: now,
-    }))
+    })
   );
-
-  const limpiezaIds = data.map((l) => l.id);
-  if (limpiezaIds.length > 0) {
-    await db.limpieza_products.where("limpieza_id").anyOf(limpiezaIds).delete();
-  }
-
   const productRows = data.flatMap((lim) =>
     (lim.limpieza_products ?? []).flatMap((lp) => {
       if (lp.id === undefined || lp.created_at === undefined || lp.updated_at === undefined) {
@@ -139,9 +134,15 @@ export async function getLimpiezasByFarm(farmId: string): Promise<LimpiezaWithDe
     })
   );
 
-  if (productRows.length > 0) {
-    await db.limpieza_products.bulkPut(productRows);
-  }
+  await db.transaction("rw", [db.limpiezas, db.limpieza_products], async () => {
+    await db.limpiezas.bulkPut(limpiezaRows);
+    if (limpiezaIds.length > 0) {
+      await db.limpieza_products.where("limpieza_id").anyOf(limpiezaIds).delete();
+    }
+    if (productRows.length > 0) {
+      await db.limpieza_products.bulkPut(productRows);
+    }
+  });
 
   return data;
 }
