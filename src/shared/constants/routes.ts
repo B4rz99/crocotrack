@@ -23,4 +23,8 @@ export const ROUTES = {
   SACRIFICIOS: "/farms/:farmId/sacrificios",
   SACRIFICIO_CREATE: "/farms/:farmId/sacrificios/nuevo",
   SACRIFICIO_DETAIL: "/farms/:farmId/sacrificios/:sacrificioId",
+  LIMPIEZA: "/farms/:farmId/limpieza",
+  LIMPIEZA_CREATE: "/farms/:farmId/limpieza/nueva",
+  LIMPIEZA_STOCK: "/farms/:farmId/limpieza/stock",
+  LIMPIEZA_STOCK_CREATE: "/farms/:farmId/limpieza/stock/nueva",
 } as const;

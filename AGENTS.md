@@ -1,4 +1,6 @@
-# CrocoTrack
+# Agent instructions — CrocoTrack
+
+This file is the **agent-facing** copy of project rules (Cursor, Codex, etc.). Humans maintain the same substance in `CLAUDE.md`; update both when changing stack or workflow notes.
 
 Crocodile farm management platform with offline-first architecture, multi-tenant RLS, and onboarding wizard.
 
@@ -71,14 +73,14 @@ supabase/
 
 - **Biome, not ESLint:** This project uses Biome 2.4.x for linting and formatting. Do NOT install or configure ESLint. Run `bun run lint` (not `eslint`). Biome config is in `biome.json`.
 - **shadcn base-nova style:** shadcn was initialized with the `base-nova` style which uses `@base-ui/react` primitives instead of Radix. Component APIs may differ from shadcn docs/examples online. Always read the actual component files in `src/shared/components/ui/` before using them.
-- **`form` and `steps` components unavailable:** These shadcn components don't exist in the base-nova registry. Forms use manual state management with Zod validation.
+- `form` **and** `steps` **components unavailable:** These shadcn components don't exist in the base-nova registry. Forms use manual state management with Zod validation.
 - **Zod v4:** This project uses Zod v4 (`^4.3.6`), not v3. API is mostly compatible but some methods differ (e.g., `z.email()` instead of `z.string().email()`).
 - **Tailwind CSS v4:** Uses `@theme inline` blocks in CSS, not `tailwind.config.js`. The `@tailwindcss/vite` plugin is used instead of PostCSS.
 - **No pg_uuidv7 on Supabase hosted:** The `pg_uuidv7` extension is not available. All UUIDs use `gen_random_uuid()` instead.
 - **IPv6 connectivity:** `supabase db push` fails due to IPv6 routing issues. Run migrations via the Supabase SQL Editor in the dashboard instead.
 - **Supabase project ref:** `pfvpvbagrarwmioepupz`
-- **`next-themes` dependency:** Required by the sonner/Toaster component. `Providers` wraps the app in `ThemeProvider` to prevent runtime errors.
-- **`"use client"` directives:** Some shadcn components have `"use client"` directives — these are harmless in a Vite SPA (no RSC) but are dead code.
+- `next-themes` **dependency:** Required by the sonner/Toaster component. `Providers` wraps the app in `ThemeProvider` to prevent runtime errors.
+- `"use client"` **directives:** Some shadcn components have `"use client"` directives — these are harmless in a Vite SPA (no RSC) but are dead code.
 - **Path alias:** `@/*` maps to `./src/*` (configured in both `tsconfig.json` and `vite.config.ts`).
 - **All UI strings are hardcoded in Spanish** (Colombia-only MVP). No i18n library is used.
 - **`SelectValue` (Base UI):** Pass a **function child** `(value) => ReactNode` so the trigger shows the right label (e.g. resolve name from `value`). A zero-arg `() => label` also works but prefer `(value) =>` when the label must track the selected id. Otherwise the trigger may show the raw value.

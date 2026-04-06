@@ -12,6 +12,10 @@ import { CreateEntradaPage } from "@/features/entradas/pages/CreateEntradaPage";
 import { EntradasListPage } from "@/features/entradas/pages/EntradasListPage";
 import { FarmDashboardPage } from "@/features/farms/pages/FarmDashboardPage";
 import { FarmsPage } from "@/features/farms/pages/FarmsPage";
+import { CleaningStockPage } from "@/features/limpieza/pages/CleaningStockPage";
+import { CreateCleaningPurchasePage } from "@/features/limpieza/pages/CreateCleaningPurchasePage";
+import { CreateLimpiezaPage } from "@/features/limpieza/pages/CreateLimpiezaPage";
+import { LimpiezaListPage } from "@/features/limpieza/pages/LimpiezaListPage";
 import { CreateMortalidadPage } from "@/features/mortalidad/pages/CreateMortalidadPage";
 import { MortalidadListPage } from "@/features/mortalidad/pages/MortalidadListPage";
 import { OnboardingPage } from "@/features/onboarding/pages/OnboardingPage";
@@ -76,6 +80,10 @@ export const router = createBrowserRouter([
           { path: "sacrificios", element: <SacrificioListPage /> },
           { path: "sacrificios/nuevo", element: <CreateSacrificioPage /> },
           { path: "sacrificios/:sacrificioId", element: <SacrificioDetailPage /> },
+          { path: "limpieza", element: <LimpiezaListPage /> },
+          { path: "limpieza/nueva", element: <CreateLimpiezaPage /> },
+          { path: "limpieza/stock", element: <CleaningStockPage /> },
+          { path: "limpieza/stock/nueva", element: <CreateCleaningPurchasePage /> },
         ],
       },
       // Settings routes

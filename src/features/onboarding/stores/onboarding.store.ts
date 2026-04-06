@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { CreateCleaningProductTypeInput } from "@/shared/schemas/cleaning-product-type.schema";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
 import type { CreateOrgInput } from "@/shared/schemas/org.schema";
@@ -9,7 +10,7 @@ interface FarmData {
   readonly location?: string;
 }
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 const MAX_STEP = TOTAL_STEPS - 1;
 
 interface OnboardingState {
@@ -19,6 +20,8 @@ interface OnboardingState {
   readonly poolsData: readonly CreatePoolInput[];
   readonly incubatorsData: readonly CreateIncubatorInput[];
   readonly foodTypesData: readonly CreateFoodTypeInput[];
+  readonly cleaningProductsData: readonly CreateCleaningProductTypeInput[];
+  readonly cleaningFrequencyDays: number | null;
   readonly inviteEmails: readonly string[];
   readonly setOrgData: (data: CreateOrgInput) => void;
   readonly setFarmData: (data: FarmData) => void;
@@ -28,6 +31,8 @@ interface OnboardingState {
   readonly setFoodTypesData: (foodTypes: readonly CreateFoodTypeInput[]) => void;
   readonly addFoodType: (foodType: CreateFoodTypeInput) => void;
   readonly removeFoodType: (index: number) => void;
+  readonly setCleaningProductsData: (products: readonly CreateCleaningProductTypeInput[]) => void;
+  readonly setCleaningFrequencyDays: (days: number | null) => void;
   readonly setIncubatorsData: (data: readonly CreateIncubatorInput[]) => void;
   readonly addInviteEmail: (email: string) => void;
   readonly removeInviteEmail: (index: number) => void;
@@ -43,6 +48,8 @@ const initialState = {
   poolsData: [] as readonly CreatePoolInput[],
   incubatorsData: [] as readonly CreateIncubatorInput[],
   foodTypesData: [] as readonly CreateFoodTypeInput[],
+  cleaningProductsData: [] as readonly CreateCleaningProductTypeInput[],
+  cleaningFrequencyDays: null as number | null,
   inviteEmails: [] as readonly string[],
 } as const;
 
@@ -71,6 +78,10 @@ export const useOnboardingStore = create<OnboardingState>((set) => ({
     set((state) => ({
       foodTypesData: state.foodTypesData.filter((_, i) => i !== index),
     })),
+
+  setCleaningProductsData: (products) => set({ cleaningProductsData: products }),
+
+  setCleaningFrequencyDays: (days) => set({ cleaningFrequencyDays: days }),
 
   setIncubatorsData: (data) => set({ incubatorsData: data }),
 

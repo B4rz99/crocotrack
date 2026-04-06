@@ -27,6 +27,11 @@ const SYNCABLE_TABLES = [
   "traslado_size_groups",
   "sacrificios",
   "sacrificio_size_groups",
+  "cleaning_product_types",
+  "cleaning_product_stock",
+  "cleaning_product_purchases",
+  "limpiezas",
+  "limpieza_products",
 ] as const;
 type SyncableTable = (typeof SYNCABLE_TABLES)[number];
 

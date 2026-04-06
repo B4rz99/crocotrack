@@ -2,6 +2,7 @@ import { db } from "@/shared/lib/db";
 import { untypedSupabase } from "@/shared/lib/supabase";
 import { addToOutbox } from "@/shared/lib/sync";
 import { generateId, nowISO } from "@/shared/lib/utils";
+import type { CreateCleaningProductTypeInput } from "@/shared/schemas/cleaning-product-type.schema";
 import type { CreateFoodTypeInput } from "@/shared/schemas/food-type.schema";
 import type { CreateIncubatorInput } from "@/shared/schemas/incubator.schema";
 import type { CreateOrgInput } from "@/shared/schemas/org.schema";
@@ -11,6 +12,8 @@ interface OnboardingData {
   readonly orgData: CreateOrgInput;
   readonly farmData: { readonly name: string; readonly location?: string };
   readonly foodTypesData: readonly CreateFoodTypeInput[];
+  readonly cleaningProductsData: readonly CreateCleaningProductTypeInput[];
+  readonly cleaningFrequencyDays: number | null;
   readonly poolsData: readonly CreatePoolInput[];
   readonly incubatorsData: readonly CreateIncubatorInput[];
   readonly inviteEmails: readonly string[];
@@ -104,6 +107,7 @@ export async function submitOnboarding(
     org_id: orgId,
     name: data.farmData.name,
     location: data.farmData.location ?? null,
+    cleaning_frequency_days: data.cleaningFrequencyDays ?? null,
     is_active: true,
     created_at: now,
     updated_at: now,
@@ -118,6 +122,7 @@ export async function submitOnboarding(
   await db.farms.put({
     ...farmPayload,
     location: farmPayload.location ?? undefined,
+    cleaning_frequency_days: farmPayload.cleaning_frequency_days ?? undefined,
     _sync_status: farmError ? "pending" : "synced",
     _local_updated_at: now,
   });
@@ -132,6 +137,16 @@ export async function submitOnboarding(
     org_id: orgId,
     name: ft.name,
     unit: ft.unit ?? "kg",
+    is_default: false,
+    is_active: true,
+    created_at: now,
+    updated_at: now,
+  }));
+
+  const cleaningProductEntries = data.cleaningProductsData.map((p) => ({
+    id: generateId(),
+    org_id: orgId,
+    name: p.name,
     is_default: false,
     is_active: true,
     created_at: now,
@@ -164,6 +179,7 @@ export async function submitOnboarding(
 
   await Promise.all([
     batchInsertWithSync("food_types", foodTypeEntries, now),
+    batchInsertWithSync("cleaning_product_types", cleaningProductEntries, now),
     batchInsertWithSync("pools", poolEntries, now, (entry) => ({
       ...entry,
       code: (entry.code as string | null) ?? undefined,
