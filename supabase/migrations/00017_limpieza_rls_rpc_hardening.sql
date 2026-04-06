@@ -1,11 +1,14 @@
 -- Harden limpieza RLS and create_limpieza duplicate detection.
 -- Safe if 00011_limpieza.sql was already applied with older policies / RPC body.
 
--- Helper to check pool-to-farm ownership without subquery column-name ambiguity.
+-- Helper to check pool belongs to farm and org without subquery column-name ambiguity.
 -- In a correlated EXISTS subquery, an unqualified `farm_id` resolves to the nearest
 -- FROM-clause table first (pools also has farm_id), making the check vacuous.
 -- Passing as explicit function parameters avoids that scoping issue.
-CREATE OR REPLACE FUNCTION public.pool_in_farm(p_pool_id UUID, p_farm_id UUID)
+-- Also enforces pools.org_id = p_org_id (defense in depth: pools and farms are not
+-- constrained to share org_id at the FK level, so pool_in_farm(pool, farm) alone
+-- would not guarantee tenant isolation).
+CREATE OR REPLACE FUNCTION public.pool_in_farm(p_pool_id UUID, p_farm_id UUID, p_org_id UUID)
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
@@ -14,7 +17,9 @@ SET search_path = public
 AS $$
     SELECT EXISTS (
         SELECT 1 FROM public.pools
-        WHERE id = p_pool_id AND farm_id = p_farm_id
+        WHERE id = p_pool_id
+          AND farm_id = p_farm_id
+          AND org_id = p_org_id
     );
 $$;
 
@@ -84,7 +89,7 @@ CREATE POLICY "limpiezas_insert" ON public.limpiezas FOR INSERT
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
-        AND (SELECT public.pool_in_farm(pool_id, farm_id))
+        AND (SELECT public.pool_in_farm(pool_id, farm_id, org_id))
     );
 
 DROP POLICY IF EXISTS "limpiezas_update" ON public.limpiezas;
@@ -97,7 +102,7 @@ CREATE POLICY "limpiezas_update" ON public.limpiezas FOR UPDATE
     WITH CHECK (
         org_id = (SELECT public.get_user_org_id())
         AND (SELECT public.user_has_farm_access(farm_id))
-        AND (SELECT public.pool_in_farm(pool_id, farm_id))
+        AND (SELECT public.pool_in_farm(pool_id, farm_id, org_id))
     );
 
 CREATE OR REPLACE FUNCTION public.create_limpieza(
