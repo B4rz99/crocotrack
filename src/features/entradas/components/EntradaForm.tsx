@@ -1,16 +1,10 @@
 import { type FormEvent, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { EntradaOriginType } from "@/shared/schemas/entrada.schema";
@@ -81,6 +75,12 @@ export function EntradaForm({ farmId, pools, isLoading = false, onSubmit }: Entr
   }
 
   function handleOriginPoolChange(pId: string, comps: SizeCompositionItem[]) {
+    if (pId === "") {
+      setOriginPoolId(undefined);
+      setMaxForSize({});
+      setCompositions([{ size_inches: 0, animal_count: 0 }]);
+      return;
+    }
     setOriginPoolId(pId);
     const newMax = Object.fromEntries(comps.map((c) => [c.size_inches, c.animal_count])) as Record<
       number,
@@ -169,25 +169,17 @@ export function EntradaForm({ farmId, pools, isLoading = false, onSubmit }: Entr
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pool-select">Pileta destino</Label>
-        <Select
+        <Label htmlFor="pool-destino-combobox">Pileta destino</Label>
+        <PoolCombobox
+          id="pool-destino-combobox"
+          pools={pools}
           value={poolId}
-          onValueChange={(v) => {
-            if (v) setPoolId(v);
+          onChange={(id) => {
+            setPoolId(id);
+            if (id) setErrors((prev) => ({ ...prev, pool_id: "" }));
           }}
-          items={pools.map((p) => ({ value: p.id, label: p.name }))}
-        >
-          <SelectTrigger id="pool-select" className="w-full">
-            <SelectValue placeholder="Seleccionar pileta" />
-          </SelectTrigger>
-          <SelectContent>
-            {pools.map((pool) => (
-              <SelectItem key={pool.id} value={pool.id}>
-                {pool.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          error={errors.pool_id}
+        />
         <FieldError message={errors.pool_id} />
       </div>
 

@@ -1,17 +1,11 @@
 import { ChevronDownIcon, ChevronRightIcon, PlusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import type { SacrificioGroupInput } from "@/shared/schemas/sacrificio.schema";
 
 interface SacrificioGroupEditorProps {
@@ -269,30 +263,16 @@ export function SacrificioGroupEditor({
                       {rejIndex === 0 && (
                         <span className="text-xs text-muted-foreground">Pileta destino</span>
                       )}
-                      <Select
+                      <PoolCombobox
+                        id={`rej-dest-${index}-${rejIndex}`}
+                        pools={destinationPools}
                         value={rej.destination_pool_id}
-                        onValueChange={(val) => {
-                          if (val) updateRejected(index, rejIndex, { destination_pool_id: val });
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {() => {
-                              const pool = destinationPools.find(
-                                (p) => p.id === rej.destination_pool_id
-                              );
-                              return pool ? poolLabel(pool) : "Seleccionar pileta";
-                            }}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {destinationPools.map((pool) => (
-                            <SelectItem key={pool.id} value={pool.id}>
-                              {poolLabel(pool)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onChange={(id) =>
+                          updateRejected(index, rejIndex, { destination_pool_id: id })
+                        }
+                        getOptionLabel={poolLabel}
+                        showCodeHint={false}
+                      />
                     </div>
                     <Button
                       type="button"

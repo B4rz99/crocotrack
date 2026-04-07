@@ -1,21 +1,23 @@
 import { type FormEvent, useMemo, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { LoteSizeSelector } from "@/shared/components/LoteSizeSelector";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateTrasladoInput } from "@/shared/schemas/traslado.schema";
 import { createTrasladoSchema } from "@/shared/schemas/traslado.schema";
+
+function trasladoDestinationOptionLabel(pool: PoolWithLotes): string {
+  const count =
+    pool.lotes[0]?.lote_size_compositions.reduce((sum, c) => sum + c.animal_count, 0) ?? 0;
+  return pool.capacity != null
+    ? `${pool.name} (${count}/${pool.capacity})`
+    : `${pool.name} (${count})`;
+}
 
 interface TrasladoFormProps {
   readonly pools: readonly PoolWithLotes[];
@@ -38,7 +40,7 @@ export function TrasladoForm({ pools, isLoading = false, onSubmit }: TrasladoFor
   const destinationPools = crianzaPools.filter((p) => p.id !== poolId);
 
   const selectedOrigin = originPools.find((p) => p.id === poolId);
-  const selectedDestination = destinationPools.find((p) => p.id === destinationPoolId);
+  const selectedDestination = crianzaPools.find((p) => p.id === destinationPoolId);
   const activeLoteCompositions = selectedOrigin?.lotes[0]?.lote_size_compositions ?? [];
   const activeLoteId = selectedOrigin?.lotes[0]?.id ?? "";
 
@@ -58,17 +60,15 @@ export function TrasladoForm({ pools, isLoading = false, onSubmit }: TrasladoFor
     return null;
   }, [selectedDestination, transferTotal]);
 
-  function handleOriginChange(value: string | null) {
-    if (!value) return;
-    setPoolId(value);
+  function handleOriginChange(originId: string) {
+    setPoolId(originId);
     setDestinationPoolId("");
     setCompositions([]);
-    setErrors({});
+    if (originId) setErrors({});
   }
 
-  function handleDestinationChange(value: string | null) {
-    if (!value) return;
-    setDestinationPoolId(value);
+  function handleDestinationChange(destId: string) {
+    setDestinationPoolId(destId);
     setErrors((prev) => {
       const { destination_pool_id: _, ...rest } = prev;
       return rest;
@@ -123,25 +123,20 @@ export function TrasladoForm({ pools, isLoading = false, onSubmit }: TrasladoFor
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="origin-pool-select">Pileta de origen</Label>
-        <Select value={poolId} onValueChange={handleOriginChange}>
-          <SelectTrigger id="origin-pool-select" className="w-full" aria-invalid={!!errors.pool_id}>
-            <SelectValue>
-              {() => selectedOrigin?.name ?? "Seleccionar pileta de origen"}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {originPools.map((pool) => (
-              <SelectItem key={pool.id} value={pool.id}>
-                {pool.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {originPools.length === 0 && (
+        <Label htmlFor="origin-pool-combobox">Pileta de origen</Label>
+        {originPools.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No hay piletas de crianza con lote activo.
           </p>
+        ) : (
+          <PoolCombobox
+            id="origin-pool-combobox"
+            pools={originPools}
+            value={poolId}
+            onChange={handleOriginChange}
+            placeholder="Buscar pileta de origen…"
+            error={errors.pool_id}
+          />
         )}
         <FieldError message={errors.pool_id} />
       </div>
@@ -158,36 +153,17 @@ export function TrasladoForm({ pools, isLoading = false, onSubmit }: TrasladoFor
 
       {poolId && (
         <div className="space-y-2">
-          <Label htmlFor="destination-pool-select">Pileta de destino</Label>
-          <Select value={destinationPoolId} onValueChange={handleDestinationChange}>
-            <SelectTrigger
-              id="destination-pool-select"
-              className="w-full"
-              aria-invalid={!!errors.destination_pool_id}
-            >
-              <SelectValue>
-                {() => selectedDestination?.name ?? "Seleccionar pileta de destino"}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {destinationPools.map((pool) => {
-                const count =
-                  pool.lotes[0]?.lote_size_compositions.reduce(
-                    (sum, c) => sum + c.animal_count,
-                    0
-                  ) ?? 0;
-                const capacityLabel = pool.capacity
-                  ? ` (${count}/${pool.capacity})`
-                  : ` (${count})`;
-                return (
-                  <SelectItem key={pool.id} value={pool.id}>
-                    {pool.name}
-                    {capacityLabel}
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="destination-pool-combobox">Pileta de destino</Label>
+          <PoolCombobox
+            id="destination-pool-combobox"
+            pools={destinationPools}
+            value={destinationPoolId}
+            onChange={handleDestinationChange}
+            getOptionLabel={trasladoDestinationOptionLabel}
+            showCodeHint={false}
+            placeholder="Buscar pileta de destino…"
+            error={errors.destination_pool_id}
+          />
           {capacityWarning && <p className="text-sm text-amber-600">{capacityWarning}</p>}
           <FieldError message={errors.destination_pool_id} />
         </div>

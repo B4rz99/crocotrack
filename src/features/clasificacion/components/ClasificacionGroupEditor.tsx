@@ -1,17 +1,11 @@
 import { PlusIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import type { ClasificacionGroupInput } from "@/shared/schemas/clasificacion.schema";
 
 interface ClasificacionGroupEditorProps {
@@ -148,32 +142,15 @@ export function ClasificacionGroupEditor({
                   Pileta destino
                 </Label>
               )}
-              <Select
+              <PoolCombobox
+                id={`dest-${index}`}
+                pools={destinationPools}
                 value={draft.destination_pool_id}
-                onValueChange={(val) => {
-                  if (val) updateDraft(index, { destination_pool_id: val });
-                }}
-              >
-                <SelectTrigger
-                  id={`dest-${index}`}
-                  className="w-full"
-                  aria-invalid={!!rowErrors.destination_pool_id}
-                >
-                  <SelectValue>
-                    {() => {
-                      const pool = destinationPools.find((p) => p.id === draft.destination_pool_id);
-                      return pool ? poolLabel(pool) : "Seleccionar pileta";
-                    }}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {destinationPools.map((pool) => (
-                    <SelectItem key={pool.id} value={pool.id}>
-                      {poolLabel(pool)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(id) => updateDraft(index, { destination_pool_id: id })}
+                getOptionLabel={poolLabel}
+                showCodeHint={false}
+                error={rowErrors.destination_pool_id}
+              />
               <FieldError message={rowErrors.destination_pool_id} />
             </div>
 
