@@ -53,16 +53,34 @@ export function PoolCombobox({
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const listRef = useRef<HTMLDivElement>(null);
+  const queryRef = useRef(query);
+  const valueRef = useRef(value);
+  const prevValueRef = useRef(value);
+  queryRef.current = query;
+  valueRef.current = value;
   const uid = useId();
   const listId = `${uid}-list`;
 
   useEffect(() => {
-    if (!value) {
-      setQuery("");
+    const prev = prevValueRef.current;
+    prevValueRef.current = value;
+
+    if (value) {
+      const p = pools.find((x) => x.id === value);
+      setQuery(p != null ? labelFnRef.current(p) : "");
       return;
     }
-    const p = pools.find((x) => x.id === value);
-    setQuery(p != null ? labelFnRef.current(p) : "");
+
+    // External clear (parent set value to "") while the input still shows the old label:
+    // reset the field. If the user had already edited away from that label (divergence),
+    // keep their text so they can finish searching.
+    if (prev !== "") {
+      const prevPool = pools.find((x) => x.id === prev);
+      const prevLabel = prevPool != null ? labelFnRef.current(prevPool).trim() : "";
+      if (prevLabel !== "" && queryRef.current.trim() === prevLabel) {
+        setQuery("");
+      }
+    }
   }, [value, pools]);
 
   const matchingPools = pools.filter((p) => matchesQuery(p, query, labelFn));
@@ -80,12 +98,23 @@ export function PoolCombobox({
     setQuery(val);
     setOpen(true);
     setHighlightedIndex(-1);
-    if (val === "") onChange("");
+    if (val.trim() === "") {
+      onChange("");
+      setQuery("");
+      return;
+    }
+    if (value !== "") {
+      const sel = pools.find((p) => p.id === value);
+      if (sel != null && val.trim() !== labelFn(sel).trim()) {
+        onChange("");
+      }
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open) {
       if (e.key === "ArrowDown" || e.key === "Enter") {
+        e.preventDefault();
         setOpen(true);
         const m = pools.filter((p) => matchesQuery(p, query, labelFn));
         setHighlightedIndex(m.length > 0 ? 0 : -1);
@@ -128,7 +157,18 @@ export function PoolCombobox({
         value={query}
         onChange={handleInputChange}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={() =>
+          setTimeout(() => {
+            setOpen(false);
+            const v = valueRef.current;
+            const q = queryRef.current;
+            if (v === "") return;
+            const sel = pools.find((p) => p.id === v);
+            if (sel != null && q.trim() !== labelFnRef.current(sel).trim()) {
+              onChange("");
+            }
+          }, 150)
+        }
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         autoComplete="off"
