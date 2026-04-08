@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
@@ -44,7 +45,6 @@ export function AlimentacionForm({
   const [notes, setNotes] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const selectedPool = pools.find((p) => p.id === poolId);
   const selectedFoodType = foodTypes.find((ft) => ft.id === foodTypeId);
   const stockForType = foodStock.find((s) => s.food_type_id === foodTypeId);
   const currentStock = stockForType?.current_quantity ?? 0;
@@ -88,19 +88,17 @@ export function AlimentacionForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pool-select">Pileta</Label>
-        <Select value={poolId} onValueChange={(v) => v && setPoolId(v)}>
-          <SelectTrigger id="pool-select" className="w-full" aria-invalid={!!errors.pool_id}>
-            <SelectValue>{() => selectedPool?.name ?? "Seleccionar pileta"}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {pools.map((pool) => (
-              <SelectItem key={pool.id} value={pool.id}>
-                {pool.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <Label htmlFor="pool-combobox">Pileta</Label>
+        <PoolCombobox
+          id="pool-combobox"
+          pools={pools}
+          value={poolId}
+          onChange={(id) => {
+            setPoolId(id);
+            if (id) setErrors((prev) => ({ ...prev, pool_id: "" }));
+          }}
+          error={errors.pool_id}
+        />
         <FieldError message={errors.pool_id} />
       </div>
 

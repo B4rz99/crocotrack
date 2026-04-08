@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { useFarms } from "@/features/farms/hooks/useFarms";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Label } from "@/shared/components/ui/label";
@@ -59,8 +60,11 @@ export function FincaPropiaFields({
     onOriginFarmChange(farmId);
   }
 
-  function handlePoolChange(poolId: string | null) {
-    if (!poolId) return;
+  function handlePoolChange(poolId: string) {
+    if (poolId === "") {
+      onOriginPoolChange("", []);
+      return;
+    }
     const pool = originPools?.find((p) => p.id === poolId);
     onOriginPoolChange(poolId, toLoteCompositions(pool?.lotes[0]));
   }
@@ -90,25 +94,23 @@ export function FincaPropiaFields({
 
       {originFarmId && (
         <div className="space-y-2">
-          <Label htmlFor="origin-pool">Pileta de origen</Label>
-          <Select
-            value={originPoolId ?? ""}
-            onValueChange={handlePoolChange}
-            items={(originPools ?? []).map((p) => ({ value: p.id, label: p.name }))}
-          >
-            <SelectTrigger id="origin-pool" className="w-full">
-              <SelectValue
-                placeholder={poolsLoading ? "Cargando..." : "Seleccionar pileta con lote activo"}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {(originPools ?? []).map((pool) => (
-                <SelectItem key={pool.id} value={pool.id}>
-                  {pool.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="origin-pool-combobox">Pileta de origen</Label>
+          {poolsLoading ? (
+            <p className="text-sm text-muted-foreground">Cargando piletas…</p>
+          ) : (originPools ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No hay piletas con lote activo en esta granja.
+            </p>
+          ) : (
+            <PoolCombobox
+              id="origin-pool-combobox"
+              pools={originPools ?? []}
+              value={originPoolId ?? ""}
+              onChange={handlePoolChange}
+              placeholder="Buscar pileta con lote activo…"
+              error={errors?.origin_pool_id}
+            />
+          )}
           <FieldError message={errors?.origin_pool_id} />
         </div>
       )}

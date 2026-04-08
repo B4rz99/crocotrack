@@ -1,16 +1,10 @@
 import { type FormEvent, useMemo, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { zodArrayFieldErrors, zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type {
@@ -64,9 +58,8 @@ export function SacrificioForm({ pools, isLoading = false, onSubmit }: Sacrifici
     [groups, loteTotal]
   );
 
-  function handlePoolChange(value: string | null) {
-    if (!value) return;
-    setPoolId(value);
+  function handlePoolChange(nextId: string) {
+    setPoolId(nextId);
     setGroups([]);
     setErrors({});
     setGroupErrors({});
@@ -128,28 +121,21 @@ export function SacrificioForm({ pools, isLoading = false, onSubmit }: Sacrifici
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pool-select">Pileta de origen</Label>
-        <Select value={poolId} onValueChange={handlePoolChange}>
-          <SelectTrigger id="pool-select" className="w-full" aria-invalid={!!errors.pool_id}>
-            <SelectValue>
-              {() => {
-                const pool = crianzaPools.find((p) => p.id === poolId);
-                return pool ? poolOriginLabel(pool) : "Seleccionar pileta";
-              }}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {crianzaPools.map((pool) => (
-              <SelectItem key={pool.id} value={pool.id}>
-                {poolOriginLabel(pool)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {crianzaPools.length === 0 && (
+        <Label htmlFor="pool-origen-combobox">Pileta de origen</Label>
+        {crianzaPools.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No hay piletas de crianza con lote activo.
           </p>
+        ) : (
+          <PoolCombobox
+            id="pool-origen-combobox"
+            pools={crianzaPools}
+            value={poolId}
+            onChange={handlePoolChange}
+            getOptionLabel={poolOriginLabel}
+            showCodeHint={false}
+            error={errors.pool_id}
+          />
         )}
         <FieldError message={errors.pool_id} />
       </div>

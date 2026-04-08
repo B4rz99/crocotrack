@@ -83,4 +83,3 @@ supabase/
 - **All UI strings are hardcoded in Spanish** (Colombia-only MVP). No i18n library is used.
 - **`SelectValue` (Base UI):** Pass a **function child** `(value) => ReactNode` so the trigger shows the right label (e.g. resolve name from `value`). A zero-arg `() => label` also works but prefer `(value) =>` when the label must track the selected id. Otherwise the trigger may show the raw value.
 - **Farm routing:** `/farms/:farmId/*` — `FarmLayout`/`SettingsLayout` wrap `AppShell`. `navLinkClass` exported from `AppShell`. Use `useFarmStore.getState()` in async callbacks (avoid stale closure on `lastFarmId`).
-

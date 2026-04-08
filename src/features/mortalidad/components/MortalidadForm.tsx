@@ -1,17 +1,11 @@
 import { type FormEvent, useState } from "react";
 import type { PoolWithLotes } from "@/features/farms/api/pools.api";
+import { PoolCombobox } from "@/features/farms/components/PoolCombobox";
 import { LoteSizeSelector } from "@/shared/components/LoteSizeSelector";
 import { Button } from "@/shared/components/ui/button";
 import { FieldError } from "@/shared/components/ui/field-error";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select";
 import { zodFieldErrors } from "@/shared/lib/form-utils";
 import { todayIsoDate } from "@/shared/lib/utils";
 import type { CreateMortalidadInput } from "@/shared/schemas/mortalidad.schema";
@@ -39,11 +33,10 @@ export function MortalidadForm({ pools, isLoading = false, onSubmit }: Mortalida
   const activeLoteCompositions = selectedPool?.lotes[0]?.lote_size_compositions ?? [];
   const activeLoteId = selectedPool?.lotes[0]?.id ?? "";
 
-  function handlePoolChange(value: string | null) {
-    if (!value) return;
-    setPoolId(value);
+  function handlePoolChange(nextId: string) {
+    setPoolId(nextId);
     setCompositions([]);
-    setErrors({});
+    if (nextId) setErrors({});
   }
 
   function handleSubmit(e: FormEvent) {
@@ -94,23 +87,19 @@ export function MortalidadForm({ pools, isLoading = false, onSubmit }: Mortalida
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="pool-select">Pileta</Label>
-        <Select value={poolId} onValueChange={handlePoolChange}>
-          <SelectTrigger id="pool-select" className="w-full" aria-invalid={!!errors.pool_id}>
-            <SelectValue>{() => selectedPool?.name ?? "Seleccionar pileta"}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {crianzaPools.map((pool) => (
-              <SelectItem key={pool.id} value={pool.id}>
-                {pool.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {crianzaPools.length === 0 && (
+        <Label htmlFor="pool-combobox">Pileta</Label>
+        {crianzaPools.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No hay piletas de crianza con lote activo.
           </p>
+        ) : (
+          <PoolCombobox
+            id="pool-combobox"
+            pools={crianzaPools}
+            value={poolId}
+            onChange={handlePoolChange}
+            error={errors.pool_id}
+          />
         )}
         <FieldError message={errors.pool_id} />
       </div>
