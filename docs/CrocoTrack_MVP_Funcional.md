@@ -1,6 +1,5 @@
 # CROCOTRACK — Especificación Funcional del MVP
 
-**Plataforma de Gestión para Criaderos de Cocodrilos**
 Versión 1.1 | 2025
 
 ---
